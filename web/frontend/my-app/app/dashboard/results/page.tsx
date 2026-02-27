@@ -7,6 +7,13 @@ import { useProfileData } from "@/lib/profile-hook";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { BottomNav } from "@/components/navigation/bottom-nav";
 import { motion, AnimatePresence } from "framer-motion";
+<<<<<<< HEAD
+import { AlertTriangle, Brain, Loader2, RefreshCw } from "lucide-react";
+import { RiskCard } from "@/components/predict/risk-card";
+import { ProbabilityBars } from "@/components/predict/probability-bars";
+import { FeatureCards } from "@/components/predict/feature-cards";
+import { type PredictionResult, profileToModelInput } from "@/components/predict/types";
+=======
 import {
   ShieldCheck,
   AlertTriangle,
@@ -152,6 +159,7 @@ function getRiskMessage(riskClass: string) {
   if (lower === "high") return "Elevated risk detected. Please consult your doctor for further evaluation.";
   return "Your risk is within normal range. Maintain healthy habits for continued wellness.";
 }
+>>>>>>> e72f236a8a5c1d47d074d8e4a0765020129a3ded
 
 export default function ResultsPage() {
   const { user } = useAuth();
