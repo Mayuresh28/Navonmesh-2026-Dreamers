@@ -6,11 +6,8 @@ import { useAuth } from "@/lib/auth-context";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { useProfileData, type UserProfile } from "@/lib/profile-hook";
 import { motion } from "framer-motion";
-import { HeartPulse, ArrowRight, CheckCircle } from "lucide-react";
-import { PersonalInfo } from "@/components/profile-setup/personal-info";
-import { LifestyleForm } from "@/components/profile-setup/lifestyle-form";
-import { MedicalHistoryForm } from "@/components/profile-setup/medical-history-form";
-import { ComputedPreview } from "@/components/profile-setup/computed-preview";
+import { HeartPulse, ArrowRight, CheckCircle, Activity, ShieldCheck, Calculator } from "lucide-react";
+import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
 
 export default function ProfileSetupPage() {
   const router = useRouter();
@@ -75,9 +72,8 @@ export default function ProfileSetupPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen flex flex-col relative overflow-hidden bg-background">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent/30 rounded-full blur-3xl -z-10" />
-        <div className="absolute bottom-[-10%] right-[-15%] w-[40%] h-[50%] bg-status-low/20 rounded-full blur-3xl -z-10" />
+      <div className="min-h-screen flex flex-col relative overflow-hidden selection:bg-accent selection:text-primary bg-transparent">
+        <GlassmorphicBackground />
 
         <nav className="w-full px-6 py-6 md:px-12 z-10">
           <div className="flex items-center gap-3">
