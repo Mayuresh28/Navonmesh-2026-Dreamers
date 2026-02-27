@@ -78,9 +78,8 @@ export default function ProfilePage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-background">
         <Navbar activeTab="profile" onTabChange={(tab) => {
-          if (tab === "dashboard") {
-            router.push("/dashboard");
-          }
+          if (tab === "dashboard") router.push("/dashboard");
+          else if (tab === "results") router.push("/dashboard/results");
         }} />
 
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-160px)] relative overflow-hidden selection:bg-accent selection:text-primary p-6">

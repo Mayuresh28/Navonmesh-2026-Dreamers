@@ -11,14 +11,13 @@ import { Zap } from "lucide-react";
 export default function DashboardPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"dashboard" | "profile">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "profile" | "results">("dashboard");
 
-  const handleTabChange = (tab: "dashboard" | "profile") => {
+  const handleTabChange = (tab: "dashboard" | "profile" | "results") => {
     console.log("[Dashboard] Tab changed to:", tab);
     setActiveTab(tab);
-    if (tab === "profile") {
-      router.push("/dashboard/profile");
-    }
+    if (tab === "profile") router.push("/dashboard/profile");
+    else if (tab === "results") router.push("/dashboard/results");
   };
 
   return (

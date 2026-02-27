@@ -1,15 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { HeartPulse, BarChart3, User, LogOut } from "lucide-react";
+import { HeartPulse, BarChart3, User, LogOut, ShieldCheck } from "lucide-react";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { FC } from "react";
 
 interface NavbarProps {
-  activeTab: "dashboard" | "profile";
-  onTabChange: (tab: "dashboard" | "profile") => void;
+  activeTab: "dashboard" | "profile" | "results";
+  onTabChange: (tab: "dashboard" | "profile" | "results") => void;
 }
 
 export const Navbar: FC<NavbarProps> = ({ activeTab, onTabChange }) => {
@@ -43,10 +43,10 @@ export const Navbar: FC<NavbarProps> = ({ activeTab, onTabChange }) => {
         </motion.div>
 
         {/* Tabs */}
-        <div className="hidden md:flex items-center gap-2 bg-card/30 rounded-[16px] p-1 border border-border-soft">
+        <div className="hidden md:flex items-center gap-1 bg-card/30 rounded-[16px] p-1 border border-border-soft">
           <motion.button
             onClick={() => onTabChange("dashboard")}
-            className={`px-6 py-2 rounded-[12px] font-medium transition-all duration-200 flex items-center gap-2 ${
+            className={`px-5 py-2 rounded-[12px] font-medium transition-all duration-200 flex items-center gap-2 text-sm ${
               activeTab === "dashboard"
                 ? "bg-primary/20 text-primary"
                 : "text-text-secondary hover:text-text-primary"
@@ -58,8 +58,21 @@ export const Navbar: FC<NavbarProps> = ({ activeTab, onTabChange }) => {
             Dynamic Data
           </motion.button>
           <motion.button
+            onClick={() => onTabChange("results")}
+            className={`px-5 py-2 rounded-[12px] font-medium transition-all duration-200 flex items-center gap-2 text-sm ${
+              activeTab === "results"
+                ? "bg-primary/20 text-primary"
+                : "text-text-secondary hover:text-text-primary"
+            }`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <ShieldCheck className="w-4 h-4" />
+            Risk Results
+          </motion.button>
+          <motion.button
             onClick={() => onTabChange("profile")}
-            className={`px-6 py-2 rounded-[12px] font-medium transition-all duration-200 flex items-center gap-2 ${
+            className={`px-5 py-2 rounded-[12px] font-medium transition-all duration-200 flex items-center gap-2 text-sm ${
               activeTab === "profile"
                 ? "bg-primary/20 text-primary"
                 : "text-text-secondary hover:text-text-primary"
@@ -85,10 +98,10 @@ export const Navbar: FC<NavbarProps> = ({ activeTab, onTabChange }) => {
       </div>
 
       {/* Mobile Tab Selector */}
-      <div className="md:hidden border-t border-border-soft bg-card/30 px-6 py-3 flex items-center gap-2">
+      <div className="md:hidden border-t border-border-soft bg-card/30 px-4 py-3 flex items-center gap-1">
         <motion.button
           onClick={() => onTabChange("dashboard")}
-          className={`flex-1 px-4 py-2 rounded-[10px] font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
+          className={`flex-1 px-3 py-2 rounded-[10px] font-medium text-xs transition-all duration-200 flex items-center justify-center gap-1.5 ${
             activeTab === "dashboard"
               ? "bg-primary/20 text-primary"
               : "text-text-secondary"
@@ -96,12 +109,25 @@ export const Navbar: FC<NavbarProps> = ({ activeTab, onTabChange }) => {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          <BarChart3 className="w-4 h-4" />
+          <BarChart3 className="w-3.5 h-3.5" />
           Dynamic
         </motion.button>
         <motion.button
+          onClick={() => onTabChange("results")}
+          className={`flex-1 px-3 py-2 rounded-[10px] font-medium text-xs transition-all duration-200 flex items-center justify-center gap-1.5 ${
+            activeTab === "results"
+              ? "bg-primary/20 text-primary"
+              : "text-text-secondary"
+          }`}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <ShieldCheck className="w-3.5 h-3.5" />
+          Results
+        </motion.button>
+        <motion.button
           onClick={() => onTabChange("profile")}
-          className={`flex-1 px-4 py-2 rounded-[10px] font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
+          className={`flex-1 px-3 py-2 rounded-[10px] font-medium text-xs transition-all duration-200 flex items-center justify-center gap-1.5 ${
             activeTab === "profile"
               ? "bg-primary/20 text-primary"
               : "text-text-secondary"
@@ -109,7 +135,7 @@ export const Navbar: FC<NavbarProps> = ({ activeTab, onTabChange }) => {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          <User className="w-4 h-4" />
+          <User className="w-3.5 h-3.5" />
           Profile
         </motion.button>
       </div>
