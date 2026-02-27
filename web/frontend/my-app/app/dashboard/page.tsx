@@ -72,15 +72,16 @@ export default function DashboardPage() {
                   Real-time health monitoring and analytics dashboard with personalized insights
                 </motion.p>
 
-                <motion.div
+                <motion.button
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.5 }}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-[16px] bg-status-low/20 border border-status-low/40 text-status-low font-medium"
+                  onClick={() => router.push("/dynamic")}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-[16px] bg-accent/20 border border-accent/40 text-accent font-medium cursor-pointer hover:bg-accent/30 transition-colors"
                 >
-                  <div className="w-2 h-2 rounded-full bg-status-low animate-pulse" />
-                  Coming Soon
-                </motion.div>
+                  <Zap className="w-4 h-4" />
+                  Go to Dashboard
+                </motion.button>
               </motion.div>
             </div>
           </motion.main>

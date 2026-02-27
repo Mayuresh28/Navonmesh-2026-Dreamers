@@ -13,6 +13,9 @@ export interface UserProfile {
   smokingStatus: "never" | "former" | "current";
   alcoholUse: "never" | "occasional" | "moderate" | "heavy";
   existingConditions: string[];
+  bmi: number; // Weight / (Height_m)^2
+  geneticRiskScore: number; // 0 or 1 (binary) based on family history
+  ageRiskMultiplier: number; // 1 + Age/100
   createdAt: string;
   updatedAt: string;
 }
@@ -67,7 +70,7 @@ export function useProfileData(userId?: string) {
     fetchProfile();
   }, [userId]);
 
-  // Save profile to MongoDB
+  // Save profile to MongoDB (auto-detects create vs update)
   const saveProfile = async (profileData: UserProfile): Promise<boolean> => {
     console.log("[ProfileHook] saveProfile() called");
     console.log("[ProfileHook] userId:", userId);
@@ -82,11 +85,13 @@ export function useProfileData(userId?: string) {
     try {
       setLoading(true);
       const requestBody = { userId, ...profileData };
-      console.log("[ProfileHook] Sending POST request to /api/profile");
+      const isUpdate = profile !== null;
+      const method = isUpdate ? "PUT" : "POST";
+      console.log(`[ProfileHook] Sending ${method} request to /api/profile`);
       console.log("[ProfileHook] Request body:", requestBody);
 
       const response = await fetch("/api/profile", {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
       });

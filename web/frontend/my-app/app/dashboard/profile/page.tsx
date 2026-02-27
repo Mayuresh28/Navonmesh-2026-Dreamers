@@ -15,6 +15,9 @@ import {
   Wine,
   AlertCircle,
   Users,
+  Calculator,
+  Dna,
+  Clock,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -265,6 +268,110 @@ export default function ProfilePage() {
                         )}
                       </p>
                       <p className="text-xs text-text-secondary mt-2">kcal/day</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+
+              {/* Computed Health Parameters - 3 columns */}
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="grid grid-cols-3 gap-6"
+              >
+                {/* BMI Card */}
+                <motion.div variants={itemVariants} className="card group hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-4">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
+                      (profile.bmi ?? 0) < 18.5
+                        ? "bg-status-mod/20"
+                        : (profile.bmi ?? 0) < 25
+                        ? "bg-status-low/20"
+                        : (profile.bmi ?? 0) < 30
+                        ? "bg-status-mod/20"
+                        : "bg-status-high/20"
+                    }`}>
+                      <Calculator className={`w-7 h-7 ${
+                        (profile.bmi ?? 0) < 18.5
+                          ? "text-status-mod"
+                          : (profile.bmi ?? 0) < 25
+                          ? "text-status-low"
+                          : (profile.bmi ?? 0) < 30
+                          ? "text-status-mod"
+                          : "text-status-high"
+                      }`} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-text-secondary text-sm mb-1">BMI</p>
+                      <p className={`text-4xl font-bold ${
+                        (profile.bmi ?? 0) < 18.5
+                          ? "text-status-mod"
+                          : (profile.bmi ?? 0) < 25
+                          ? "text-status-low"
+                          : (profile.bmi ?? 0) < 30
+                          ? "text-status-mod"
+                          : "text-status-high"
+                      }`}>
+                        {profile.bmi
+                          ? profile.bmi
+                          : (profile.weight / ((profile.height / 100) * (profile.height / 100))).toFixed(1)}
+                      </p>
+                      <p className="text-xs text-text-secondary mt-2">
+                        {(() => {
+                          const bmi = profile.bmi ?? profile.weight / ((profile.height / 100) * (profile.height / 100));
+                          if (bmi < 18.5) return "Underweight";
+                          if (bmi < 25) return "Normal";
+                          if (bmi < 30) return "Overweight";
+                          return "Obese";
+                        })()}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Genetic Risk Score Card */}
+                <motion.div variants={itemVariants} className="card group hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-4">
+                    {(() => {
+                      const grs = profile.geneticRiskScore ?? 0;
+                      const color = grs >= 0.5 ? "status-high" : grs > 0 ? "status-mod" : "status-low";
+                      return (
+                        <>
+                          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center bg-${color}/20`}>
+                            <Dna className={`w-7 h-7 text-${color}`} />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-text-secondary text-sm mb-1">Genetic Risk</p>
+                            <p className={`text-4xl font-bold text-${color}`}>
+                              {grs}
+                            </p>
+                            <p className="text-xs text-text-secondary mt-2">
+                              {grs === 0 ? "Low risk" : grs < 0.5 ? "Moderate risk" : "High risk"}
+                            </p>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </motion.div>
+
+                {/* Age Risk Multiplier Card */}
+                <motion.div variants={itemVariants} className="card group hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-accent/30 flex items-center justify-center">
+                      <Clock className="text-primary w-7 h-7" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-text-secondary text-sm mb-1">Age Risk</p>
+                      <p className="text-4xl font-bold text-text-primary">
+                        {profile.ageRiskMultiplier
+                          ? profile.ageRiskMultiplier
+                          : (1 + profile.age / 100).toFixed(2)}
+                      </p>
+                      <p className="text-xs text-text-secondary mt-2">
+                        Age + lifestyle factor
+                      </p>
                     </div>
                   </div>
                 </motion.div>

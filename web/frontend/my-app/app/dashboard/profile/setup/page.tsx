@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { useProfileData, type UserProfile } from "@/lib/profile-hook";
 import { motion } from "framer-motion";
-import { HeartPulse, ArrowRight, CheckCircle, Activity, ShieldCheck } from "lucide-react";
+import { HeartPulse, ArrowRight, CheckCircle, Activity, ShieldCheck, Calculator } from "lucide-react";
 
 export default function ProfileSetupPage() {
   const router = useRouter();
@@ -103,15 +103,26 @@ export default function ProfileSetupPage() {
     console.log("[ProfileSetup] Form validation passed");
 
     try {
-      const profileData: Omit<UserProfile, "createdAt" | "updatedAt"> = {
-        age: parseInt(formData.age),
+      const age = parseInt(formData.age);
+      const heightCm = parseInt(formData.height);
+      const weight = parseInt(formData.weight);
+      const heightM = heightCm / 100;
+      const bmi = parseFloat((weight / (heightM * heightM)).toFixed(1));
+      const geneticRiskScore = formData.familyHistory.trim().length > 0 ? 1 : 0;
+      const ageRiskMultiplier = parseFloat((1 + age / 100).toFixed(2));
+
+      const profileData: Omit<UserProfile, "userId" | "_id" | "createdAt" | "updatedAt"> = {
+        age,
         gender: formData.gender,
-        height: parseInt(formData.height),
-        weight: parseInt(formData.weight),
+        height: heightCm,
+        weight,
         familyHistory: formData.familyHistory,
         smokingStatus: formData.smokingStatus,
         alcoholUse: formData.alcoholUse,
         existingConditions: formData.existingConditions,
+        bmi,
+        geneticRiskScore,
+        ageRiskMultiplier,
       };
 
       console.log("[ProfileSetup] Profile data constructed:", profileData);
@@ -432,6 +443,83 @@ export default function ProfileSetupPage() {
                       </motion.div>
                     </div>
                   </div>
+
+                  {/* Computed Health Parameters (live preview) */}
+                  {formData.age && formData.height && formData.weight ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.85 }}
+                      className="p-6 rounded-[20px] bg-gradient-to-br from-primary/10 to-transparent border border-primary/20"
+                    >
+                      <h2 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
+                        <Calculator className="w-5 h-5" />
+                        Computed Health Parameters
+                      </h2>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* BMI */}
+                        {(() => {
+                          const h = parseInt(formData.height) / 100;
+                          const bmi = parseFloat((parseInt(formData.weight) / (h * h)).toFixed(1));
+                          const bmiCategory =
+                            bmi < 18.5 ? "Underweight" : bmi < 25 ? "Normal" : bmi < 30 ? "Overweight" : "Obese";
+                          const bmiColor =
+                            bmi < 18.5
+                              ? "text-status-medium"
+                              : bmi < 25
+                              ? "text-status-low"
+                              : bmi < 30
+                              ? "text-status-medium"
+                              : "text-status-high";
+                          return (
+                            <div className="bg-card/60 rounded-2xl p-4 border border-border-soft text-center">
+                              <p className="text-xs text-text-secondary mb-1">BMI</p>
+                              <p className={`text-2xl font-bold ${bmiColor}`}>{isFinite(bmi) ? bmi : "—"}</p>
+                              <p className={`text-xs font-medium mt-1 ${bmiColor}`}>{isFinite(bmi) ? bmiCategory : ""}</p>
+                            </div>
+                          );
+                        })()}
+
+                        {/* Genetic Risk Score (weighted) */}
+                        {(() => {
+                          let grs = 0;
+                          if (formData.familyHistory.trim().length > 0) grs += 0.4;
+                          if (formData.smokingStatus === "current") grs += 0.3;
+                          else if (formData.smokingStatus === "former") grs += 0.15;
+                          if (formData.alcoholUse === "heavy") grs += 0.3;
+                          else if (formData.alcoholUse === "moderate") grs += 0.15;
+                          else if (formData.alcoholUse === "occasional") grs += 0.05;
+                          grs = parseFloat(Math.min(grs, 1).toFixed(2));
+                          const grsColor = grs >= 0.5 ? "text-status-high" : grs > 0 ? "text-status-medium" : "text-status-low";
+                          return (
+                            <div className="bg-card/60 rounded-2xl p-4 border border-border-soft text-center">
+                              <p className="text-xs text-text-secondary mb-1">Genetic Risk Score</p>
+                              <p className={`text-2xl font-bold ${grsColor}`}>{grs}</p>
+                              <p className="text-xs font-medium mt-1 text-text-secondary">
+                                {grs === 0 ? "Low risk" : grs < 0.5 ? "Moderate risk" : "High risk"}
+                              </p>
+                            </div>
+                          );
+                        })()}
+
+                        {/* Age Risk Multiplier (lifestyle-boosted) */}
+                        {(() => {
+                          let arm = 1 + parseInt(formData.age) / 100;
+                          if (formData.smokingStatus === "current") arm += 0.15;
+                          else if (formData.smokingStatus === "former") arm += 0.05;
+                          if (formData.alcoholUse === "heavy") arm += 0.1;
+                          else if (formData.alcoholUse === "moderate") arm += 0.05;
+                          return (
+                            <div className="bg-card/60 rounded-2xl p-4 border border-border-soft text-center">
+                              <p className="text-xs text-text-secondary mb-1">Age Risk Multiplier</p>
+                              <p className="text-2xl font-bold text-text-primary">{arm.toFixed(2)}</p>
+                              <p className="text-xs font-medium mt-1 text-text-secondary">Age + lifestyle factor</p>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </motion.div>
+                  ) : null}
 
                   {/* Submit Button */}
                   <motion.button
