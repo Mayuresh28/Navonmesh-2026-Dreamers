@@ -6,6 +6,8 @@ import { useTheme } from "@/lib/theme-context";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
+import { TypewriterEffectSmooth } from "@/components/ui/typewriter-effect";
 
 /* ═══════════════════════════════════════════════════════════════
    INLINE SVG COMPONENTS
@@ -32,32 +34,32 @@ function MandalaSvg() {
   return (
     <svg className="mandala" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
       <g fill="none">
-        <circle cx="250" cy="250" r="224" stroke="#2d6a4f" strokeWidth="2.5" strokeOpacity=".85" />
-        <circle cx="250" cy="250" r="182" stroke="#c9a84c" strokeWidth="1.5" strokeOpacity=".5" strokeDasharray="6 11" />
-        <line x1="26" y1="250" x2="474" y2="250" stroke="#2d6a4f" strokeWidth="1.8" strokeOpacity=".55" />
-        <line x1="250" y1="26" x2="250" y2="474" stroke="#2d6a4f" strokeWidth="1.8" strokeOpacity=".55" />
-        <line x1="92" y1="92" x2="408" y2="408" stroke="#2d6a4f" strokeWidth="1.5" strokeOpacity=".48" />
-        <line x1="408" y1="92" x2="92" y2="408" stroke="#2d6a4f" strokeWidth="1.5" strokeOpacity=".48" />
-        <polygon points="250,32 456,384 44,384" stroke="#c9a84c" strokeWidth="2" strokeOpacity=".55" />
-        <polygon points="250,468 44,116 456,116" stroke="#c9a84c" strokeWidth="2" strokeOpacity=".55" />
-        <circle cx="250" cy="72" r="38" stroke="#2d6a4f" strokeWidth="1.8" strokeOpacity=".42" />
-        <circle cx="250" cy="428" r="38" stroke="#2d6a4f" strokeWidth="1.8" strokeOpacity=".42" />
-        <circle cx="72" cy="250" r="38" stroke="#2d6a4f" strokeWidth="1.8" strokeOpacity=".42" />
-        <circle cx="428" cy="250" r="38" stroke="#2d6a4f" strokeWidth="1.8" strokeOpacity=".42" />
-        <circle cx="120" cy="120" r="36" stroke="#c9a84c" strokeWidth="1.5" strokeOpacity=".36" />
-        <circle cx="380" cy="120" r="36" stroke="#c9a84c" strokeWidth="1.5" strokeOpacity=".36" />
-        <circle cx="120" cy="380" r="36" stroke="#c9a84c" strokeWidth="1.5" strokeOpacity=".36" />
-        <circle cx="380" cy="380" r="36" stroke="#c9a84c" strokeWidth="1.5" strokeOpacity=".36" />
-        <circle cx="250" cy="26" r="6" fill="#2d6a4f" fillOpacity=".72" />
-        <circle cx="250" cy="474" r="6" fill="#2d6a4f" fillOpacity=".72" />
-        <circle cx="26" cy="250" r="6" fill="#2d6a4f" fillOpacity=".72" />
-        <circle cx="474" cy="250" r="6" fill="#2d6a4f" fillOpacity=".72" />
-        <circle cx="92" cy="92" r="5" fill="#c9a84c" fillOpacity=".78" />
-        <circle cx="408" cy="408" r="5" fill="#c9a84c" fillOpacity=".78" />
-        <circle cx="408" cy="92" r="5" fill="#c9a84c" fillOpacity=".78" />
-        <circle cx="92" cy="408" r="5" fill="#c9a84c" fillOpacity=".78" />
-        <circle cx="250" cy="250" r="10" stroke="#2d6a4f" strokeWidth="2" strokeOpacity=".6" />
-        <circle cx="250" cy="250" r="5" fill="#c9a84c" fillOpacity=".92" />
+        <circle cx="250" cy="250" r="224" stroke="#1b4332" strokeWidth="2.5" strokeOpacity="1" />
+        <circle cx="250" cy="250" r="182" stroke="#d4a017" strokeWidth="1.5" strokeOpacity=".9" strokeDasharray="6 11" />
+        <line x1="26" y1="250" x2="474" y2="250" stroke="#1b4332" strokeWidth="1.8" strokeOpacity=".85" />
+        <line x1="250" y1="26" x2="250" y2="474" stroke="#1b4332" strokeWidth="1.8" strokeOpacity=".85" />
+        <line x1="92" y1="92" x2="408" y2="408" stroke="#1b4332" strokeWidth="1.5" strokeOpacity=".8" />
+        <line x1="408" y1="92" x2="92" y2="408" stroke="#1b4332" strokeWidth="1.5" strokeOpacity=".8" />
+        <polygon points="250,32 456,384 44,384" stroke="#d4a017" strokeWidth="2" strokeOpacity=".9" />
+        <polygon points="250,468 44,116 456,116" stroke="#d4a017" strokeWidth="2" strokeOpacity=".9" />
+        <circle cx="250" cy="72" r="38" stroke="#1b4332" strokeWidth="1.8" strokeOpacity=".75" />
+        <circle cx="250" cy="428" r="38" stroke="#1b4332" strokeWidth="1.8" strokeOpacity=".75" />
+        <circle cx="72" cy="250" r="38" stroke="#1b4332" strokeWidth="1.8" strokeOpacity=".75" />
+        <circle cx="428" cy="250" r="38" stroke="#1b4332" strokeWidth="1.8" strokeOpacity=".75" />
+        <circle cx="120" cy="120" r="36" stroke="#d4a017" strokeWidth="1.5" strokeOpacity=".7" />
+        <circle cx="380" cy="120" r="36" stroke="#d4a017" strokeWidth="1.5" strokeOpacity=".7" />
+        <circle cx="120" cy="380" r="36" stroke="#d4a017" strokeWidth="1.5" strokeOpacity=".7" />
+        <circle cx="380" cy="380" r="36" stroke="#d4a017" strokeWidth="1.5" strokeOpacity=".7" />
+        <circle cx="250" cy="26" r="6" fill="#1b4332" fillOpacity=".95" />
+        <circle cx="250" cy="474" r="6" fill="#1b4332" fillOpacity=".95" />
+        <circle cx="26" cy="250" r="6" fill="#1b4332" fillOpacity=".95" />
+        <circle cx="474" cy="250" r="6" fill="#1b4332" fillOpacity=".95" />
+        <circle cx="92" cy="92" r="5" fill="#d4a017" fillOpacity=".95" />
+        <circle cx="408" cy="408" r="5" fill="#d4a017" fillOpacity=".95" />
+        <circle cx="408" cy="92" r="5" fill="#d4a017" fillOpacity=".95" />
+        <circle cx="92" cy="408" r="5" fill="#d4a017" fillOpacity=".95" />
+        <circle cx="250" cy="250" r="10" stroke="#1b4332" strokeWidth="2" strokeOpacity=".9" />
+        <circle cx="250" cy="250" r="5" fill="#d4a017" fillOpacity="1" />
       </g>
     </svg>
   );
@@ -214,7 +216,7 @@ export default function LandingPage() {
       {/* ══ NAV ══ */}
       <nav className="landing-nav">
         <div className="nav-logo">
-          PRĀṆA<sup>™</sup>
+          धन्वंतरी
         </div>
       </nav>
 
@@ -224,7 +226,6 @@ export default function LandingPage() {
           <div className="landing-blob lb1" />
           <div className="landing-blob lb2" />
           <div className="landing-blob lb3" />
-          <div className="landing-blob lb4" />
         </div>
 
         {/* <MandalaSvg /> */}
@@ -232,12 +233,26 @@ export default function LandingPage() {
         <div className="hero-inner">
           {/* LEFT */}
           <div className="hero-left">
-            <div className="shlok-tag">✦ Sanskrit Shlok</div>
-            <div className="shlok-deva">आरोग्यं परमं भाग्यम् ॥</div>
-            <div className="shlok-en">
-              &ldquo;Health is the supreme fortune —<br />
-              the greatest wealth a soul can possess.&rdquo;
+            
+            <div className="shlok-deva">
+              <TypewriterEffectSmooth
+                words={[
+                  { text: "आरोग्यं" },
+                  { text: "परमं" },
+                  { text: "भाग्यम्" },
+                  { text: "॥" },
+                ]}
+              />
             </div>
+            <motion.div
+              className="shlok-en"
+              initial={{ opacity: 0, y: 20, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.8, delay: 1.2, ease: "easeOut" }}
+            >
+              &ldquo;Health is the supreme fortune,<br />
+              the greatest wealth a soul can possess.&rdquo;
+            </motion.div>
             <div className="shlok-src">Ashtanga Hridayam · Sutrasthana 1.2</div>
 
             <button onClick={handleCta} className="hero-cta-btn">
@@ -248,6 +263,7 @@ export default function LandingPage() {
 
           {/* RIGHT — Doctor + animations */}
           <div className="hero-centre">
+            <MandalaSvg />
             <div className="doc-halo" />
             <div className="orbit-ring" />
             <div className="orbit-ring orbit-ring-2" />
@@ -259,16 +275,16 @@ export default function LandingPage() {
 
             {/* Orbiting data pills */}
             <div className="data-pill dp-hr">
-              <span className="dp-icon">♥</span> 72 bpm
+              ❤️ 72 bpm
             </div>
             <div className="data-pill dp-spo2">
-              SpO₂ 98%
+              🩸 SpO₂ 98%
             </div>
             <div className="data-pill dp-glucose">
-              Glucose 94
+              🍯 Glucose 94
             </div>
             <div className="data-pill dp-bp">
-              BP 120/80
+              🩺 BP 120/80
             </div>
 
             {/* Glow particles */}
@@ -293,14 +309,6 @@ export default function LandingPage() {
 
     
 
-      {/* ══ FOOTER ══ */}
-      <footer className="landing-footer">
-        <div className="f-logo">
-          PRĀṆA<small>VEDIC HEALTH OS</small>
-        </div>
-        <div className="f-shlok">आरोग्यं परमं भाग्यम् ॥</div>
-        <div className="f-copy">© 2026 PRĀṆA. All rights reserved.</div>
-      </footer>
     </div>
   );
 }
