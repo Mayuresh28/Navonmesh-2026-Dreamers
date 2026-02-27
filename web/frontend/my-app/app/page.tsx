@@ -1,64 +1,92 @@
-import Image from "next/image";
+"use client";
+
+import { motion } from "framer-motion";
+import { Activity, ShieldCheck, TrendingUp, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="flex min-h-screen flex-col items-center bg-[var(--color-bg-light)] font-sans p-6 sm:p-12 overflow-hidden selection:bg-[var(--color-accent-blue)]">
+      {/* Soft gradient background elements */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[var(--color-accent-blue)] opacity-40 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-[#E3EAF5] opacity-50 rounded-full blur-[120px] pointer-events-none" />
+
+      {/* Main Container */}
+      <main className="flex flex-col items-center justify-center w-full max-w-4xl flex-1 z-10 text-center gap-10">
+        
+        {/* Animated Title Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="flex flex-col items-center gap-4"
+        >
+          <div className="bg-white p-4 rounded-full shadow-[0px_4px_24px_rgba(126,166,247,0.15)] mb-2">
+            <ShieldCheck className="w-12 h-12 text-[var(--color-primary-blue)]" />
+          </div>
+          
+          <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-[var(--color-primary-blue)] drop-shadow-sm">
+            धन्वंतरी
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-lg sm:text-xl text-[var(--color-text-secondary)] max-w-lg mt-2 leading-relaxed">
+            Your Proactive Sentinel for Preventive Health Monitoring & Early Risk Detection.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        </motion.div>
+
+        {/* Feature Highlights Grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+          className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl mt-4"
+        >
+          {[
+            {
+              icon: <Activity className="w-6 h-6 text-[var(--color-risk-low)]" />,
+              title: "Continuous Tracking",
+              desc: "Real-time vitals monitoring"
+            },
+            {
+              icon: <TrendingUp className="w-6 h-6 text-[var(--color-primary-blue)]" />,
+              title: "Insights",
+              desc: "Actionable health trends"
+            }
+          ].map((feature, idx) => (
+             <motion.div 
+              key={idx}
+              whileHover={{ y: -4, scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center gap-4 bg-white p-5 rounded-[20px] shadow-[0px_8px_32px_rgba(0,0,0,0.03)] border border-[var(--color-border-light)]"
+            >
+              <div className="p-3 bg-[var(--color-bg-light)] rounded-2xl">
+                {feature.icon}
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-[16px] text-[var(--color-text-primary)]">{feature.title}</h3>
+                <p className="text-[13px] text-[var(--color-text-secondary)]">{feature.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Call to Action Button */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.6, ease: "easeOut" }}
+          className="mt-6"
+        >
+          <Link href="/auth">
+            <motion.button 
+              whileHover={{ scale: 1.05, backgroundColor: "var(--color-secondary-blue)", boxShadow: "0px 8px 24px rgba(126,166,247,0.3)" }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center gap-2 bg-[var(--color-primary-blue)] text-white px-8 py-4 rounded-[16px] font-medium text-lg transition-all"
+            >
+              Get Started <ArrowRight className="w-5 h-5" />
+            </motion.button>
+          </Link>
+        </motion.div>
+
       </main>
     </div>
   );
