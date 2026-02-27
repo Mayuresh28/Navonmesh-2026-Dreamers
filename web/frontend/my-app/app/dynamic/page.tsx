@@ -505,6 +505,7 @@ function UploadRow({ cfg, csvFile, imgFile, status, onCsv, onImg, inputValue, on
 
 type Mode = "manual" | "autosync";
 type View = "form" | "results";
+type FileState = { csv: File | null; img: File | null; status: "idle" | "ok" | "err"; inputValue: string };
 
 export default function HealthDashboard() {
     const [mode, setMode] = useState<Mode>("manual");

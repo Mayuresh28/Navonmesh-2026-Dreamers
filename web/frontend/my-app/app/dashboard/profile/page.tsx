@@ -10,9 +10,10 @@ import { HealthMetrics } from "@/components/profile/health-metrics";
 import { LifestyleCards } from "@/components/profile/lifestyle-cards";
 import { ComputedParams } from "@/components/profile/computed-params";
 import { MedicalHistory } from "@/components/profile/medical-history";
-import { HeartPulse } from "lucide-react";
+import { HeartPulse, Users, Ruler, Scale, Cigarette, Wine, Flame, Calculator, Dna, Clock, AlertCircle } from "lucide-react";
 import { useEffect } from "react";
 import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
+import { Navbar } from "@/lib/navbar";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -54,6 +55,11 @@ export default function ProfilePage() {
     },
   };
 
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   if (!profile) return null;
 
   return (
@@ -86,7 +92,7 @@ export default function ProfilePage() {
                   <HeartPulse className="text-primary w-5 h-5" />
                 </div>
                 <h1 className="text-xl font-bold text-text-primary">Your Health Profile</h1>
-              </div>
+              </motion.div>
               <button onClick={() => router.push("/dashboard/profile/setup")}
                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary hover:bg-primary/30 transition-colors text-sm font-medium">
                 <HeartPulse className="w-4 h-4" /> Edit Profile
@@ -414,6 +420,7 @@ export default function ProfilePage() {
                 </span>
               </motion.div>
             </div>
+          </div>
           </motion.div>
         </div>
         <BottomNav />

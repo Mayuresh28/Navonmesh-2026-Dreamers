@@ -8,6 +8,10 @@ import { useProfileData, type UserProfile } from "@/lib/profile-hook";
 import { motion } from "framer-motion";
 import { HeartPulse, ArrowRight, CheckCircle, Activity, ShieldCheck, Calculator } from "lucide-react";
 import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
+import { PersonalInfo } from "@/components/profile-setup/personal-info";
+import { LifestyleForm } from "@/components/profile-setup/lifestyle-form";
+import { MedicalHistoryForm } from "@/components/profile-setup/medical-history-form";
+import { ComputedPreview } from "@/components/profile-setup/computed-preview";
 
 export default function ProfileSetupPage() {
   const router = useRouter();
