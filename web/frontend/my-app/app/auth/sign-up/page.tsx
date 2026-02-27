@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowRight, HeartPulse } from "lucide-react";
 import Link from "next/link";
+import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -18,35 +19,35 @@ export default function SignUpPage() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("[SignUp] Form submission started");
-    console.log("[SignUp] Email:", email);
     setError("");
 
     if (password !== confirmPassword) {
-      console.error("[SignUp] ✗ Passwords do not match");
       setError("Passwords do not match");
       return;
     }
 
     if (password.length < 6) {
-      console.error("[SignUp] ✗ Password too short");
       setError("Password must be at least 6 characters");
       return;
     }
 
     setLoading(true);
-    console.log("[SignUp] Validation passed");
 
     try {
-      console.log("[SignUp] Calling Firebase createUserWithEmailAndPassword...");
       await createUserWithEmailAndPassword(auth, email, password);
-      console.log("[SignUp] ✓ Firebase user created successfully");
-      console.log("[SignUp] Redirecting to /dashboard/profile/setup...");
       router.push("/dashboard/profile/setup");
     } catch (err) {
-      console.error("[SignUp] ✗ Account creation failed:", err);
       if (err instanceof Error) {
-        setError(err.message);
+        const msg = err.message;
+        if (msg.includes("email-already-in-use")) {
+          setError("An account with this email already exists. Try signing in instead.");
+        } else if (msg.includes("invalid-email")) {
+          setError("Please enter a valid email address.");
+        } else if (msg.includes("weak-password")) {
+          setError("Password is too weak. Use at least 6 characters.");
+        } else {
+          setError(msg);
+        }
       } else {
         setError("Failed to create account");
       }
@@ -56,10 +57,8 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden selection:bg-accent selection:text-primary bg-background">
-      {/* Soft Background Blur Elements */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent/30 rounded-full blur-3xl -z-10 mix-blend-multiply" />
-      <div className="absolute bottom-[-10%] right-[-15%] w-[40%] h-[50%] bg-status-low/20 rounded-full blur-3xl -z-10 mix-blend-multiply" />
+    <div className="min-h-screen flex flex-col relative overflow-hidden selection:bg-accent selection:text-primary bg-transparent">
+      <GlassmorphicBackground />
 
       {/* Header */}
       <nav className="w-full px-6 py-6 md:px-12 z-10">

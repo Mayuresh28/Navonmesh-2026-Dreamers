@@ -20,6 +20,7 @@ import {
   Clock,
 } from "lucide-react";
 import { useEffect } from "react";
+import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -28,23 +29,16 @@ export default function ProfilePage() {
 
   // Redirect to setup if no profile exists
   useEffect(() => {
-    console.log("[ProfilePage] useEffect - checking profile status");
-    console.log("[ProfilePage] loading:", loading);
-    console.log("[ProfilePage] userId:", user?.uid);
-    console.log("[ProfilePage] hasProfile():", hasProfile());
-
     if (!loading && !hasProfile()) {
-      console.log("[ProfilePage] No profile found - redirecting to setup page");
       router.push("/dashboard/profile/setup");
-    } else if (!loading && hasProfile()) {
-      console.log("[ProfilePage] Profile exists - displaying profile page");
     }
-  }, [loading, hasProfile, router, user?.uid]);
+  }, [loading, hasProfile, router]);
 
   if (loading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="min-h-screen flex items-center justify-center bg-transparent">
+          <GlassmorphicBackground />
           <div className="flex flex-col items-center gap-4">
             <div className="w-12 h-12 rounded-full border-4 border-border-soft border-t-primary animate-spin" />
             <p className="text-text-secondary">Loading profile...</p>
@@ -76,26 +70,24 @@ export default function ProfilePage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-transparent has-bottom-nav">
+        <GlassmorphicBackground />
         <Navbar activeTab="profile" onTabChange={(tab) => {
           if (tab === "dashboard") router.push("/dashboard");
           else if (tab === "results") router.push("/dashboard/results");
         }} />
 
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-160px)] relative overflow-hidden selection:bg-accent selection:text-primary p-6">
-          {/* Soft Background Blur Elements */}
-          <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent/30 rounded-full blur-3xl -z-10 mix-blend-multiply" />
-          <div className="absolute bottom-[-10%] right-[-15%] w-[40%] h-[50%] bg-status-low/20 rounded-full blur-3xl -z-10 mix-blend-multiply" />
 
           {/* Main Profile Container - Centered */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="w-[90vw] lg:w-[80vw] max-h-[80vh] bg-card rounded-[32px] border border-border-soft shadow-lg overflow-hidden flex flex-col"
+            className="w-[95vw] md:w-[90vw] lg:w-[80vw] max-h-[85vh] md:max-h-[80vh] bg-card rounded-[24px] md:rounded-[32px] border border-border-soft shadow-[0_4px_24px_rgb(126_166_247_/_0.08)] overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="px-8 py-6 border-b border-border-soft flex items-center justify-between bg-background/50">
+            <div className="px-4 md:px-8 py-5 md:py-6 border-b border-border-soft flex items-center justify-between bg-background/50">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -125,14 +117,14 @@ export default function ProfilePage() {
             </div>
 
           {/* Content - Scrollable */}
-          <div className="flex-1 overflow-y-auto px-8 py-8">
-            <div className="space-y-8">
-              {/* Health Metrics Grid - 3 columns */}
+          <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 md:py-8">
+            <div className="space-y-6 md:space-y-8">
+              {/* Health Metrics Grid */}
               <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-3 gap-6"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
               >
                 {/* Age Card */}
                 <motion.div variants={itemVariants} className="card group hover:shadow-md transition-shadow">
@@ -192,12 +184,12 @@ export default function ProfilePage() {
                 </motion.div>
               </motion.div>
 
-              {/* Lifestyle Information - 3 columns */}
+              {/* Lifestyle Information */}
               <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-3 gap-6"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
               >
                 {/* Smoking Status Card */}
                 <motion.div variants={itemVariants} className="card group hover:shadow-md transition-shadow">
@@ -272,12 +264,12 @@ export default function ProfilePage() {
                 </motion.div>
               </motion.div>
 
-              {/* Computed Health Parameters - 3 columns */}
+              {/* Computed Health Parameters */}
               <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-3 gap-6"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
               >
                 {/* BMI Card */}
                 <motion.div variants={itemVariants} className="card group hover:shadow-md transition-shadow">
@@ -388,7 +380,7 @@ export default function ProfilePage() {
                   Medical History
                 </h2>
 
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                   {/* Family History */}
                   <div>
                     <p className="text-sm font-semibold text-text-secondary mb-3 uppercase">

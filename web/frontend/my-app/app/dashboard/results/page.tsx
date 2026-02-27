@@ -20,7 +20,12 @@ import {
   Dna,
   Clock,
   Target,
+  UserCircle,
+  AlertCircle,
+  ArrowRight,
+  FileWarning,
 } from "lucide-react";
+import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
 
 interface PredictionResult {
   predicted_class: string;
@@ -38,6 +43,50 @@ interface PredictionResult {
   };
 }
 
+// Check if profile has all required fields for prediction
+function validateProfileForPrediction(profile: {
+  bmi?: number;
+  geneticRiskScore?: number;
+  ageRiskMultiplier?: number;
+  age?: number;
+  height?: number;
+  weight?: number;
+  familyHistory?: string;
+  existingConditions?: string[];
+  smokingStatus?: string;
+  alcoholUse?: string;
+}): { valid: boolean; missingFields: string[]; warnings: string[] } {
+  const missingFields: string[] = [];
+  const warnings: string[] = [];
+
+  if (!profile.age || profile.age <= 0) missingFields.push("Age");
+  if (!profile.height || profile.height <= 0) missingFields.push("Height");
+  if (!profile.weight || profile.weight <= 0) missingFields.push("Weight");
+
+  if (profile.bmi === undefined || profile.bmi === null || isNaN(profile.bmi)) {
+    missingFields.push("BMI (computed from height & weight)");
+  } else if (profile.bmi < 10 || profile.bmi > 60) {
+    warnings.push(`BMI value of ${profile.bmi} seems unusual. Please verify your height and weight.`);
+  }
+
+  if (profile.geneticRiskScore === undefined || profile.geneticRiskScore === null) {
+    missingFields.push("Genetic Risk Score");
+  }
+
+  if (profile.ageRiskMultiplier === undefined || profile.ageRiskMultiplier === null) {
+    missingFields.push("Age Risk Multiplier");
+  }
+
+  if (!profile.smokingStatus) warnings.push("Smoking status is not set — defaulting to 'never'.");
+  if (!profile.alcoholUse) warnings.push("Alcohol use is not set — defaulting to 'never'.");
+
+  return {
+    valid: missingFields.length === 0,
+    missingFields,
+    warnings,
+  };
+}
+
 // Map user profile data to ML model input
 function profileToModelInput(profile: {
   bmi: number;
@@ -48,10 +97,8 @@ function profileToModelInput(profile: {
   smokingStatus: string;
   alcoholUse: string;
 }) {
-  // Baseline_Risk: compute from conditions + lifestyle (0.05 to 0.6 range)
   let baselineRisk = 0.05;
 
-  // Conditions add risk
   const highRiskConditions = ["Heart Disease", "Diabetes", "Cancer", "Kidney Disease"];
   const medRiskConditions = ["Hypertension", "Thyroid", "Liver Disease", "Asthma"];
 
@@ -60,32 +107,25 @@ function profileToModelInput(profile: {
     else if (medRiskConditions.includes(cond)) baselineRisk += 0.05;
   }
 
-  // Family history adds risk
   if (profile.familyHistory && profile.familyHistory.toLowerCase() !== "none" && profile.familyHistory.trim() !== "") {
     baselineRisk += 0.08;
   }
 
-  // Smoking adds risk
   if (profile.smokingStatus === "current") baselineRisk += 0.1;
   else if (profile.smokingStatus === "former") baselineRisk += 0.04;
 
-  // Alcohol adds risk
   if (profile.alcoholUse === "heavy") baselineRisk += 0.08;
   else if (profile.alcoholUse === "moderate") baselineRisk += 0.04;
   else if (profile.alcoholUse === "occasional") baselineRisk += 0.01;
 
-  // Clamp
   baselineRisk = Math.min(0.6, Math.max(0.05, baselineRisk));
 
-  const result = {
+  return {
     BMI: profile.bmi,
     Genetic_Risk: profile.geneticRiskScore,
     Age_Risk_Multiplier: profile.ageRiskMultiplier,
     Baseline_Risk: parseFloat(baselineRisk.toFixed(4)),
   };
-
-  console.log("[Results] profileToModelInput computed:", result);
-  return result;
 }
 
 function getRiskColor(riskClass: string) {
@@ -112,10 +152,12 @@ function getRiskMessage(riskClass: string) {
 export default function ResultsPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const { profile, loading: profileLoading, hasProfile } = useProfileData(user?.uid);
+  const { profile, loading: profileLoading, hasProfile, error: profileError } = useProfileData(user?.uid);
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [predicting, setPredicting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const validation = profile ? validateProfileForPrediction(profile) : null;
 
   const runPrediction = async () => {
     if (!profile) return;
@@ -125,7 +167,6 @@ export default function ResultsPage() {
 
     try {
       const modelInput = profileToModelInput(profile);
-      console.log("[Results] Model input:", modelInput);
 
       const response = await fetch("/api/predict", {
         method: "POST",
@@ -139,7 +180,6 @@ export default function ResultsPage() {
       }
 
       const result: PredictionResult = await response.json();
-      console.log("[Results] Prediction result:", result);
       setPrediction(result);
     } catch (err) {
       console.error("[Results] Prediction error:", err);
@@ -149,9 +189,9 @@ export default function ResultsPage() {
     }
   };
 
-  // Auto-predict when profile loads
+  // Auto-predict when profile loads and is valid
   useEffect(() => {
-    if (profile && !prediction && !predicting) {
+    if (profile && !prediction && !predicting && validation?.valid) {
       runPrediction();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -160,31 +200,38 @@ export default function ResultsPage() {
   const handleTabChange = (tab: "dashboard" | "profile" | "results") => {
     if (tab === "dashboard") router.push("/dashboard");
     else if (tab === "profile") router.push("/dashboard/profile");
-    // results = current page
   };
 
-  // Loading state
+  // ── Loading State ──
   if (profileLoading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-transparent has-bottom-nav">
+          <GlassmorphicBackground />
           <Navbar activeTab="results" onTabChange={handleTabChange} />
           <div className="flex items-center justify-center h-[calc(100vh-80px)]">
-            <div className="flex flex-col items-center gap-4">
-              <Loader2 className="w-10 h-10 text-primary animate-spin" />
-              <p className="text-text-secondary">Loading your health data...</p>
-            </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex flex-col items-center gap-4"
+            >
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              </div>
+              <p className="text-text-secondary text-sm">Loading your health data...</p>
+            </motion.div>
           </div>
         </div>
       </ProtectedRoute>
     );
   }
 
-  // No profile state
-  if (!hasProfile()) {
+  // ── Profile Error State ──
+  if (profileError) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-transparent has-bottom-nav">
+          <GlassmorphicBackground />
           <Navbar activeTab="results" onTabChange={handleTabChange} />
           <div className="flex items-center justify-center h-[calc(100vh-80px)] px-6">
             <motion.div
@@ -192,19 +239,141 @@ export default function ResultsPage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-md"
             >
-              <div className="w-20 h-20 rounded-full bg-status-mod/20 flex items-center justify-center mx-auto mb-6">
-                <AlertTriangle className="w-10 h-10 text-status-mod" />
+              <div className="w-20 h-20 rounded-full bg-status-high/10 flex items-center justify-center mx-auto mb-6 border border-status-high/20">
+                <AlertCircle className="w-10 h-10 text-status-high" />
               </div>
-              <h2 className="text-2xl font-bold text-text-primary mb-3">Profile Required</h2>
-              <p className="text-text-secondary mb-6">
-                Complete your health profile first so we can analyze your risk factors.
+              <h2 className="text-2xl font-bold text-text-primary mb-3">Unable to Load Profile</h2>
+              <p className="text-text-secondary mb-2 leading-relaxed">
+                We encountered an error loading your health profile data.
+              </p>
+              <p className="text-sm text-text-secondary/70 mb-8 bg-background rounded-[12px] p-3 border border-border-soft">
+                {profileError}
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="btn-secondary inline-flex items-center gap-2"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Retry
+                </button>
+                <button
+                  onClick={() => router.push("/dashboard/profile")}
+                  className="btn-primary inline-flex items-center gap-2"
+                >
+                  Go to Profile
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  // ── No Profile State ──
+  if (!hasProfile()) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-transparent has-bottom-nav">
+          <GlassmorphicBackground />
+          <Navbar activeTab="results" onTabChange={handleTabChange} />
+          <div className="flex items-center justify-center h-[calc(100vh-80px)] px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center max-w-md"
+            >
+              <motion.div
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="w-24 h-24 rounded-full bg-accent/30 flex items-center justify-center mx-auto mb-6 border border-primary/15"
+              >
+                <UserCircle className="w-12 h-12 text-primary" />
+              </motion.div>
+              <h2 className="text-2xl font-bold text-text-primary mb-3">Health Profile Required</h2>
+              <p className="text-text-secondary mb-8 leading-relaxed">
+                To generate your AI-powered risk assessment, we need your health profile data first.
+                This only takes a couple of minutes.
               </p>
               <button
                 onClick={() => router.push("/dashboard/profile/setup")}
-                className="btn-primary"
+                className="btn-primary inline-flex items-center gap-2 group"
               >
-                Complete Profile
+                Complete Your Profile
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
+            </motion.div>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  // ── Incomplete Profile Data State ──
+  if (validation && !validation.valid) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-transparent has-bottom-nav">
+          <GlassmorphicBackground />
+          <Navbar activeTab="results" onTabChange={handleTabChange} />
+          <div className="flex items-center justify-center h-[calc(100vh-80px)] px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-lg w-full"
+            >
+              <div className="card text-center">
+                <div className="w-20 h-20 rounded-full bg-status-mod/10 flex items-center justify-center mx-auto mb-6 border border-status-mod/20">
+                  <FileWarning className="w-10 h-10 text-status-mod" />
+                </div>
+                <h2 className="text-2xl font-bold text-text-primary mb-3">Incomplete Profile Data</h2>
+                <p className="text-text-secondary mb-6 leading-relaxed">
+                  Your health profile is missing some required information needed for the risk assessment.
+                </p>
+
+                {/* Missing Fields */}
+                <div className="bg-status-high/5 rounded-[16px] p-4 mb-4 border border-status-high/15 text-left">
+                  <p className="text-sm font-semibold text-status-high mb-2 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4" />
+                    Missing Required Fields
+                  </p>
+                  <ul className="space-y-1.5">
+                    {validation.missingFields.map((field) => (
+                      <li key={field} className="text-sm text-text-secondary flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-status-high/60 shrink-0" />
+                        {field}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Warnings */}
+                {validation.warnings.length > 0 && (
+                  <div className="bg-status-mod/5 rounded-[16px] p-4 mb-6 border border-status-mod/15 text-left">
+                    <p className="text-sm font-semibold text-status-mod mb-2 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      Warnings
+                    </p>
+                    <ul className="space-y-1.5">
+                      {validation.warnings.map((warning, i) => (
+                        <li key={i} className="text-sm text-text-secondary flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-status-mod/60 shrink-0 mt-1.5" />
+                          {warning}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => router.push("/dashboard/profile/setup")}
+                  className="btn-primary w-full inline-flex items-center justify-center gap-2 group"
+                >
+                  Update Your Profile
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -216,23 +385,45 @@ export default function ResultsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-transparent has-bottom-nav">
+        <GlassmorphicBackground />
         <Navbar activeTab="results" onTabChange={handleTabChange} />
 
-        <main className="max-w-6xl mx-auto px-6 py-10">
+        <main className="max-w-5xl mx-auto px-6 py-10">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-10"
           >
+            <div className="flex items-center gap-2 mb-2">
+              <ShieldCheck className="w-5 h-5 text-primary" />
+              <span className="text-sm font-medium text-primary">Risk Assessment</span>
+            </div>
             <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">
               Health Risk Assessment
             </h1>
-            <p className="text-text-secondary text-lg">
+            <p className="text-text-secondary">
               AI-powered risk prediction based on your health profile
             </p>
           </motion.div>
+
+          {/* Warnings Banner */}
+          {validation && validation.warnings.length > 0 && !error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 rounded-[16px] bg-status-mod/8 border border-status-mod/20 flex items-start gap-3"
+            >
+              <AlertTriangle className="w-5 h-5 text-status-mod flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-text-primary mb-1">Data Warnings</p>
+                {validation.warnings.map((w, i) => (
+                  <p key={i} className="text-text-secondary text-xs">{w}</p>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
           {/* Error State */}
           <AnimatePresence>
@@ -241,19 +432,19 @@ export default function ResultsPage() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="mb-8 p-5 rounded-[20px] bg-status-high/10 border border-status-high/30 flex items-start gap-4"
+                className="mb-8 p-5 rounded-[20px] bg-status-high/8 border border-status-high/20 flex items-start gap-4"
               >
                 <AlertTriangle className="w-6 h-6 text-status-high flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <p className="text-status-high font-medium mb-1">Prediction Error</p>
                   <p className="text-text-secondary text-sm">{error}</p>
                   <p className="text-text-secondary text-xs mt-2">
-                    Make sure the ML server is running: <code className="bg-card px-2 py-0.5 rounded text-xs">cd ml/static && python app.py</code>
+                    Make sure the ML server is running: <code className="bg-background px-2 py-0.5 rounded-[8px] text-xs border border-border-soft">cd ml/static && python app.py</code>
                   </p>
                 </div>
                 <button
                   onClick={runPrediction}
-                  className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-status-high/20 text-status-high hover:bg-status-high/30 transition-colors text-sm font-medium"
+                  className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-status-high/10 text-status-high hover:bg-status-high/20 transition-colors text-sm font-medium"
                 >
                   <RefreshCw className="w-4 h-4" />
                   Retry
@@ -272,12 +463,12 @@ export default function ResultsPage() {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="mb-6"
+                className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 mb-6"
               >
-                <Brain className="w-16 h-16 text-primary" />
+                <Brain className="w-10 h-10 text-primary" />
               </motion.div>
               <h3 className="text-xl font-semibold text-text-primary mb-2">Analyzing Your Health Data</h3>
-              <p className="text-text-secondary">Running ML model prediction...</p>
+              <p className="text-text-secondary text-sm">Running ML model prediction...</p>
             </motion.div>
           )}
 
@@ -294,9 +485,9 @@ export default function ResultsPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className={`relative overflow-hidden rounded-[28px] p-8 md:p-10 border ${riskColors?.border}/30 bg-gradient-to-br from-card to-card/80 shadow-lg`}
+                className={`relative overflow-hidden rounded-[24px] p-8 md:p-10 border ${riskColors?.border}/20 bg-card shadow-[0_4px_24px_rgb(126_166_247_/_0.08)]`}
               >
-                <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-gradient-to-br from-transparent ${riskColors?.bg}/5 -z-0 blur-3xl" />
+                <div className={`absolute top-0 right-0 w-64 h-64 rounded-full ${riskColors?.bg}/5 blur-3xl pointer-events-none`} />
 
                 <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
                   {/* Risk Icon & Level */}
@@ -305,7 +496,7 @@ export default function ResultsPage() {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
-                      className={`w-28 h-28 rounded-full ${riskColors?.bg}/20 flex items-center justify-center border-2 ${riskColors?.border}/40 mb-4`}
+                      className={`w-28 h-28 rounded-full ${riskColors?.bg}/15 flex items-center justify-center border-2 ${riskColors?.border}/30 mb-4`}
                     >
                       <span className={riskColors?.text}>
                         {getRiskIcon(prediction.predicted_class)}
@@ -327,13 +518,13 @@ export default function ResultsPage() {
                     <h2 className="text-2xl font-bold text-text-primary mb-3">
                       {getRiskMessage(prediction.predicted_class)}
                     </h2>
-                    <p className="text-text-secondary leading-relaxed">
+                    <p className="text-text-secondary leading-relaxed text-sm">
                       This assessment is based on your BMI, genetic risk factors, age-adjusted risk,
                       and baseline health indicators analyzed by our Random Forest ML model.
                     </p>
                     <button
                       onClick={runPrediction}
-                      className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-[12px] bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
+                      className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-[12px] bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
                     >
                       <RefreshCw className="w-4 h-4" />
                       Re-run Analysis
@@ -349,7 +540,7 @@ export default function ResultsPage() {
                 transition={{ delay: 0.3 }}
                 className="card"
               >
-                <h3 className="text-lg font-semibold text-text-primary mb-6 flex items-center gap-2">
+                <h3 className="section-title mb-6">
                   <Activity className="w-5 h-5 text-primary" />
                   Class Probabilities
                 </h3>
@@ -368,7 +559,7 @@ export default function ResultsPage() {
                           transition={{ delay: 0.4 + idx * 0.1 }}
                         >
                           <div className="flex items-center justify-between mb-2">
-                            <span className={`font-medium ${isMax ? colors.text : "text-text-primary"} flex items-center gap-2`}>
+                            <span className={`font-medium text-sm ${isMax ? colors.text : "text-text-primary"} flex items-center gap-2`}>
                               {isMax && (
                                 <span className={`w-2 h-2 rounded-full ${colors.bg} animate-pulse`} />
                               )}
@@ -383,7 +574,7 @@ export default function ResultsPage() {
                               initial={{ width: 0 }}
                               animate={{ width: `${percentage}%` }}
                               transition={{ duration: 1, delay: 0.5 + idx * 0.1, ease: "easeOut" }}
-                              className={`h-full rounded-full ${colors.bg} ${isMax ? "shadow-sm" : "opacity-60"}`}
+                              className={`h-full rounded-full ${colors.bg} ${isMax ? "" : "opacity-60"}`}
                             />
                           </div>
                         </motion.div>
@@ -401,7 +592,7 @@ export default function ResultsPage() {
                   transition={{ delay: 0.5 }}
                   className="card"
                 >
-                  <h3 className="text-lg font-semibold text-text-primary mb-6 flex items-center gap-2">
+                  <h3 className="section-title mb-6">
                     <TrendingUp className="w-5 h-5 text-primary" />
                     Model Input Features
                   </h3>
@@ -412,32 +603,32 @@ export default function ResultsPage() {
                         value: prediction.input_features.BMI.toFixed(1),
                         icon: <HeartPulse className="w-5 h-5" />,
                         color: "text-primary",
-                        bgColor: "bg-primary/10",
-                        borderColor: "border-primary/20",
+                        bgColor: "bg-primary/8",
+                        borderColor: "border-primary/15",
                       },
                       {
                         label: "Genetic Risk",
                         value: prediction.input_features.Genetic_Risk.toFixed(2),
                         icon: <Dna className="w-5 h-5" />,
                         color: "text-status-high",
-                        bgColor: "bg-status-high/10",
-                        borderColor: "border-status-high/20",
+                        bgColor: "bg-status-high/8",
+                        borderColor: "border-status-high/15",
                       },
                       {
-                        label: "Age Risk Multiplier",
+                        label: "Age Risk",
                         value: prediction.input_features.Age_Risk_Multiplier.toFixed(2),
                         icon: <Clock className="w-5 h-5" />,
                         color: "text-status-mod",
-                        bgColor: "bg-status-mod/10",
-                        borderColor: "border-status-mod/20",
+                        bgColor: "bg-status-mod/8",
+                        borderColor: "border-status-mod/15",
                       },
                       {
                         label: "Baseline Risk",
                         value: prediction.input_features.Baseline_Risk.toFixed(4),
                         icon: <Target className="w-5 h-5" />,
                         color: "text-secondary",
-                        bgColor: "bg-secondary/10",
-                        borderColor: "border-secondary/20",
+                        bgColor: "bg-secondary/8",
+                        borderColor: "border-secondary/15",
                       },
                     ].map((feat, idx) => (
                       <motion.div
@@ -462,12 +653,12 @@ export default function ResultsPage() {
                   transition={{ delay: 0.6 }}
                   className="card"
                 >
-                  <h3 className="text-lg font-semibold text-text-primary mb-6 flex items-center gap-2">
+                  <h3 className="section-title mb-6">
                     <Brain className="w-5 h-5 text-primary" />
                     Engineered Features
                   </h3>
                   <p className="text-text-secondary text-sm mb-5">
-                    These features are computed internally by the model pipeline for enhanced prediction accuracy.
+                    Computed internally by the model pipeline for enhanced prediction accuracy.
                   </p>
 
                   <div className="space-y-4">
@@ -476,22 +667,22 @@ export default function ResultsPage() {
                         label: "Composite Risk",
                         value: prediction.engineered_features.Composite_Risk,
                         formula: "BMI×0.3 + GR×0.3 + ARM×0.2 + BR×0.2",
-                        color: "from-primary/20 to-accent/20",
-                        borderColor: "border-primary/20",
+                        bgColor: "bg-primary/5",
+                        borderColor: "border-primary/15",
                       },
                       {
                         label: "BMI × Genetic",
                         value: prediction.engineered_features.BMI_Genetic,
                         formula: "BMI × Genetic_Risk",
-                        color: "from-status-high/20 to-status-mod/20",
-                        borderColor: "border-status-high/20",
+                        bgColor: "bg-status-high/5",
+                        borderColor: "border-status-high/15",
                       },
                       {
                         label: "Age × Baseline",
                         value: prediction.engineered_features.Age_Baseline,
                         formula: "Age_Risk_Multiplier × Baseline_Risk",
-                        color: "from-status-mod/20 to-status-low/20",
-                        borderColor: "border-status-mod/20",
+                        bgColor: "bg-status-mod/5",
+                        borderColor: "border-status-mod/15",
                       },
                     ].map((feat, idx) => (
                       <motion.div
@@ -499,10 +690,10 @@ export default function ResultsPage() {
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.7 + idx * 0.1 }}
-                        className={`p-4 rounded-[16px] bg-gradient-to-r ${feat.color} border ${feat.borderColor}`}
+                        className={`p-4 rounded-[16px] ${feat.bgColor} border ${feat.borderColor}`}
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium text-text-primary">{feat.label}</span>
+                          <span className="font-medium text-text-primary text-sm">{feat.label}</span>
                           <span className="text-lg font-bold text-text-primary">{feat.value.toFixed(4)}</span>
                         </div>
                         <span className="text-xs text-text-secondary font-mono">{feat.formula}</span>

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowRight, HeartPulse } from "lucide-react";
 import Link from "next/link";
+import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -17,21 +18,23 @@ export default function SignInPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("[SignIn] Form submission started");
-    console.log("[SignIn] Email:", email);
     setError("");
     setLoading(true);
 
     try {
-      console.log("[SignIn] Calling Firebase signInWithEmailAndPassword...");
       await signInWithEmailAndPassword(auth, email, password);
-      console.log("[SignIn] ✓ Firebase authentication successful");
-      console.log("[SignIn] Redirecting to /dashboard...");
       router.push("/dashboard");
     } catch (err) {
-      console.error("[SignIn] ✗ Authentication failed:", err);
       if (err instanceof Error) {
-        setError(err.message);
+        // Firebase error messages are verbose; show user-friendly messages
+        const msg = err.message;
+        if (msg.includes("user-not-found") || msg.includes("wrong-password") || msg.includes("invalid-credential")) {
+          setError("Invalid email or password. Please try again.");
+        } else if (msg.includes("too-many-requests")) {
+          setError("Too many attempts. Please try again later.");
+        } else {
+          setError(msg);
+        }
       } else {
         setError("Failed to sign in");
       }
@@ -41,10 +44,8 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden selection:bg-accent selection:text-primary bg-background">
-      {/* Soft Background Blur Elements */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent/30 rounded-full blur-3xl -z-10 mix-blend-multiply" />
-      <div className="absolute bottom-[-10%] right-[-15%] w-[40%] h-[50%] bg-status-low/20 rounded-full blur-3xl -z-10 mix-blend-multiply" />
+    <div className="min-h-screen flex flex-col relative overflow-hidden selection:bg-accent selection:text-primary bg-transparent">
+      <GlassmorphicBackground />
 
       {/* Header */}
       <nav className="w-full px-6 py-6 md:px-12 z-10">

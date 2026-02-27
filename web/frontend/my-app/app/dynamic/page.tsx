@@ -7,6 +7,7 @@ import {
     ParameterMetrics,
     parseCSVtoNumbers,
 } from "./healthEngine";
+import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    SVG ICON COMPONENTS
@@ -209,44 +210,44 @@ function riskDescription(s: number): string {
 
 const RISK_COLORS = {
     low: {
-        bg: "bg-emerald-50",
-        border: "border-emerald-200",
-        text: "text-emerald-700",
-        bar: "bg-emerald-500",
-        barColor: "#10b981",
-        icon: "text-emerald-600",
-        cardBorder: "border-l-emerald-500",
-        badge: "bg-emerald-100 text-emerald-800",
+        bg: "bg-status-low/10",
+        border: "border-status-low/30",
+        text: "text-status-low",
+        bar: "bg-status-low",
+        barColor: "#86E3A3",
+        icon: "text-status-low",
+        cardBorder: "border-l-status-low",
+        badge: "bg-status-low/15 text-status-low",
     },
     moderate: {
-        bg: "bg-amber-50",
-        border: "border-amber-200",
-        text: "text-amber-700",
-        bar: "bg-amber-500",
-        barColor: "#f59e0b",
-        icon: "text-amber-600",
-        cardBorder: "border-l-amber-500",
-        badge: "bg-amber-100 text-amber-800",
+        bg: "bg-status-mod/10",
+        border: "border-status-mod/30",
+        text: "text-status-mod",
+        bar: "bg-status-mod",
+        barColor: "#FFD580",
+        icon: "text-status-mod",
+        cardBorder: "border-l-status-mod",
+        badge: "bg-status-mod/15 text-status-mod",
     },
     high: {
-        bg: "bg-orange-50",
-        border: "border-orange-200",
-        text: "text-orange-700",
-        bar: "bg-orange-500",
-        barColor: "#f97316",
-        icon: "text-orange-600",
-        cardBorder: "border-l-orange-500",
-        badge: "bg-orange-100 text-orange-800",
+        bg: "bg-status-high/10",
+        border: "border-status-high/30",
+        text: "text-status-high",
+        bar: "bg-status-high",
+        barColor: "#FF9C9C",
+        icon: "text-status-high",
+        cardBorder: "border-l-status-high",
+        badge: "bg-status-high/15 text-status-high",
     },
     critical: {
-        bg: "bg-red-50",
-        border: "border-red-200",
-        text: "text-red-700",
-        bar: "bg-red-500",
-        barColor: "#ef4444",
-        icon: "text-red-600",
-        cardBorder: "border-l-red-500",
-        badge: "bg-red-100 text-red-800",
+        bg: "bg-status-high/15",
+        border: "border-status-high/40",
+        text: "text-status-high",
+        bar: "bg-status-high",
+        barColor: "#FF9C9C",
+        icon: "text-status-high",
+        cardBorder: "border-l-status-high",
+        badge: "bg-status-high/20 text-status-high font-bold",
     },
 };
 
@@ -258,10 +259,10 @@ const CAT_LABEL: Record<string, string> = {
 };
 
 const CAT_BADGE: Record<string, string> = {
-    Low: "bg-emerald-100 text-emerald-800",
-    Moderate: "bg-amber-100 text-amber-800",
-    High: "bg-orange-100 text-orange-800",
-    Critical: "bg-red-100 text-red-800",
+    Low: "bg-status-low/15 text-status-low",
+    Moderate: "bg-status-mod/15 text-status-mod",
+    High: "bg-status-high/15 text-status-high",
+    Critical: "bg-status-high/20 text-status-high font-bold",
 };
 
 /* ═══════════════════════════════════════════════════════════════════════════════
@@ -272,7 +273,7 @@ function RiskBar({ score }: { score: number }) {
     const pct = Math.min(score * 100, 100);
     const lvl = riskLevel(score);
     return (
-        <div className="h-3 w-full rounded-full bg-gray-100 overflow-hidden">
+        <div className="h-3 w-full rounded-full bg-border-soft/50 overflow-hidden">
             <div
                 className={`h-full rounded-full transition-all duration-700 ease-out ${RISK_COLORS[lvl].bar}`}
                 style={{ width: `${pct}%` }}
@@ -301,17 +302,17 @@ function HealthCard({ eKey, m }: { eKey: string; m: ParameterMetrics }) {
     const desc = riskDescription(m.riskScore);
 
     return (
-        <div className={`rounded-2xl bg-white border-l-4 ${colors.cardBorder} border border-gray-200/60 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden`}>
+        <div className={`rounded-[20px] bg-card border-l-4 ${colors.cardBorder} border border-border-soft shadow-[0_2px_16px_rgb(126_166_247_/_0.06)] hover:shadow-[0_4px_24px_rgb(126_166_247_/_0.12)] transition-all duration-300 overflow-hidden`}>
             {/* Top section */}
             <div className="p-5 pb-4">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                        <div className={`w-12 h-12 rounded-xl ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.icon}`}>
+                        <div className={`w-12 h-12 rounded-[14px] ${colors.bg} ${colors.border} border flex items-center justify-center ${colors.icon}`}>
                             {IconFn ? IconFn("w-6 h-6") : Icons.activity("w-6 h-6")}
                         </div>
                         <div>
-                            <h3 className="text-lg font-bold text-gray-900">{d.label}</h3>
-                            <p className="text-sm text-gray-400">{d.unit}</p>
+                            <h3 className="text-lg font-bold text-text-primary">{d.label}</h3>
+                            <p className="text-sm text-text-secondary">{d.unit}</p>
                         </div>
                     </div>
                     <span className={`text-sm font-bold px-3 py-1.5 rounded-full ${colors.badge}`}>
@@ -321,20 +322,20 @@ function HealthCard({ eKey, m }: { eKey: string; m: ParameterMetrics }) {
 
                 {/* Risk bar */}
                 <RiskBar score={m.riskScore} />
-                <p className="text-sm text-gray-500 mt-3">{desc}</p>
+                <p className="text-sm text-text-secondary mt-3">{desc}</p>
             </div>
 
             {/* Bottom stats — only simple, useful info */}
             <div className={`px-5 py-3 ${colors.bg} border-t ${colors.border} flex items-center justify-between`}>
                 <div>
-                    <p className="text-xs text-gray-500 mb-0.5">Average Value</p>
-                    <p className="text-lg font-bold text-gray-900">
-                        {m.mean.toFixed(1)} <span className="text-sm font-normal text-gray-400">{d.unit}</span>
+                    <p className="text-xs text-text-secondary mb-0.5">Average Value</p>
+                    <p className="text-lg font-bold text-text-primary">
+                        {m.mean.toFixed(1)} <span className="text-sm font-normal text-text-secondary">{d.unit}</span>
                     </p>
                 </div>
                 <div className="text-right">
-                    <p className="text-xs text-gray-500 mb-0.5">Readings</p>
-                    <p className="text-lg font-bold text-gray-900">{m.sampleCount}</p>
+                    <p className="text-xs text-text-secondary mb-0.5">Readings</p>
+                    <p className="text-lg font-bold text-text-primary">{m.sampleCount}</p>
                 </div>
             </div>
         </div>
@@ -352,22 +353,22 @@ function OverallSummary({ oa }: { oa: OverallAssessment }) {
     const friendlyCat = CAT_LABEL[oa.riskCategory] ?? oa.riskCategory;
 
     return (
-        <div className="rounded-2xl bg-white border border-gray-200/60 shadow-sm overflow-hidden">
+        <div className="rounded-[24px] bg-card border border-border-soft shadow-[0_2px_16px_rgb(126_166_247_/_0.06)] overflow-hidden">
             <div className="p-6 sm:p-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Your Health Summary</h2>
+                <h2 className="text-xl font-bold text-text-primary mb-6">Your Health Summary</h2>
 
                 <div className="flex flex-col sm:flex-row items-center gap-8">
                     {/* Donut chart */}
                     <div className="relative shrink-0 w-36 h-36">
                         <svg viewBox="0 0 36 36" className="w-36 h-36 -rotate-90">
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f3f4f6" strokeWidth="3" />
+                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#E3EAF5" strokeWidth="3" />
                             <circle cx="18" cy="18" r="15.9" fill="none" stroke={color}
                                 strokeWidth="3" strokeDasharray={dash} strokeLinecap="round"
                                 className="transition-all duration-700 ease-out" />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-3xl font-black text-gray-900">{pct.toFixed(0)}%</span>
-                            <span className="text-xs text-gray-400 font-medium mt-0.5">Health Risk</span>
+                            <span className="text-3xl font-black text-text-primary">{pct.toFixed(0)}%</span>
+                            <span className="text-xs text-text-secondary font-medium mt-0.5">Health Risk</span>
                         </div>
                     </div>
 
@@ -376,7 +377,7 @@ function OverallSummary({ oa }: { oa: OverallAssessment }) {
                         <span className={`inline-block text-base font-bold px-5 py-2 rounded-full mb-4 ${CAT_BADGE[oa.riskCategory]}`}>
                             {friendlyCat}
                         </span>
-                        <p className="text-base text-gray-600 leading-relaxed mb-4">
+                        <p className="text-base text-text-secondary leading-relaxed mb-4">
                             {pct < 25
                                 ? "Great news! Your overall health readings are within normal range. Keep maintaining your healthy lifestyle."
                                 : pct < 50
@@ -387,8 +388,8 @@ function OverallSummary({ oa }: { oa: OverallAssessment }) {
                             }
                         </p>
                         {oa.highestRiskParameter && (
-                            <p className="text-sm text-gray-500">
-                                Focus area: <span className="font-semibold text-gray-800">{highLabel}</span>
+                            <p className="text-sm text-text-secondary">
+                                Focus area: <span className="font-semibold text-text-primary">{highLabel}</span>
                             </p>
                         )}
                     </div>
@@ -417,35 +418,35 @@ function UploadRow({ cfg, csvFile, imgFile, status, onCsv, onImg, inputValue, on
     const IconFn = Icons[cfg.key];
 
     const rowBg =
-        status === "ok" ? "border-emerald-200 bg-emerald-50/50" :
-            status === "err" ? "border-red-200 bg-red-50/40" :
-                "border-gray-200 bg-white hover:bg-gray-50/50";
+        status === "ok" ? "border-status-low/40 bg-status-low/5" :
+            status === "err" ? "border-status-high/40 bg-status-high/5" :
+                "border-border-soft bg-card hover:bg-background/50";
 
     return (
-        <div className={`flex items-center gap-4 rounded-2xl border-2 px-5 py-4 transition-all duration-200 hover:shadow-sm ${rowBg}`}>
+        <div className={`flex items-center gap-4 rounded-[20px] border-2 px-5 py-4 transition-all duration-200 hover:shadow-sm ${rowBg}`}>
             {/* Icon */}
-            <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 shrink-0">
+            <div className="w-12 h-12 rounded-[14px] bg-background border border-border-soft flex items-center justify-center text-text-secondary shrink-0">
                 {IconFn ? IconFn("w-6 h-6") : Icons.activity("w-6 h-6")}
             </div>
 
             {/* Label */}
             <div className="flex-1 min-w-0">
-                <p className="text-base font-semibold text-gray-800">
+                <p className="text-base font-semibold text-text-primary">
                     {cfg.label}
-                    {cfg.optional && <span className="ml-2 text-xs text-gray-400 font-normal">(Optional)</span>}
+                    {cfg.optional && <span className="ml-2 text-xs text-text-secondary font-normal">(Optional)</span>}
                 </p>
-                <p className="text-sm text-gray-400 mt-0.5">{cfg.description}</p>
+                <p className="text-sm text-text-secondary mt-0.5">{cfg.description}</p>
             </div>
 
             {/* Status */}
             <div className="shrink-0 w-20 flex justify-center">
                 {status === "ok" && (
-                    <span className="inline-flex items-center gap-1.5 text-sm text-emerald-600 font-semibold">
+                    <span className="inline-flex items-center gap-1.5 text-sm text-status-low font-semibold">
                         {Icons.check("w-4 h-4")} Ready
                     </span>
                 )}
                 {status === "err" && (
-                    <span className="inline-flex items-center gap-1.5 text-sm text-red-500 font-semibold">
+                    <span className="inline-flex items-center gap-1.5 text-sm text-status-high font-semibold">
                         {Icons.alertTriangle("w-4 h-4")} Error
                     </span>
                 )}
@@ -458,15 +459,15 @@ function UploadRow({ cfg, csvFile, imgFile, status, onCsv, onImg, inputValue, on
                     value={inputValue ?? ""}
                     onChange={(e) => onInputChange?.(e.target.value)}
                     placeholder={`Enter ${cfg.unit}`}
-                    className="w-40 h-11 px-4 rounded-xl border-2 border-gray-200 bg-gray-50 text-base text-gray-700 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:bg-white outline-none transition-all"
+                    className="input-field w-40 h-11"
                 />
             ) : (
                 <>
                     <button
                         onClick={() => csvRef.current?.click()}
-                        className={`shrink-0 inline-flex items-center gap-2 h-11 px-5 rounded-xl border-2 text-sm font-semibold transition-all duration-200 ${csvFile
+                        className={`shrink-0 inline-flex items-center gap-2 h-11 px-5 rounded-[14px] border-2 text-sm font-semibold transition-all duration-200 ${csvFile
                             ? "border-primary/40 bg-primary/5 text-primary"
-                            : "border-gray-200 bg-gray-50 text-gray-600 hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
+                            : "border-border-soft bg-background text-text-secondary hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
                             }`}
                     >
                         {Icons.upload("w-4 h-4")}
@@ -482,9 +483,9 @@ function UploadRow({ cfg, csvFile, imgFile, status, onCsv, onImg, inputValue, on
                 <>
                     <button
                         onClick={() => imgRef.current?.click()}
-                        className={`shrink-0 inline-flex items-center gap-2 h-11 px-4 rounded-xl border-2 text-sm font-semibold transition-all duration-200 ${imgFile
-                            ? "border-violet-300 bg-violet-50 text-violet-700"
-                            : "border-gray-200 bg-gray-50 text-gray-600 hover:border-violet-200 hover:bg-violet-50/50 hover:text-violet-600"
+                        className={`shrink-0 inline-flex items-center gap-2 h-11 px-4 rounded-[14px] border-2 text-sm font-semibold transition-all duration-200 ${imgFile
+                            ? "border-secondary/30 bg-secondary/5 text-secondary"
+                            : "border-border-soft bg-background text-text-secondary hover:border-secondary/20 hover:bg-secondary/5 hover:text-secondary"
                             }`}
                     >
                         {Icons.image("w-4 h-4")}
@@ -607,30 +608,31 @@ export default function HealthDashboard() {
        RENDER
        ═══════════════════════════════════════════════════════════════════════════ */
     return (
-        <div className="h-screen w-screen overflow-hidden bg-[#f8f9fc] flex flex-col" style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+        <div className="h-screen w-screen overflow-hidden bg-transparent flex flex-col" style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+            <GlassmorphicBackground />
 
             {/* ══ HEADER ══════════════════════════════════════════════════════════ */}
-            <header className="shrink-0 bg-white border-b border-gray-200/80 h-16 px-6 sm:px-8 flex items-center justify-between gap-4 shadow-sm">
+            <header className="shrink-0 bg-card/80 backdrop-blur-md border-b border-border-soft h-16 px-6 sm:px-8 flex items-center justify-between gap-4 shadow-[0_2px_12px_rgb(126_166_247_/_0.05)]">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
+                    <div className="w-10 h-10 rounded-[14px] bg-primary/15 flex items-center justify-center text-primary border border-primary/20">
                         {Icons.logo("w-5 h-5")}
                     </div>
                     <div>
-                        <span className="text-lg font-bold text-gray-900 tracking-tight">Dhanvantari</span>
-                        <p className="text-xs text-gray-400 font-medium hidden sm:block">Health Analysis</p>
+                        <span className="text-lg font-bold text-text-primary tracking-tight">धन्वंतरी</span>
+                        <p className="text-xs text-text-secondary font-medium hidden sm:block">Health Analysis</p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                     {view === "form" && (
-                        <div className="flex items-center bg-gray-100 rounded-xl p-1">
+                        <div className="flex items-center bg-background rounded-[14px] p-1 border border-border-soft">
                             {(["manual", "autosync"] as Mode[]).map(m => (
                                 <button
                                     key={m}
                                     onClick={() => switchMode(m)}
-                                    className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${mode === m
-                                        ? "bg-white shadow-sm text-gray-900"
-                                        : "text-gray-500 hover:text-gray-700"
+                                    className={`px-5 py-2 rounded-[10px] text-sm font-semibold transition-all duration-200 ${mode === m
+                                        ? "bg-card shadow-sm text-text-primary"
+                                        : "text-text-secondary hover:text-text-primary"
                                         }`}
                                 >
                                     {m === "manual" ? "Upload Data" : "Auto Sync"}
@@ -642,7 +644,7 @@ export default function HealthDashboard() {
                     {view === "results" && (
                         <button
                             onClick={handleBack}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-gray-200 bg-white text-sm font-semibold text-gray-600 hover:border-gray-300 hover:text-gray-800 transition-all duration-200 shadow-sm"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[14px] border-2 border-border-soft bg-card text-sm font-semibold text-text-secondary hover:border-primary/30 hover:text-primary transition-all duration-200 shadow-sm"
                         >
                             {Icons.arrowLeft("w-4 h-4")}
                             Back
@@ -661,8 +663,8 @@ export default function HealthDashboard() {
 
                             {/* Welcome text */}
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900">Upload Your Health Data</h1>
-                                <p className="text-base text-gray-500 mt-1">
+                                <h1 className="text-2xl font-bold text-text-primary">Upload Your Health Data</h1>
+                                <p className="text-base text-text-secondary mt-1">
                                     Upload your health files or enter values below to get a personalized health report.
                                 </p>
                             </div>
@@ -671,7 +673,7 @@ export default function HealthDashboard() {
                             <section>
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-1.5 h-6 rounded-full bg-primary" />
-                                    <h2 className="text-lg font-bold text-gray-800">Basic Health Data</h2>
+                                    <h2 className="text-lg font-bold text-text-primary">Basic Health Data</h2>
                                 </div>
                                 <div className="flex flex-col gap-3">
                                     {LOW_FREQ.map(cfg => (
@@ -690,11 +692,11 @@ export default function HealthDashboard() {
                             {/* Section: Additional Tests */}
                             <section>
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-1.5 h-6 rounded-full bg-gray-300" />
-                                    <h2 className="text-lg font-bold text-gray-800">
+                                    <div className="w-1.5 h-6 rounded-full bg-border-soft" />
+                                    <h2 className="text-lg font-bold text-text-primary">
                                         Additional Tests
                                     </h2>
-                                    <span className="text-sm text-gray-400 font-medium">(Optional)</span>
+                                    <span className="text-sm text-text-secondary font-medium">(Optional)</span>
                                 </div>
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                                     {HI_FREQ.map(cfg => (
@@ -712,9 +714,9 @@ export default function HealthDashboard() {
                             <button
                                 onClick={handleAnalyze}
                                 disabled={loading || !anyReady}
-                                className={`shrink-0 w-full py-4 rounded-2xl text-lg font-bold tracking-wide transition-all duration-200 ${!loading && anyReady
-                                    ? "bg-primary hover:bg-secondary text-white shadow-lg hover:shadow-xl active:scale-[0.99]"
-                                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                className={`shrink-0 w-full py-4 rounded-[20px] text-lg font-bold tracking-wide transition-all duration-200 ${!loading && anyReady
+                                    ? "bg-primary hover:bg-secondary text-white shadow-[0_4px_16px_rgb(126_166_247_/_0.35)] hover:shadow-[0_6px_24px_rgb(126_166_247_/_0.4)] active:scale-[0.99] cursor-pointer"
+                                    : "bg-border-soft text-text-secondary cursor-not-allowed"
                                     }`}
                             >
                                 {loading ? (
@@ -734,11 +736,11 @@ export default function HealthDashboard() {
                     {mode === "autosync" && (
                         <div className="flex-1 flex flex-col items-center justify-center px-8 gap-8">
                             <div className="text-center max-w-lg">
-                                <div className="w-20 h-20 rounded-2xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center text-primary mx-auto mb-6">
+                                <div className="w-20 h-20 rounded-[20px] bg-primary/10 border-2 border-primary/20 flex items-center justify-center text-primary mx-auto mb-6">
                                     {Icons.shield("w-10 h-10")}
                                 </div>
-                                <h1 className="text-2xl font-bold text-gray-900">Auto Sync</h1>
-                                <p className="text-base text-gray-500 mt-3 leading-relaxed">
+                                <h1 className="text-2xl font-bold text-text-primary">Auto Sync</h1>
+                                <p className="text-base text-text-secondary mt-3 leading-relaxed">
                                     Automatically sync and analyze all your health data in one click.
                                     This combines everything you have uploaded so far to give you the
                                     most accurate picture of your health.
@@ -751,16 +753,16 @@ export default function HealthDashboard() {
                                     const PIcon = Icons[p.key];
                                     return (
                                         <div key={p.key}
-                                            className={`flex flex-col items-center gap-2 rounded-2xl border-2 px-3 py-4 text-center transition-all duration-200 ${loading
+                                            className={`flex flex-col items-center gap-2 rounded-[16px] border-2 px-3 py-4 text-center transition-all duration-200 ${loading
                                                 ? "border-primary/30 bg-primary/5 animate-pulse"
-                                                : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm"
+                                                : "border-border-soft bg-card hover:border-primary/20 hover:shadow-sm"
                                                 }`}
                                         >
-                                            <div className="text-gray-400">
+                                            <div className="text-text-secondary">
                                                 {PIcon ? PIcon("w-6 h-6") : Icons.activity("w-6 h-6")}
                                             </div>
-                                            <span className="text-xs font-semibold text-gray-600 leading-tight">{p.label}</span>
-                                            {p.optional && <span className="text-[10px] text-gray-400 -mt-0.5">Optional</span>}
+                                            <span className="text-xs font-semibold text-text-secondary leading-tight">{p.label}</span>
+                                            {p.optional && <span className="text-[10px] text-text-secondary/60 -mt-0.5">Optional</span>}
                                         </div>
                                     );
                                 })}
@@ -770,10 +772,10 @@ export default function HealthDashboard() {
                             {loading && (
                                 <div className="w-full max-w-lg">
                                     <div className="flex justify-between mb-2">
-                                        <span className="text-sm text-gray-500 font-medium">Loading your health data...</span>
+                                        <span className="text-sm text-text-secondary font-medium">Loading your health data...</span>
                                         <span className="text-sm font-bold text-primary">{autoProgress}%</span>
                                     </div>
-                                    <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                                    <div className="h-3 bg-border-soft/50 rounded-full overflow-hidden">
                                         <div className="h-full bg-primary rounded-full transition-all duration-200 ease-out"
                                             style={{ width: `${autoProgress}%` }} />
                                     </div>
@@ -783,7 +785,7 @@ export default function HealthDashboard() {
                             <button
                                 onClick={handleAutoSync}
                                 disabled={loading}
-                                className="w-full max-w-lg py-4 rounded-2xl bg-primary hover:bg-secondary text-white font-bold text-lg tracking-wide shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full max-w-lg py-4 rounded-[20px] bg-primary hover:bg-secondary text-white font-bold text-lg tracking-wide shadow-[0_4px_16px_rgb(126_166_247_/_0.35)] hover:shadow-[0_6px_24px_rgb(126_166_247_/_0.4)] transition-all duration-200 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                             >
                                 {loading ? (
                                     <span className="flex items-center justify-center gap-3">
@@ -809,7 +811,7 @@ export default function HealthDashboard() {
                     {/* Section header */}
                     <div className="flex items-center gap-3">
                         <div className="w-1.5 h-6 rounded-full bg-primary" />
-                        <h2 className="text-xl font-bold text-gray-900">Detailed Results</h2>
+                        <h2 className="text-xl font-bold text-text-primary">Detailed Results</h2>
                     </div>
 
                     {/* Health cards */}
@@ -825,14 +827,14 @@ export default function HealthDashboard() {
 
             {/* ── Loading Overlay ── */}
             {loading && view === "form" && (
-                <div className="absolute inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center z-10">
-                    <div className="flex flex-col items-center gap-5 bg-white rounded-3xl border border-gray-200/80 shadow-xl px-12 py-10">
+                <div className="absolute inset-0 bg-card/70 backdrop-blur-sm flex items-center justify-center z-10">
+                    <div className="flex flex-col items-center gap-5 bg-card rounded-[24px] border border-border-soft shadow-[0_8px_32px_rgb(126_166_247_/_0.15)] px-12 py-10">
                         <Spinner size="h-10 w-10" />
                         <div className="text-center">
-                            <p className="text-lg font-bold text-gray-800">
+                            <p className="text-lg font-bold text-text-primary">
                                 {mode === "manual" ? "Analyzing Your Health Data" : "Loading Your Report"}
                             </p>
-                            <p className="text-sm text-gray-400 mt-2">This will only take a moment...</p>
+                            <p className="text-sm text-text-secondary mt-2">This will only take a moment...</p>
                         </div>
                     </div>
                 </div>

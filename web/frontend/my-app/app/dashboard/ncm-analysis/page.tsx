@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    TYPES
@@ -351,7 +352,8 @@ export default function NCMAnalysisPage() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-background flex flex-col">
+        <div className="min-h-screen bg-transparent flex flex-col">
+            <GlassmorphicBackground />
             {/* ── Top Bar ── */}
             <header className="shrink-0 px-6 py-4 flex items-center justify-between border-b border-border-soft bg-card/80 backdrop-blur-md">
                 <div className="flex items-center gap-4">
