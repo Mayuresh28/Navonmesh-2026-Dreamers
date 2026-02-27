@@ -123,7 +123,7 @@ export function SystemicBanner({ flag, ncmIndex }: SystemicBannerProps) {
 
           {/* NCM composite */}
           <div className="pb-metric">
-            <div className="pb-metric-label">NCM Composite</div>
+            <div className="pb-metric-label">Neuro-Cardio-Muscular Composite</div>
             <div className="pb-metric-value" style={{ color: valueColor }}>
               {ncmIndex.toFixed(1)}
             </div>
