@@ -505,7 +505,6 @@ function UploadRow({ cfg, csvFile, imgFile, status, onCsv, onImg, inputValue, on
 
 type Mode = "manual" | "autosync";
 type View = "form" | "results";
-type FS = { csv: File | null; img: File | null; status: "idle" | "ok" | "err" };
 
 export default function HealthDashboard() {
     const [mode, setMode] = useState<Mode>("manual");
@@ -514,7 +513,7 @@ export default function HealthDashboard() {
     const [loading, setLoading] = useState(false);
     const [autoProgress, setAutoProgress] = useState(0);
 
-    const [files, setFiles] = useState<Record<string, FS & { inputValue?: string }>>(() =>
+    const [files, setFiles] = useState<Record<string, FileState>>(() =>
         Object.fromEntries(ALL_PARAMS.map(p => [p.key, { csv: null, img: null, status: "idle" as const, inputValue: "" }]))
     );
 
@@ -656,8 +655,6 @@ export default function HealthDashboard() {
             {/* ══ FORM VIEW ═══════════════════════════════════════════════════════ */}
             {view === "form" && (
                 <div className="flex-1 overflow-hidden flex flex-col">
-
-                    {/* ── MANUAL MODE ── */}
                     {mode === "manual" && (
                         <div className="flex-1 overflow-auto flex flex-col px-6 sm:px-8 py-6 gap-6">
 
@@ -731,8 +728,6 @@ export default function HealthDashboard() {
                             </button>
                         </div>
                     )}
-
-                    {/* ── VIEW FULL REPORT MODE ── */}
                     {mode === "autosync" && (
                         <div className="flex-1 flex flex-col items-center justify-center px-8 gap-8">
                             <div className="text-center max-w-lg">

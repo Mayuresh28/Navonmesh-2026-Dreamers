@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useProfileData } from "@/lib/profile-hook";
 import { ProtectedRoute } from "@/lib/protected-route";
-import { Navbar } from "@/lib/navbar";
+import { BottomNav } from "@/components/navigation/bottom-nav";
 import { motion } from "framer-motion";
 import {
   Zap,
@@ -21,7 +21,6 @@ import {
 import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
 
 export default function DashboardPage() {
-  const { user } = useAuth();
   const router = useRouter();
   const { profile, loading: profileLoading, hasProfile } = useProfileData(user?.uid);
   const [activeTab, setActiveTab] = useState<"dashboard" | "profile" | "results">("dashboard");

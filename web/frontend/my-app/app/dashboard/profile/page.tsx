@@ -5,20 +5,12 @@ import { ProtectedRoute } from "@/lib/protected-route";
 import { useProfileData } from "@/lib/profile-hook";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Navbar } from "@/lib/navbar";
-import {
-  HeartPulse,
-  Scale,
-  Ruler,
-  Flame,
-  Cigarette,
-  Wine,
-  AlertCircle,
-  Users,
-  Calculator,
-  Dna,
-  Clock,
-} from "lucide-react";
+import { BottomNav } from "@/components/navigation/bottom-nav";
+import { HealthMetrics } from "@/components/profile/health-metrics";
+import { LifestyleCards } from "@/components/profile/lifestyle-cards";
+import { ComputedParams } from "@/components/profile/computed-params";
+import { MedicalHistory } from "@/components/profile/medical-history";
+import { HeartPulse } from "lucide-react";
 import { useEffect } from "react";
 import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
 
@@ -27,7 +19,6 @@ export default function ProfilePage() {
   const router = useRouter();
   const { profile, loading, hasProfile } = useProfileData(user?.uid);
 
-  // Redirect to setup if no profile exists
   useEffect(() => {
     if (!loading && !hasProfile()) {
       router.push("/dashboard/profile/setup");
@@ -63,10 +54,7 @@ export default function ProfilePage() {
     },
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-  };
+  if (!profile) return null;
 
   return (
     <ProtectedRoute>
@@ -97,23 +85,12 @@ export default function ProfilePage() {
                 <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
                   <HeartPulse className="text-primary w-5 h-5" />
                 </div>
-                <div>
-                  <h1 className="text-xl font-bold text-text-primary">Your Health Profile</h1>
-                </div>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <button
-                  onClick={() => router.push("/dashboard/profile/setup")}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary hover:bg-primary/30 transition-colors text-sm font-medium"
-                >
-                  <HeartPulse className="w-4 h-4" />
-                  Edit Profile
-                </button>
-              </motion.div>
+                <h1 className="text-xl font-bold text-text-primary">Your Health Profile</h1>
+              </div>
+              <button onClick={() => router.push("/dashboard/profile/setup")}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary hover:bg-primary/30 transition-colors text-sm font-medium">
+                <HeartPulse className="w-4 h-4" /> Edit Profile
+              </button>
             </div>
 
           {/* Content - Scrollable */}
@@ -437,10 +414,10 @@ export default function ProfilePage() {
                 </span>
               </motion.div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
+        <BottomNav />
       </div>
-    </div>
     </ProtectedRoute>
   );
 }
