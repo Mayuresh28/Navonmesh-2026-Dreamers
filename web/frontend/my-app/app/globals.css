@@ -31,15 +31,15 @@ body {
 /* Base components following UI Design System */
 @layer components {
   .card {
-    @apply bg-card rounded-[20px] md:rounded-[24px] p-5 shadow-[0_4px_24px_rgba(126, 166, 247, 0.06)] border border-border-soft;
+    @apply bg-card rounded-[20px] md:rounded-[24px] p-5 shadow-[0_4px_24px_rgb(126_166_247_/_0.06)] border border-border-soft;
   }
 
   .btn-primary {
-    @apply bg-primary text-white rounded-[16px] h-12 px-6 font-medium transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(126, 166, 247, 0.3)] active:scale-95;
+    @apply bg-primary text-white rounded-[16px] h-12 px-6 font-medium transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgb(126_166_247_/_0.3)] active:scale-95;
   }
 
   .btn-secondary {
-    @apply bg-accent text-primary rounded-[16px] h-12 px-6 font-medium transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-opacity-90 active:scale-95;
+    @apply bg-accent text-primary rounded-[16px] h-12 px-6 font-medium transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-accent/90 active:scale-95;
   }
 
   .input-field {
