@@ -2,8 +2,13 @@
 
 import { motion } from "framer-motion";
 import { Activity, ShieldCheck, HeartPulse, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
+  const { user } = useAuth();
+  const router = useRouter();
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -49,9 +54,15 @@ export default function LandingPage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <button className="text-text-secondary hover:text-primary transition-colors text-sm font-medium px-4 py-2 rounded-full hover:bg-accent/30">
-            Sign In
-          </button>
+          {user ? (
+            <Link href="/dashboard" className="text-text-secondary hover:text-primary transition-colors text-sm font-medium px-4 py-2 rounded-full hover:bg-accent/30">
+              Dashboard
+            </Link>
+          ) : (
+            <Link href="/auth/sign-in" className="text-text-secondary hover:text-primary transition-colors text-sm font-medium px-4 py-2 rounded-full hover:bg-accent/30">
+              Sign In
+            </Link>
+          )}
         </motion.div>
       </nav>
 
@@ -84,7 +95,7 @@ export default function LandingPage() {
           </motion.p>
 
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <button className="btn-primary flex items-center justify-center gap-2 group">
+            <button onClick={() => user ? router.push('/dashboard') : router.push('/auth/sign-up')} className="btn-primary flex items-center justify-center gap-2 group">
               Start Monitoring
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
