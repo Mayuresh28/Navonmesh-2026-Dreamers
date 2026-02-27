@@ -47,9 +47,8 @@ interface Threshold {
 }
 
 export const THRESHOLDS: Record<string, Threshold> = {
+    blood_pressure: { low: 120, high: 180, inverse: false, varianceScale: 100, trendThreshold: 3.0 },
     heart_rate: { low: 70, high: 110, inverse: false, varianceScale: 50, trendThreshold: 2.0 },
-    systolic_bp: { low: 120, high: 180, inverse: false, varianceScale: 100, trendThreshold: 3.0 },
-    diastolic_bp: { low: 80, high: 120, inverse: false, varianceScale: 50, trendThreshold: 2.0 },
     glucose: { low: 100, high: 200, inverse: false, varianceScale: 200, trendThreshold: 5.0 },
     spo2: { low: 90, high: 95, inverse: true, varianceScale: 2, trendThreshold: -0.5 },
     sleep: { low: 4, high: 8, inverse: true, varianceScale: 1, trendThreshold: -0.2 },
@@ -240,9 +239,8 @@ function series(base: number, drift: number, amp: number, period: number, n: num
 
 export function generateAutoSyncData(n = 100): Record<string, number[]> {
     return {
+        blood_pressure: series(125, 20, 5, 10, n),
         heart_rate: series(72, 13, 4, 14, n),
-        systolic_bp: series(125, 20, 5, 10, n),
-        diastolic_bp: series(82, 10, 3, 10, n),
         glucose: series(95, 15, 6, 7, n),
         spo2: series(97, -2, 0.8, 12, n),
         sleep: series(7, -2, 0.5, 14, n),

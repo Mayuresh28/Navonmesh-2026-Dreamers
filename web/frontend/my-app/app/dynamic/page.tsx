@@ -20,15 +20,16 @@ interface ParamCard {
     icon: string;
     optional?: boolean;
     isBP?: boolean;       // Blood Pressure requires two-column CSV
+    isInput?: boolean;    // Direct number input instead of CSV
 }
 
 const LOW_FREQ: ParamCard[] = [
-    { key: "blood_pressure", label: "Blood Pressure", unit: "mmHg", icon: "🩸", isBP: true },
+    { key: "blood_pressure", label: "Blood Pressure", unit: "mmHg", icon: "🩸" },
     { key: "heart_rate", label: "Heart Rate", unit: "bpm", icon: "❤️" },
     { key: "glucose", label: "Blood Glucose", unit: "mg/dL", icon: "🍬" },
     { key: "spo2", label: "SpO₂", unit: "%", icon: "🫁" },
-    { key: "sleep", label: "Sleep", unit: "hrs", icon: "😴" },
-    { key: "steps", label: "Steps", unit: "steps", icon: "👟" },
+    { key: "sleep", label: "Sleep", unit: "hrs", icon: "😴", isInput: true },
+    { key: "steps", label: "Steps", unit: "steps", icon: "👟", isInput: true },
 ];
 
 const HI_FREQ: ParamCard[] = [
@@ -42,6 +43,7 @@ const ALL_PARAMS = [...LOW_FREQ, ...HI_FREQ];
 // ─── Result display meta (maps engine key → display config) ──────────────────
 
 const DISPLAY: Record<string, { label: string; unit: string; icon: string }> = {
+    blood_pressure: { label: "Blood Pressure", unit: "mmHg", icon: "🩸" },
     heart_rate: { label: "Heart Rate", unit: "bpm", icon: "❤️" },
     glucose: { label: "Blood Glucose", unit: "mg/dL", icon: "🍬" },
     spo2: { label: "SpO₂", unit: "%", icon: "🫁" },
@@ -52,17 +54,17 @@ const DISPLAY: Record<string, { label: string; unit: string; icon: string }> = {
     ecg: { label: "ECG Metrics", unit: "ms", icon: "📈" },
 };
 
-// Ordered list for the results panel — blood_pressure is a special merged card
-const RESULT_ORDER: Array<{ id: string; isBP?: boolean }> = [
-    { id: "blood_pressure", isBP: true },
-    { id: "heart_rate" },
-    { id: "glucose" },
-    { id: "spo2" },
-    { id: "sleep" },
-    { id: "steps" },
-    { id: "eeg" },
-    { id: "emg" },
-    { id: "ecg" },
+// Ordered list for the results panel
+const RESULT_ORDER = [
+    "blood_pressure",
+    "heart_rate",
+    "glucose",
+    "spo2",
+    "sleep",
+    "steps",
+    "eeg",
+    "emg",
+    "ecg",
 ];
 
 // ─── Risk helpers ─────────────────────────────────────────────────────────────
@@ -240,9 +242,11 @@ interface UploadRowProps {
     status: "idle" | "ok" | "err";
     onCsv: (f: File | null) => void;
     onImg: (f: File | null) => void;
+    inputValue?: string;
+    onInputChange?: (v: string) => void;
 }
 
-function UploadRow({ cfg, csvFile, imgFile, status, onCsv, onImg }: UploadRowProps) {
+function UploadRow({ cfg, csvFile, imgFile, status, onCsv, onImg, inputValue, onInputChange }: UploadRowProps) {
     const csvRef = useRef<HTMLInputElement>(null);
     const imgRef = useRef<HTMLInputElement>(null);
 
@@ -272,27 +276,46 @@ function UploadRow({ cfg, csvFile, imgFile, status, onCsv, onImg }: UploadRowPro
                 {status === "err" && <span className="text-[10px] text-red-500 font-bold">⚠ Error</span>}
             </div>
 
-            {/* CSV upload */}
-            <button
-                onClick={() => csvRef.current?.click()}
-                className={`flex-shrink-0 flex items-center gap-1.5 h-8 px-3 rounded-lg border text-xs font-medium transition-colors ${csvFile ? "border-blue-400 bg-blue-50 text-blue-700" : "border-gray-200 bg-gray-50 text-gray-500 hover:border-blue-300 hover:bg-blue-50"
-                    }`}
-            >
-                📄 {csvFile ? csvFile.name.length > 14 ? csvFile.name.slice(0, 14) + "…" : csvFile.name : "CSV / Excel"}
-            </button>
-            <input ref={csvRef} type="file" className="hidden" accept=".csv,.xlsx,.xls,.txt"
-                onChange={e => onCsv(e.target.files?.[0] ?? null)} />
+            {/* Input logic */}
+            {cfg.isInput ? (
+                <div className="flex-shrink-0 flex items-center gap-2">
+                    <input
+                        type="number"
+                        value={inputValue ?? ""}
+                        onChange={(e) => onInputChange?.(e.target.value)}
+                        placeholder={`Enter ${cfg.label}...`}
+                        className="w-32 h-8 px-3 rounded-lg border border-gray-200 bg-gray-50 text-xs text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none transition-all"
+                    />
+                </div>
+            ) : (
+                <>
+                    {/* CSV upload */}
+                    <button
+                        onClick={() => csvRef.current?.click()}
+                        className={`flex-shrink-0 flex items-center gap-1.5 h-8 px-3 rounded-lg border text-xs font-medium transition-colors ${csvFile ? "border-blue-400 bg-blue-50 text-blue-700" : "border-gray-200 bg-gray-50 text-gray-500 hover:border-blue-300 hover:bg-blue-50"
+                            }`}
+                    >
+                        📄 {csvFile ? csvFile.name.length > 14 ? csvFile.name.slice(0, 14) + "…" : csvFile.name : "CSV / Excel"}
+                    </button>
+                    <input ref={csvRef} type="file" className="hidden" accept=".csv,.xlsx,.xls,.txt"
+                        onChange={e => onCsv(e.target.files?.[0] ?? null)} />
+                </>
+            )}
 
-            {/* Image upload */}
-            <button
-                onClick={() => imgRef.current?.click()}
-                className={`flex-shrink-0 flex items-center gap-1.5 h-8 px-3 rounded-lg border text-xs font-medium transition-colors ${imgFile ? "border-purple-400 bg-purple-50 text-purple-700" : "border-gray-200 bg-gray-50 text-gray-500 hover:border-purple-300 hover:bg-purple-50"
-                    }`}
-            >
-                🖼️ {imgFile ? imgFile.name.length > 10 ? imgFile.name.slice(0, 10) + "…" : imgFile.name : "Image"}
-            </button>
-            <input ref={imgRef} type="file" className="hidden" accept="image/*"
-                onChange={e => onImg(e.target.files?.[0] ?? null)} />
+            {/* Image upload (only for non-input parameters) */}
+            {!cfg.isInput && (
+                <>
+                    <button
+                        onClick={() => imgRef.current?.click()}
+                        className={`flex-shrink-0 flex items-center gap-1.5 h-8 px-3 rounded-lg border text-xs font-medium transition-colors ${imgFile ? "border-purple-400 bg-purple-50 text-purple-700" : "border-gray-200 bg-gray-50 text-gray-500 hover:border-purple-300 hover:bg-purple-50"
+                            }`}
+                    >
+                        🖼️ {imgFile ? imgFile.name.length > 10 ? imgFile.name.slice(0, 10) + "…" : imgFile.name : "Image"}
+                    </button>
+                    <input ref={imgRef} type="file" className="hidden" accept="image/*"
+                        onChange={e => onImg(e.target.files?.[0] ?? null)} />
+                </>
+            )}
         </div>
     );
 }
@@ -310,12 +333,12 @@ export default function HealthDashboard() {
     const [loading, setLoading] = useState(false);
     const [autoProgress, setAutoProgress] = useState(0);
 
-    const [files, setFiles] = useState<Record<string, FS>>(() =>
-        Object.fromEntries(ALL_PARAMS.map(p => [p.key, { csv: null, img: null, status: "idle" as const }]))
+    const [files, setFiles] = useState<Record<string, FS & { inputValue?: string }>>(() =>
+        Object.fromEntries(ALL_PARAMS.map(p => [p.key, { csv: null, img: null, status: "idle" as const, inputValue: "" }]))
     );
 
-    const setParamFile = useCallback((key: string, field: "csv" | "img", file: File | null) => {
-        setFiles(prev => ({ ...prev, [key]: { ...prev[key], [field]: file, status: "idle" } }));
+    const setParamFile = useCallback((key: string, field: "csv" | "img" | "inputValue", val: File | string | null) => {
+        setFiles(prev => ({ ...prev, [key]: { ...prev[key], [field]: val, status: "idle" } }));
     }, []);
 
     // ── Analyse (manual) ────────────────────────────────────────────────────────
@@ -326,21 +349,22 @@ export default function HealthDashboard() {
 
         for (const p of ALL_PARAMS) {
             const state = files[p.key];
+
+            if (p.isInput) {
+                if (state.inputValue && !isNaN(parseFloat(state.inputValue))) {
+                    data[p.key] = [parseFloat(state.inputValue)];
+                    updated[p.key] = { ...state, status: "ok" };
+                }
+                continue;
+            }
+
             if (!state.csv) continue;
             try {
                 const text = await state.csv.text();
-                if (p.isBP) {
-                    const cols = parseCSVColumns(text);
-                    if (cols[0].length === 0) throw new Error("empty");
-                    data["systolic_bp"] = cols[0];
-                    data["diastolic_bp"] = cols[1].length > 0 ? cols[1] : cols[0].map(v => Math.round(v * 0.67));
-                    updated[p.key] = { ...state, status: "ok" };
-                } else {
-                    const nums = parseCSVtoNumbers(text);
-                    if (nums.length === 0) throw new Error("empty");
-                    data[p.key] = nums;
-                    updated[p.key] = { ...state, status: "ok" };
-                }
+                const nums = parseCSVtoNumbers(text);
+                if (nums.length === 0) throw new Error("empty");
+                data[p.key] = nums;
+                updated[p.key] = { ...state, status: "ok" };
             } catch {
                 updated[p.key] = { ...state, status: "err" };
             }
@@ -348,28 +372,58 @@ export default function HealthDashboard() {
 
         setFiles(updated);
         const hasData = Object.keys(data).length > 0;
+
         if (hasData) {
-            setResult(processAllParameters(data));
-            setView("results");
+            try {
+                // Add artificial processing delay
+                await new Promise(r => setTimeout(r, 2000));
+
+                const response = await fetch('/api/health-analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                if (!response.ok) throw new Error('Failed to save analysis');
+
+                const resultData = await response.json();
+                setResult(resultData);
+                setView("results");
+            } catch (err: any) {
+                console.error(err);
+                alert("Error during analysis: " + err.message);
+            }
         }
         setLoading(false);
     }, [files]);
 
     // ── Auto sync ───────────────────────────────────────────────────────────────
-    const handleAutoSync = useCallback(() => {
+    const handleAutoSync = useCallback(async () => {
         setLoading(true);
         setAutoProgress(0);
         let step = 0;
         const iv = setInterval(() => {
-            step += 7;
+            step += 5;
             setAutoProgress(Math.min(step, 100));
-            if (step >= 100) {
-                clearInterval(iv);
-                setResult(processAllParameters(generateAutoSyncData(100)));
-                setLoading(false);
-                setView("results");
-            }
-        }, 80);
+            if (step >= 100) clearInterval(iv);
+        }, 100);
+
+        try {
+            const response = await fetch('/api/health-analyze');
+            if (!response.ok) throw new Error('No previous data found. Please run a Manual Analysis first to populate the database.');
+
+            const resultData = await response.json();
+
+            // Wait for progress bar to finish
+            await new Promise(r => setTimeout(r, 2200));
+
+            setResult(resultData);
+            setView("results");
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
     const handleBack = () => {
@@ -385,7 +439,9 @@ export default function HealthDashboard() {
         setAutoProgress(0);
     };
 
-    const anyReady = ALL_PARAMS.some(p => files[p.key].csv !== null);
+    const anyReady = ALL_PARAMS.some(p =>
+        (p.isInput && files[p.key].inputValue) || (!p.isInput && files[p.key].csv !== null)
+    );
 
     // ═══════════════════════════════════════════════════════════════════════════
     // RENDER
@@ -463,6 +519,8 @@ export default function HealthDashboard() {
                                             status={files[cfg.key].status}
                                             onCsv={f => setParamFile(cfg.key, "csv", f)}
                                             onImg={f => setParamFile(cfg.key, "img", f)}
+                                            inputValue={files[cfg.key].inputValue}
+                                            onInputChange={v => setParamFile(cfg.key, "inputValue", v)}
                                         />
                                     ))}
                                 </div>
@@ -517,7 +575,7 @@ export default function HealthDashboard() {
                                 <div className="w-20 h-20 rounded-3xl bg-blue-50 border-2 border-blue-200 flex items-center justify-center text-4xl mx-auto mb-4">⚡</div>
                                 <h2 className="text-xl font-bold text-gray-800">Auto Sync Mode</h2>
                                 <p className="text-sm text-gray-500 mt-1 max-w-sm">
-                                    Automatically generates <strong>100 daily readings</strong> per parameter using deterministic formulas, then instantly computes risk scores.
+                                    Fetches <strong>all stored entries</strong> from the database, merges every data point per parameter, and re-runs the full risk analysis on the complete dataset.
                                 </p>
                             </div>
 
@@ -590,13 +648,7 @@ export default function HealthDashboard() {
                                 alignContent: "start",
                             }}
                         >
-                            {RESULT_ORDER.map(({ id, isBP }) => {
-                                if (isBP) {
-                                    const sys = result.metrics["systolic_bp"];
-                                    const dia = result.metrics["diastolic_bp"];
-                                    if (!sys && !dia) return null;
-                                    return <BPMetricCard key="blood_pressure" sys={sys ?? dia} dia={dia ?? sys} />;
-                                }
+                            {RESULT_ORDER.map((id) => {
                                 const m = result.metrics[id];
                                 if (!m) return null;
                                 return <MetricCard key={id} eKey={id} m={m} />;
@@ -606,7 +658,23 @@ export default function HealthDashboard() {
                 </div>
             )}
 
-            {/* Loading overlay (while results view is transitioning) */}
+            {/* Loading overlay for Manual Mode */}
+            {loading && view === "form" && mode === "manual" && (
+                <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-10">
+                    <div className="flex flex-col items-center gap-3">
+                        <svg className="animate-spin h-10 w-10 text-blue-500" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                        </svg>
+                        <p className="text-sm text-gray-600 font-bold uppercase tracking-widest">
+                            Syncing with Database & Analyzing…
+                        </p>
+                        <p className="text-[10px] text-gray-400">Processing formula-based risks...</p>
+                    </div>
+                </div>
+            )}
+
+            {/* Loading overlay for Auto Sync */}
             {loading && view === "form" && mode === "autosync" && (
                 <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-10">
                     <div className="flex flex-col items-center gap-3">
@@ -614,7 +682,10 @@ export default function HealthDashboard() {
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                         </svg>
-                        <p className="text-sm text-gray-600 font-medium">Computing with formulas…</p>
+                        <p className="text-sm text-gray-600 font-bold uppercase tracking-widest">
+                            Fetching All Entries from Database…
+                        </p>
+                        <p className="text-[10px] text-gray-400">Merging & analyzing all data from "dynamic_data"...</p>
                     </div>
                 </div>
             )}
