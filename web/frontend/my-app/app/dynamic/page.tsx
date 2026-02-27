@@ -16,6 +16,7 @@ import { OverallSummary } from "@/components/vitals/overall-summary";
 
 type Mode = "manual" | "autosync";
 type View = "form" | "results";
+type FileState = { csv: File | null; img: File | null; status: "idle" | "ok" | "err"; inputValue: string };
 
 export default function HealthDashboard() {
     const [mode, setMode] = useState<Mode>("manual");

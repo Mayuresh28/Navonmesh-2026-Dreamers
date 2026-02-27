@@ -10,8 +10,10 @@ import { HealthMetrics } from "@/components/profile/health-metrics";
 import { LifestyleCards } from "@/components/profile/lifestyle-cards";
 import { ComputedParams } from "@/components/profile/computed-params";
 import { MedicalHistory } from "@/components/profile/medical-history";
-import { HeartPulse } from "lucide-react";
+import { HeartPulse, Users, Ruler, Scale, Cigarette, Wine, Flame, Calculator, Dna, Clock, AlertCircle } from "lucide-react";
 import { useEffect } from "react";
+import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
+import { Navbar } from "@/lib/navbar";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -28,6 +30,11 @@ export default function ProfilePage() {
       <BottomNav />
     </div></ProtectedRoute>
   );
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
 
   if (!profile) return null;
 
@@ -48,8 +55,8 @@ export default function ProfilePage() {
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "var(--teal-bg)", border: "1px solid var(--border-accent)" }}>
                   <HeartPulse className="w-5 h-5" style={{ color: "var(--teal)" }} />
                 </div>
-                <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>Your Health Profile</h1>
-              </div>
+                <h1 className="text-xl font-bold text-text-primary">Your Health Profile</h1>
+              </motion.div>
               <button onClick={() => router.push("/dashboard/profile/setup")}
                 className="btn-secondary flex items-center gap-2 !h-auto !py-2 !px-4 text-sm">
                 <HeartPulse className="w-4 h-4" /> Edit Profile
@@ -72,6 +79,7 @@ export default function ProfilePage() {
                 </span>
               </motion.div>
             </div>
+          </div>
           </motion.div>
         </div>
         <BottomNav />
