@@ -56,7 +56,7 @@ export default function ProfilePage() {
                   <HeartPulse className="w-5 h-5" style={{ color: "var(--teal)" }} />
                 </div>
                 <h1 className="text-xl font-bold text-text-primary">Your Health Profile</h1>
-              </motion.div>
+              </div>
               <button onClick={() => router.push("/dashboard/profile/setup")}
                 className="btn-secondary flex items-center gap-2 !h-auto !py-2 !px-4 text-sm">
                 <HeartPulse className="w-4 h-4" /> Edit Profile
@@ -79,7 +79,6 @@ export default function ProfilePage() {
                 </span>
               </motion.div>
             </div>
-          </div>
           </motion.div>
         </div>
         <BottomNav />
