@@ -1,0 +1,63 @@
+NAVOMESH/
+│
+├── web/
+│   └── frontend/                # Next.js (Already deployed on Vercel)
+│       └── my-app/
+│           ├── app/
+│           │   ├── api/
+│           │   │   └── predict/route.ts
+│           │   ├── auth/
+│           │   ├── dashboard/
+│           │   ├── profile/
+│           │   ├── layout.tsx
+│           │   └── page.tsx
+│           │
+│           ├── lib/
+│           ├── public/
+│           └── package.json
+│
+├── backend/                     # Node.js / Express API
+│   ├── controllers/
+│   │   └── predictionController.js
+│   ├── routes/
+│   │   └── predictionRoutes.js
+│   ├── services/
+│   │   └── mlService.js
+│   ├── models/
+│   ├── config/
+│   ├── server.js
+│   └── package.json
+│
+├── ml/                          # Machine Learning Module (Python)
+│   ├── datasets/                # Raw and processed datasets
+│   │   ├── raw/
+│   │   └── processed/
+│   │
+│   ├── preprocessing/
+│   │   ├── clean.py
+│   │   ├── normalize.py
+│   │   └── windowing.py
+│   │
+│   ├── models/
+│   │   ├── multi_disease_model.py
+│   │   └── tcn_model.py
+│   │
+│   ├── training/
+│   │   ├── train.py
+│   │   ├── evaluate.py
+│   │   └── metrics.py
+│   │
+│   ├── inference/
+│   │   ├── load_model.py
+│   │   └── predict.py
+│   │
+│   ├── saved_models/
+│   │   └── multi_disease_v1.pth
+│   │
+│   ├── requirements.txt
+│   └── main.py                  # FastAPI entry point
+│
+├── docs/
+│   └── architecture.md
+│
+└── README.md
