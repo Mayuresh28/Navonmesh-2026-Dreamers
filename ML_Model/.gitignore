@@ -1,0 +1,12 @@
+# Ignore datasets
+data/synthetic/*.csv
+
+# Ignore model files
+*.pkl
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore local info folder
+info/
