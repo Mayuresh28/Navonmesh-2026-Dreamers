@@ -4,12 +4,25 @@ import { useRouter } from "next/navigation";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { BottomNav } from "@/components/navigation/bottom-nav";
 import { motion } from "framer-motion";
-import { Zap, Activity, Sun, Moon } from "lucide-react";
-import { useTheme } from "@/lib/theme-context";
+import {
+  Zap,
+  Activity,
+  ShieldCheck,
+  HeartPulse,
+  ClipboardList,
+  ArrowRight,
+  Loader2,
+  UserCircle,
+  Sparkles,
+} from "lucide-react";
+import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
+import { Navbar } from "@/lib/navbar";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { theme, toggle } = useTheme();
+  const { user } = useAuth();
+  const { profile, loading: profileLoading, hasProfile } = useProfileData(user?.uid);
+  const [activeTab, setActiveTab] = useState<"dashboard" | "profile" | "results">("dashboard");
 
   return (
     <ProtectedRoute>
