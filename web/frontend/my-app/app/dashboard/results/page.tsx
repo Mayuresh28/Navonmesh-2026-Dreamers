@@ -27,6 +27,9 @@ import {
 } from "lucide-react";
 import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
 import { Navbar } from "@/lib/navbar";
+import { RiskCard } from "@/components/predict/risk-card";
+import { ProbabilityBars } from "@/components/predict/probability-bars";
+import { FeatureCards } from "@/components/predict/feature-cards";
 
 interface PredictionResult {
   predicted_class: string;

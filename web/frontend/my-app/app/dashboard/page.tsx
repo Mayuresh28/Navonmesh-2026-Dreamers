@@ -1,6 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
+import { useProfileData } from "@/lib/profile-hook";
+import { useTheme } from "@/lib/theme-context";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { BottomNav } from "@/components/navigation/bottom-nav";
 import { motion } from "framer-motion";
@@ -14,6 +18,8 @@ import {
   Loader2,
   UserCircle,
   Sparkles,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
 import { Navbar } from "@/lib/navbar";
@@ -22,6 +28,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { profile, loading: profileLoading, hasProfile } = useProfileData(user?.uid);
+  const { theme, toggle } = useTheme();
   const [activeTab, setActiveTab] = useState<"dashboard" | "profile" | "results">("dashboard");
 
   return (
