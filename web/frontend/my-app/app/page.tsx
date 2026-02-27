@@ -21,7 +21,7 @@ export default function LandingPage() {
 
   const handleStartMonitoring = () => {
     if (user) {
-      router.push('/dashboard/profile');
+      router.push('/dashboard');
     } else {
       router.push('/auth/sign-up');
     }
@@ -94,7 +94,7 @@ export default function LandingPage() {
             )}
           </button>
           {user ? (
-            <Link href="/dashboard/profile"
+            <Link href="/dashboard"
               className="text-sm font-medium px-4 py-2 rounded-full transition-colors"
               style={{ color: "var(--text-body)", background: "var(--teal-bg)" }}>
               Dashboard
