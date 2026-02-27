@@ -4,25 +4,12 @@ import { useRouter } from "next/navigation";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { BottomNav } from "@/components/navigation/bottom-nav";
 import { motion } from "framer-motion";
-import {
-  Zap,
-  Activity,
-  ShieldCheck,
-  HeartPulse,
-  ClipboardList,
-  ArrowRight,
-  Loader2,
-  UserCircle,
-  Sparkles,
-} from "lucide-react";
-import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
-import { Navbar } from "@/lib/navbar";
+import { Zap, Activity, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/lib/theme-context";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user } = useAuth();
-  const { profile, loading: profileLoading, hasProfile } = useProfileData(user?.uid);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "profile" | "results">("dashboard");
+  const { theme, toggle } = useTheme();
 
   return (
     <ProtectedRoute>
@@ -56,7 +43,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="flex-grow w-full flex items-center justify-center px-5 py-12"
+          className="grow w-full flex items-center justify-center px-5 py-12"
           style={{ minHeight: "calc(100vh - 130px)" }}
         >
           <div className="relative w-full max-w-3xl">
