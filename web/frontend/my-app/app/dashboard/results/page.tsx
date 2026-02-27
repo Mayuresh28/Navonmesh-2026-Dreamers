@@ -77,12 +77,15 @@ function profileToModelInput(profile: {
   // Clamp
   baselineRisk = Math.min(0.6, Math.max(0.05, baselineRisk));
 
-  return {
+  const result = {
     BMI: profile.bmi,
     Genetic_Risk: profile.geneticRiskScore,
     Age_Risk_Multiplier: profile.ageRiskMultiplier,
     Baseline_Risk: parseFloat(baselineRisk.toFixed(4)),
   };
+
+  console.log("[Results] profileToModelInput computed:", result);
+  return result;
 }
 
 function getRiskColor(riskClass: string) {
