@@ -63,15 +63,3 @@ Design an innovative and scalable preventive health monitoring framework that:
 - Supports diverse Indian populations across urban and rural environments  
 
 ---
-
-##  Expected Impact
-
-The proposed framework should aim to:
-
-- Reduce late-stage diagnosis of chronic diseases  
-- Enable early risk stratification  
-- Improve preventive healthcare awareness  
-- Reduce long-term healthcare costs  
-- Support public health decision-making through data-driven insights  
-
----
