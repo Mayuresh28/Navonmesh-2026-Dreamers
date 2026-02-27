@@ -68,6 +68,12 @@ class NCMResult(BaseModel):
     # Risk category
     risk_category: str
 
+    # Computed features (so the frontend can display them)
+    heart_rate: float = 72.0
+    hrv_sdnn: float = 50.0
+    stress_ratio: float = 1.0
+    emg_rms: float = 0.3
+
 
 # ─── Feature computation helpers ───────────────────────────────────────────────
 
@@ -157,6 +163,10 @@ def predict_ncm(inp: NCMInput):
         systemic_flag=systemic_flag,
         ncm_index=round(ncm_index, 2),
         risk_category=risk_category,
+        heart_rate=round(float(hr), 2),
+        hrv_sdnn=round(float(hrv), 2),
+        stress_ratio=round(float(sr), 4),
+        emg_rms=round(float(emg), 4),
     )
 
 
