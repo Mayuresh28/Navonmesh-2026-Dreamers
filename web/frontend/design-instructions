@@ -1,0 +1,392 @@
+PREVENTIVE HEALTHCARE APPLICATION
+UI DESIGN FLOW AND SYSTEM GUIDELINES
+Mobile-First | Pastel Light Theme | Minimal Aesthetic
+
+OBJECTIVE
+
+Design a mobile-first, fully responsive healthcare monitoring interface using a pastel-based light theme. The interface must be minimal, aesthetic, structured, and clinically trustworthy while remaining visually soft and modern.
+
+This document defines the complete UI flow and design expectations. Development implementation is not included in this phase. The agent must strictly follow these design considerations before any code generation.
+
+CORE DESIGN PRINCIPLES
+
+2.1 Visual Identity
+
+Calm and trustworthy
+
+Professional but approachable
+
+Clean and minimal
+
+Data-focused but human-centered
+
+Modern health-tech aesthetic
+
+2.2 Design Philosophy
+
+White space is essential
+
+Avoid visual clutter
+
+Avoid harsh or saturated colors
+
+Avoid heavy shadows
+
+Use rounded components
+
+Use soft pastel tones
+
+2.3 Interface Tone
+The UI must not resemble:
+
+Government portals
+
+Hospital ERP systems
+
+Dark fintech dashboards
+
+Aggressive medical emergency systems
+
+The UI must resemble:
+
+Modern health-tech startup app
+
+Preventive wellness platform
+
+AI-powered monitoring system
+
+COLOR SYSTEM (PASTEL LIGHT THEME)
+
+Primary Color Palette:
+
+Primary Blue: #7EA6F7
+Secondary Blue: #5B7BEA
+Accent Light Blue: #CFE0FF
+Background: #F4F7FB
+Card Background: #FFFFFF
+Border: #E3EAF5
+Text Primary: #1F2937
+Text Secondary: #6B7280
+
+Status Colors (Soft Pastel Only):
+
+Low Risk: #86E3A3
+Moderate Risk: #FFD580
+High Risk: #FF9C9C
+
+Strict Rules:
+
+Do not use harsh red (#FF0000).
+
+Do not use pure black for text.
+
+Avoid overly dark UI sections.
+
+All risk indicators must be soft-toned.
+
+TYPOGRAPHY SYSTEM
+
+Font Family:
+
+Clean sans-serif (Inter or equivalent modern sans-serif)
+
+Hierarchy:
+
+Page Title: 22–24px, weight 600
+Section Title: 18px, weight 600
+Card Title: 16px, weight 500
+Body Text: 14px, weight 400
+Caption Text: 12px, weight 400
+
+Spacing:
+
+Use comfortable line height (1.5–1.6).
+
+Maintain visual breathing room between sections.
+
+MOBILE-FIRST DESIGN STRATEGY
+
+5.1 Base Design Width
+Primary design reference: 375px–430px width.
+
+All layouts must be designed for mobile first. Scaling to larger devices must happen progressively.
+
+5.2 Responsive Breakpoints
+
+Mobile: 0–767px
+Tablet: 768–1023px
+Desktop: 1024–1439px
+Large Desktop: 1440px+
+
+5.3 Layout Adaptation Rules
+
+Mobile:
+
+Vertical stacked layout
+
+Single-column structure
+
+Cards stacked with consistent spacing
+
+Tablet:
+
+Two-column grid layout
+
+Balanced spacing
+
+Maintain card integrity
+
+Desktop:
+
+Three or four column grid
+
+Dashboard-style alignment
+
+Maintain white space
+
+No fixed pixel widths for layout containers. Use responsive units.
+
+DESIGN FLOW – SCREEN STRUCTURE
+
+Step 1: App Entry Screen
+
+Soft background (#F4F7FB)
+
+Minimal top header
+
+Greeting section
+
+Circular profile avatar
+
+Optional soft gradient header area
+
+Step 2: Dashboard Overview
+
+Primary metric card (large card)
+
+Health summary indicators
+
+Risk status display
+
+Trend visualization placeholder
+
+Step 3: Health Metrics Section
+Each metric must be placed inside a card with:
+
+Border radius: 20–24px
+
+Padding: 16px
+
+Subtle elevation
+
+Soft shadow only
+
+Card Structure:
+
+Icon or small illustration
+
+Metric name
+
+Current value
+
+Risk badge
+
+Small trend indicator
+
+Step 4: Detailed View (Metric Drilldown)
+
+Large title
+
+Graph section
+
+Historical data section
+
+Recommendations section
+
+Step 5: Alerts and Notifications
+
+Soft alert cards
+
+Pastel background tone depending on risk
+
+No flashing or aggressive styles
+
+Step 6: Profile and Settings
+
+Minimal structured list
+
+Clear hierarchy
+
+Rounded containers
+
+Soft dividers
+
+COMPONENT DESIGN RULES
+
+7.1 Cards
+
+Border radius: 20–24px
+
+Light shadow (very subtle)
+
+No thick borders
+
+Avoid sharp edges
+
+Shadow guideline:
+Very low opacity, soft spread, no heavy depth.
+
+7.2 Buttons
+
+Primary Button:
+
+Background: #7EA6F7
+
+White text
+
+Radius: 16px
+
+Height: 48px
+
+Secondary Button:
+
+Light pastel background
+
+Primary blue text
+
+Buttons must feel soft, not aggressive.
+
+7.3 Inputs
+
+Rounded
+
+Light border
+
+Soft focus glow
+
+Clear placeholder
+
+7.4 Navigation
+
+Mobile:
+
+Bottom navigation bar
+
+4–5 icons maximum
+
+Rounded container
+
+Active icon in primary blue
+
+Inactive icons in muted gray
+
+Desktop:
+
+Left sidebar or top navigation
+
+Clean structure
+
+Minimal labels
+
+ILLUSTRATION AND ICONOGRAPHY
+
+Use:
+
+Flat pastel illustrations
+
+Minimal line-based icons
+
+Rounded icon containers
+
+Friendly medical visuals
+
+Avoid:
+
+Realistic medical photography
+
+High contrast illustrations
+
+Complex 3D medical graphics
+
+Icons must be simple, thin-line, modern.
+
+SPACING SYSTEM
+
+Use an 8px grid system:
+
+8px – micro spacing
+16px – standard spacing
+24px – section spacing
+32px – major separation
+
+Never overcrowd UI elements. Maintain consistent padding and margin values.
+
+MICRO-INTERACTIONS
+
+Smooth fade-in animations
+
+Soft card hover elevation (desktop only)
+
+Subtle scaling on tap
+
+Smooth progress animations
+
+Animation duration: 200–300ms
+
+Easing: ease-in-out
+
+Avoid:
+
+Bounce effects
+
+Flashing alerts
+
+Over-animated transitions
+
+ACCESSIBILITY REQUIREMENTS
+
+Minimum contrast ratio 4.5:1
+
+Large tap targets (minimum 44px height)
+
+Risk indicators must include icon + text, not color only
+
+Maintain readable font sizes
+
+STRICT DESIGN RESTRICTIONS
+
+The agent must not:
+
+Introduce dark mode unless explicitly requested
+
+Use saturated or neon colors
+
+Add excessive gradients
+
+Create heavy shadows
+
+Overcrowd layout
+
+Mix multiple design styles
+
+The agent must maintain visual consistency across all screens.
+
+FINAL DESIGN VALIDATION CHECKLIST
+
+Before generating any UI output, verify:
+
+Mobile-first layout structure
+
+Proper pastel color usage
+
+Consistent border radius
+
+Consistent spacing system
+
+Typography hierarchy maintained
+
+Clean minimal visual flow
+
+Fully responsive layout logic
+
+If any of the above conditions are not met, the design is considered invalid.
