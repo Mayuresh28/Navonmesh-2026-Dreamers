@@ -84,7 +84,7 @@ export function useProfileData(userId?: string) {
 
     try {
       setLoading(true);
-      const requestBody = { userId, ...profileData };
+      const requestBody = { ...profileData, userId };
       const isUpdate = profile !== null;
       const method = isUpdate ? "PUT" : "POST";
       console.log(`[ProfileHook] Sending ${method} request to /api/profile`);

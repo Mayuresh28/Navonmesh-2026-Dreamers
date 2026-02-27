@@ -45,14 +45,14 @@ export default function LandingPage() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
+      transition: { duration: 0.6, ease: "easeOut" as const }
     },
   };
 
   const floatingVariants = {
     animate: {
       y: [0, -10, 0],
-      transition: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+      transition: { duration: 4, repeat: Infinity, ease: "easeInOut" as const }
     }
   };
 
