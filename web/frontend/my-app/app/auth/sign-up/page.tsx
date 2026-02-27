@@ -18,24 +18,33 @@ export default function SignUpPage() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("[SignUp] Form submission started");
+    console.log("[SignUp] Email:", email);
     setError("");
 
     if (password !== confirmPassword) {
+      console.error("[SignUp] ✗ Passwords do not match");
       setError("Passwords do not match");
       return;
     }
 
     if (password.length < 6) {
+      console.error("[SignUp] ✗ Password too short");
       setError("Password must be at least 6 characters");
       return;
     }
 
     setLoading(true);
+    console.log("[SignUp] Validation passed");
 
     try {
+      console.log("[SignUp] Calling Firebase createUserWithEmailAndPassword...");
       await createUserWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard");
+      console.log("[SignUp] ✓ Firebase user created successfully");
+      console.log("[SignUp] Redirecting to /dashboard/profile...");
+      router.push("/dashboard/profile");
     } catch (err) {
+      console.error("[SignUp] ✗ Account creation failed:", err);
       if (err instanceof Error) {
         setError(err.message);
       } else {

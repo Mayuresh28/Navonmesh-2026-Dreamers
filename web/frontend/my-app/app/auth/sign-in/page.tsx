@@ -17,13 +17,19 @@ export default function SignInPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("[SignIn] Form submission started");
+    console.log("[SignIn] Email:", email);
     setError("");
     setLoading(true);
 
     try {
+      console.log("[SignIn] Calling Firebase signInWithEmailAndPassword...");
       await signInWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard");
+      console.log("[SignIn] ✓ Firebase authentication successful");
+      console.log("[SignIn] Redirecting to /dashboard/profile...");
+      router.push("/dashboard/profile");
     } catch (err) {
+      console.error("[SignIn] ✗ Authentication failed:", err);
       if (err instanceof Error) {
         setError(err.message);
       } else {
