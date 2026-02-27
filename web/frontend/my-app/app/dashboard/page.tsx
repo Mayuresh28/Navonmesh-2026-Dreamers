@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { Navbar } from "@/lib/navbar";
 import { motion } from "framer-motion";
-import { Zap } from "lucide-react";
+import { Zap, Activity } from "lucide-react";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -81,6 +81,17 @@ export default function DashboardPage() {
                 >
                   <Zap className="w-4 h-4" />
                   Go to Dashboard
+                </motion.button>
+
+                <motion.button
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                  onClick={() => router.push("/dashboard/ncm-analysis")}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-[16px] bg-primary/10 border border-primary/30 text-primary font-medium cursor-pointer hover:bg-primary/20 transition-colors"
+                >
+                  <Activity className="w-4 h-4" />
+                  NCM Analysis
                 </motion.button>
               </motion.div>
             </div>
