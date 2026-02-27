@@ -75,37 +75,39 @@ export default function ProfileSetupPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen flex flex-col relative overflow-hidden bg-background">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent/30 rounded-full blur-3xl -z-10" />
-        <div className="absolute bottom-[-10%] right-[-15%] w-[40%] h-[50%] bg-status-low/20 rounded-full blur-3xl -z-10" />
+      <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: "var(--bg-base)" }}>
+        <div className="ekg-strip" />
+        {/* Ambient glow */}
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full blur-3xl -z-10" style={{ background: "var(--teal-glow)" }} />
+        <div className="absolute bottom-[-10%] right-[-15%] w-[40%] h-[50%] rounded-full blur-3xl -z-10" style={{ background: "var(--ok-bg)" }} />
 
         <nav className="w-full px-6 py-6 md:px-12 z-10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-card flex items-center justify-center shadow-sm border border-border-soft">
-              <HeartPulse className="text-primary w-6 h-6" />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+              <HeartPulse className="w-6 h-6" style={{ color: "var(--teal)" }} />
             </div>
-            <span className="text-2xl font-bold text-primary tracking-tight">धन्वंतरी</span>
+            <span className="text-2xl font-bold tracking-tight" style={{ color: "var(--teal)" }}>धन्वंतरी</span>
           </div>
         </nav>
 
         <main className="flex-grow flex items-center justify-center px-6 md:px-12 z-10 pb-12">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-2xl">
-            <div className="bg-gradient-to-br from-card/90 to-card/70 backdrop-blur-xl rounded-[32px] p-8 md:p-12 border border-accent/30 shadow-[0_8px_32px_rgb(90_127_232_/_0.15)]">
-              <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">Complete Your Profile</h1>
-              <p className="text-text-secondary mb-8">Help us understand your health better</p>
+            <div className="prana-vessel p-8 md:p-12">
+              <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>Complete Your Profile</h1>
+              <p className="mb-8" style={{ color: "var(--text-muted)" }}>Help us understand your health better</p>
 
               {success ? (
                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center py-12">
-                  <CheckCircle className="w-16 h-16 text-status-low mb-4" />
-                  <p className="text-lg font-semibold text-status-low">Profile Saved Successfully!</p>
-                  <p className="text-text-secondary mt-2">Redirecting to dashboard...</p>
+                  <CheckCircle className="w-16 h-16 mb-4" style={{ color: "var(--teal)" }} />
+                  <p className="text-lg font-semibold" style={{ color: "var(--teal)" }}>Profile Saved Successfully!</p>
+                  <p className="mt-2" style={{ color: "var(--text-muted)" }}>Redirecting to dashboard...</p>
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-8">
                   {error && (
                     <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                      className="bg-status-high/10 border border-status-high/30 rounded-[16px] p-4">
-                      <p className="text-status-high text-sm font-medium">{error}</p>
+                      className="rounded-[16px] p-4" style={{ background: "var(--danger-bg)", border: "1px solid var(--danger-border)" }}>
+                      <p className="text-sm font-medium" style={{ color: "var(--danger-text)" }}>{error}</p>
                     </motion.div>
                   )}
                   <PersonalInfo formData={formData} onChange={handleInputChange} />

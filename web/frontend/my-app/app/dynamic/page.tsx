@@ -118,31 +118,44 @@ export default function HealthDashboard() {
        RENDER
        ═══════════════════════════════════════════════════════════════════════════ */
     return (
-        <div className="h-screen w-screen overflow-hidden bg-[#f8f9fc] flex flex-col" style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+        <div className="h-screen w-screen overflow-hidden flex flex-col"
+          style={{ background: "var(--bg-base)", color: "var(--text-primary)" }}>
+
+            {/* ══ EKG STRIP ═══════════════════════════════════════════════════════ */}
+            <div className="ekg-strip shrink-0">
+              <svg className="ekg-mover" viewBox="0 0 600 44" preserveAspectRatio="none" fill="none" stroke="var(--ekg-color)" strokeWidth="1.2">
+                <polyline points="0,22 40,22 50,22 55,10 60,34 65,18 70,26 75,22 120,22 160,22 170,22 175,10 180,34 185,18 190,26 195,22 240,22 280,22 290,22 295,10 300,34 305,18 310,26 315,22 360,22 400,22 410,22 415,10 420,34 425,18 430,26 435,22 480,22 520,22 530,22 535,10 540,34 545,18 550,26 555,22 600,22" />
+              </svg>
+            </div>
 
             {/* ══ HEADER ══════════════════════════════════════════════════════════ */}
-            <header className="shrink-0 bg-white border-b border-gray-200/80 h-16 px-6 sm:px-8 flex items-center justify-between gap-4 shadow-sm">
+            <header className="shrink-0 h-16 px-6 sm:px-8 flex items-center justify-between gap-4"
+              style={{ background: "var(--bg-surface)", borderBottom: "1px solid var(--border)" }}>
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ background: "var(--teal-bg)", border: "1.5px solid var(--border-accent)" }}>
                         {Icons.logo("w-5 h-5")}
                     </div>
                     <div>
-                        <span className="text-lg font-bold text-gray-900 tracking-tight">Dhanvantari</span>
-                        <p className="text-xs text-gray-400 font-medium hidden sm:block">Health Analysis</p>
+                        <span className="text-lg font-bold tracking-tight" style={{ color: "var(--teal)" }}>PRĀṆA</span>
+                        <p className="text-xs font-medium hidden sm:block" style={{ color: "var(--text-muted)" }}>Health Analysis</p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                     {view === "form" && (
-                        <div className="flex items-center bg-gray-100 rounded-xl p-1">
+                        <div className="flex items-center rounded-xl p-1"
+                          style={{ background: "var(--bg-raised)", border: "1.5px solid var(--border)" }}>
                             {(["manual", "autosync"] as Mode[]).map(m => (
                                 <button
                                     key={m}
                                     onClick={() => switchMode(m)}
-                                    className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${mode === m
-                                        ? "bg-white shadow-sm text-gray-900"
-                                        : "text-gray-500 hover:text-gray-700"
-                                        }`}
+                                    className="px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200"
+                                    style={{
+                                      background: mode === m ? "var(--teal-bg)" : "transparent",
+                                      color: mode === m ? "var(--teal)" : "var(--text-muted)",
+                                      border: mode === m ? "1.5px solid var(--border-accent)" : "1.5px solid transparent",
+                                    }}
                                 >
                                     {m === "manual" ? "Upload Data" : "Auto Sync"}
                                 </button>
@@ -153,7 +166,12 @@ export default function HealthDashboard() {
                     {view === "results" && (
                         <button
                             onClick={handleBack}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-gray-200 bg-white text-sm font-semibold text-gray-600 hover:border-gray-300 hover:text-gray-800 transition-all duration-200 shadow-sm"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+                            style={{
+                              background: "var(--bg-card)",
+                              border: "1.5px solid var(--border-strong)",
+                              color: "var(--text-body)"
+                            }}
                         >
                             {Icons.arrowLeft("w-4 h-4")}
                             Back
@@ -182,9 +200,9 @@ export default function HealthDashboard() {
                     <OverallSummary oa={result.overall} />
 
                     {/* Section header */}
-                    <div className="flex items-center gap-3">
-                        <div className="w-1.5 h-6 rounded-full bg-primary" />
-                        <h2 className="text-xl font-bold text-gray-900">Detailed Results</h2>
+                    <div className="prana-sh">
+                        <h2 className="prana-sh-title">Detailed Results</h2>
+                        <span className="prana-sh-tag">VITALS</span>
                     </div>
 
                     {/* Health cards */}
@@ -200,14 +218,15 @@ export default function HealthDashboard() {
 
             {/* ── Loading Overlay ── */}
             {loading && view === "form" && (
-                <div className="absolute inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center z-10">
-                    <div className="flex flex-col items-center gap-5 bg-white rounded-3xl border border-gray-200/80 shadow-xl px-12 py-10">
+                <div className="absolute inset-0 backdrop-blur-sm flex items-center justify-center z-10"
+                  style={{ background: "rgba(6,13,24,0.7)" }}>
+                    <div className="prana-vessel flex flex-col items-center gap-5 px-12 py-10">
                         <Spinner size="h-10 w-10" />
                         <div className="text-center">
-                            <p className="text-lg font-bold text-gray-800">
+                            <p className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
                                 {mode === "manual" ? "Analyzing Your Health Data" : "Loading Your Report"}
                             </p>
-                            <p className="text-sm text-gray-400 mt-2">This will only take a moment...</p>
+                            <p className="text-sm mt-2" style={{ color: "var(--text-muted)" }}>This will only take a moment...</p>
                         </div>
                     </div>
                 </div>

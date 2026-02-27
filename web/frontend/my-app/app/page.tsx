@@ -1,14 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Activity, ShieldCheck, HeartPulse, ArrowRight } from "lucide-react";
+import { Activity, ShieldCheck, HeartPulse, ArrowRight, Sun, Moon } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
+import { useTheme } from "@/lib/theme-context";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function LandingPage() {
   const { user } = useAuth();
+  const { theme, toggle } = useTheme();
   const router = useRouter();
 
   useEffect(() => {
@@ -18,13 +20,9 @@ export default function LandingPage() {
   }, [user]);
 
   const handleStartMonitoring = () => {
-    console.log("[LandingPage] Start Monitoring clicked");
-    console.log("[LandingPage] user authenticated?", !!user);
     if (user) {
-      console.log("[LandingPage] Redirecting authenticated user to /dashboard/profile");
       router.push('/dashboard/profile');
     } else {
-      console.log("[LandingPage] Redirecting unauthenticated user to /auth/sign-up");
       router.push('/auth/sign-up');
     }
   };
@@ -33,64 +31,78 @@ export default function LandingPage() {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.12,
-        delayChildren: 0.3,
-      },
+      transition: { staggerChildren: 0.12, delayChildren: 0.3 },
     },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 25 },
     visible: {
-      opacity: 1,
-      y: 0,
+      opacity: 1, y: 0,
       transition: { duration: 0.6, ease: "easeOut" as const }
     },
   };
 
-  const floatingVariants = {
-    animate: {
-      y: [0, -10, 0],
-      transition: { duration: 4, repeat: Infinity, ease: "easeInOut" as const }
-    }
-  };
-
-  const scaleHoverVariants = {
-    whileHover: { scale: 1.05, transition: { duration: 0.2 } }
-  };
-
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden selection:bg-accent selection:text-primary">
-      {/* Soft Background Blur Elements */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent/30 rounded-full blur-3xl -z-10 mix-blend-multiply" />
-      <div className="absolute top-[20%] right-[-10%] w-[30%] h-[40%] bg-status-low/20 rounded-full blur-3xl -z-10 mix-blend-multiply" />
+    <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: "var(--bg-base)" }}>
+      {/* Vedic mandala glow */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[120px] -z-10 opacity-30"
+        style={{ background: "var(--teal-glow)" }} />
+      <div className="absolute top-[30%] right-[-15%] w-[35%] h-[40%] rounded-full blur-[100px] -z-10 opacity-20"
+        style={{ background: "var(--cyan)" }} />
+
+      {/* EKG Strip */}
+      <div className="ekg-strip">
+        <svg className="ekg-mover" viewBox="0 0 600 44" preserveAspectRatio="none" fill="none" stroke="var(--ekg-color)" strokeWidth="1.2">
+          <polyline points="0,22 40,22 50,22 55,10 60,34 65,18 70,26 75,22 120,22 160,22 170,22 175,10 180,34 185,18 190,26 195,22 240,22 280,22 290,22 295,10 300,34 305,18 310,26 315,22 360,22 400,22 410,22 415,10 420,34 425,18 430,26 435,22 480,22 520,22 530,22 535,10 540,34 545,18 550,26 555,22 600,22" />
+        </svg>
+      </div>
 
       {/* Navigation */}
-      <nav className="w-full px-6 py-6 md:px-12 flex items-center justify-between z-10 max-w-7xl mx-auto">
+      <nav className="w-full px-6 py-5 md:px-12 flex items-center justify-between z-10 max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
           className="flex items-center gap-3"
         >
-          <div className="w-10 h-10 rounded-full bg-card flex items-center justify-center shadow-sm border border-border-soft">
-            <HeartPulse className="text-primary w-6 h-6" />
+          <div className="w-10 h-10 rounded-full flex items-center justify-center border"
+            style={{ background: "var(--bg-card)", borderColor: "var(--border-accent)" }}>
+            <HeartPulse className="w-6 h-6" style={{ color: "var(--teal)" }} />
           </div>
-          <span className="text-2xl font-bold text-primary tracking-tight">धन्वंतरी</span>
+          <span className="text-2xl font-bold tracking-tight" style={{ color: "var(--teal)" }}>
+            PRĀṆA <span className="font-normal text-sm" style={{ color: "var(--text-muted)" }}>OS</span>
+          </span>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
+          className="flex items-center gap-3"
         >
+          <button
+            onClick={toggle}
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+            style={{ background: "var(--bg-raised)", border: "1.5px solid var(--border-strong)" }}
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? (
+              <Sun className="w-4 h-4" style={{ color: "var(--warn-text)" }} />
+            ) : (
+              <Moon className="w-4 h-4" style={{ color: "var(--text-muted)" }} />
+            )}
+          </button>
           {user ? (
-            <Link href="/dashboard/profile" className="text-text-secondary hover:text-primary transition-colors text-sm font-medium px-4 py-2 rounded-full hover:bg-accent/30">
+            <Link href="/dashboard/profile"
+              className="text-sm font-medium px-4 py-2 rounded-full transition-colors"
+              style={{ color: "var(--text-body)", background: "var(--teal-bg)" }}>
               Dashboard
             </Link>
           ) : (
-            <Link href="/auth/sign-in" className="text-text-secondary hover:text-primary transition-colors text-sm font-medium px-4 py-2 rounded-full hover:bg-accent/30">
+            <Link href="/auth/sign-in"
+              className="text-sm font-medium px-4 py-2 rounded-full transition-colors"
+              style={{ color: "var(--text-body)", background: "var(--teal-bg)" }}>
               Sign In
             </Link>
           )}
@@ -98,31 +110,34 @@ export default function LandingPage() {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-grow flex flex-col justify-center items-center px-6 md:px-12 text-center w-full max-w-5xl mx-auto z-10 mt-12 mb-20">
+      <main className="flex-grow flex flex-col justify-center items-center px-6 md:px-12 text-center w-full max-w-5xl mx-auto z-10 mt-8 mb-20">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           className="flex flex-col items-center max-w-3xl"
         >
-          <motion.div variants={itemVariants} className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-[16px] bg-accent/50 text-primary text-sm font-medium border border-primary/10 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Navonmesh Hackathon 2026
+          {/* Live badge */}
+          <motion.div variants={itemVariants} className="live-badge mb-8">
+            <span className="live-dot" />
+            PRĀṆA OS · Vedic Health Intelligence
           </motion.div>
 
           <motion.h1
             variants={itemVariants}
-            className="text-4xl md:text-5xl lg:text-7xl font-bold text-text-primary leading-[1.15] mb-6"
+            className="text-4xl md:text-5xl lg:text-7xl font-bold leading-[1.10] mb-6"
+            style={{ color: "var(--text-primary)", fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}
           >
             Proactive Care,<br />
-            <span className="text-primary tracking-tight">Empowered Living.</span>
+            <span style={{ color: "var(--teal)" }}>Empowered Living.</span>
           </motion.h1>
 
           <motion.p
             variants={itemVariants}
-            className="text-text-secondary text-base md:text-lg mb-10 max-w-xl leading-relaxed font-normal"
+            className="text-base md:text-lg mb-10 max-w-xl leading-relaxed"
+            style={{ color: "var(--text-body)" }}
           >
-            Welcome to <b className="text-text-primary text-[1.1em] font-semibold">धन्वंतरी</b>. A preventive health monitoring and early risk detection framework designed to bridge gaps and protect your future.
+            Welcome to <strong style={{ color: "var(--text-primary)" }}>PRĀṆA OS</strong> — a preventive health monitoring and early risk detection framework merging Vedic wisdom with modern biometrics.
           </motion.p>
 
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
@@ -145,35 +160,36 @@ export default function LandingPage() {
         >
           {[
             {
-              icon: <Activity className="text-primary w-6 h-6" />,
+              icon: <Activity className="w-6 h-6" style={{ color: "var(--teal)" }} />,
               title: "Continuous Monitoring",
-              desc: "Real-time health parameter tracking at scale for proactive care and analytics."
+              desc: "Real-time health parameter tracking at scale for proactive care and analytics.",
+              accent: "ok"
             },
             {
-              icon: <ShieldCheck className="text-status-low w-6 h-6" />,
+              icon: <ShieldCheck className="w-6 h-6" style={{ color: "var(--cyan)" }} />,
               title: "Early Detection",
-              desc: "Identify potential health risks early before they become critical medical emergencies."
+              desc: "Identify potential health risks early before they become critical medical emergencies.",
+              accent: "blue"
             },
             {
-              icon: <HeartPulse className="text-status-mod w-6 h-6" />,
+              icon: <HeartPulse className="w-6 h-6" style={{ color: "var(--warn-text)" }} />,
               title: "Accessible Insights",
-              desc: "Bridging the digital divide with actionable insights for every socio-economic group."
+              desc: "Bridging the digital divide with actionable insights for every socio-economic group.",
+              accent: "warn"
             }
           ].map((feature, idx) => (
             <motion.div
               key={idx}
               variants={itemVariants}
               whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="card group flex flex-col relative overflow-hidden"
+              className={`prana-card ${feature.accent} group flex flex-col`}
             >
-              {/* Subtle gradient hover effect on card */}
-              <div className="absolute inset-0 bg-gradient-to-br from-accent/0 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-              <div className="w-12 h-12 rounded-[16px] bg-accent/40 flex items-center justify-center mb-5 mt-1 border border-border-soft group-hover:scale-[1.05] transition-transform duration-300">
+              <div className="w-12 h-12 rounded-[16px] flex items-center justify-center mb-5 mt-1 transition-transform duration-300 group-hover:scale-105"
+                style={{ background: "var(--teal-bg)", border: "1px solid var(--border)" }}>
                 {feature.icon}
               </div>
-              <h3 className="text-[18px] font-semibold text-text-primary mb-2.5 tracking-tight">{feature.title}</h3>
-              <p className="text-[14px] text-text-secondary leading-relaxed font-normal">
+              <h3 className="text-[18px] font-semibold mb-2.5 tracking-tight" style={{ color: "var(--text-primary)" }}>{feature.title}</h3>
+              <p className="text-[14px] leading-relaxed" style={{ color: "var(--text-body)" }}>
                 {feature.desc}
               </p>
             </motion.div>

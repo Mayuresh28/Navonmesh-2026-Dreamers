@@ -31,26 +31,32 @@ export default function NCMAnalysisPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-20">
+    <div className="min-h-screen flex flex-col pb-20" style={{ background: "var(--bg-base)" }}>
+      {/* EKG strip */}
+      <div className="ekg-strip" />
+
       {/* Top Bar */}
-      <header className="shrink-0 px-6 py-4 flex items-center justify-between border-b border-border-soft bg-card/80 backdrop-blur-md">
+      <header className="shrink-0 px-6 py-4 flex items-center justify-between"
+        style={{ background: "var(--bg-card)", borderBottom: "1px solid var(--border)", backdropFilter: "blur(12px)" }}>
         <div className="flex items-center gap-4">
-          <button onClick={() => router.push("/dynamic")} className="p-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-500">
+          <button onClick={() => router.push("/dynamic")} className="p-2 rounded-xl transition-colors"
+            style={{ color: "var(--text-muted)" }}>
             {Icons.arrowLeft()}
           </button>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-              {Icons.activity("w-5 h-5")}
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
+              style={{ background: "var(--teal-bg)", border: "1px solid var(--border)" }}>
+              <span style={{ color: "var(--teal)" }}>{Icons.activity("w-5 h-5")}</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">NCM Analysis</h1>
-              <p className="text-xs text-gray-500">Neuro-Cardio-Muscular Health Assessment</p>
+              <h1 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>NCM Analysis</h1>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>Neuro-Cardio-Muscular Health Assessment</p>
             </div>
           </div>
         </div>
         {result && (
           <button onClick={runAnalysis} disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-600 disabled:opacity-50">
+            className="btn-secondary flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-50">
             {Icons.refresh("w-4 h-4")} Re-analyze
           </button>
         )}
@@ -64,23 +70,25 @@ export default function NCMAnalysisPage() {
             <motion.div key="initial" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
               <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
-                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-accent via-primary/50 to-primary/20 flex items-center justify-center shadow-[0_16px_48px_rgb(90_127_232_/_0.3)] border border-accent/50">
+                <div className="w-32 h-32 rounded-full flex items-center justify-center"
+                  style={{ background: "linear-gradient(135deg, var(--teal), var(--cyan))", boxShadow: "0 16px 48px rgba(13,229,168,0.3)", border: "1px solid var(--border)" }}>
                   {Icons.activity("w-14 h-14 text-white")}
                 </div>
               </motion.div>
               <div className="text-center max-w-lg">
-                <h2 className="text-3xl font-bold text-gray-900 mb-3">NCM Health Analysis</h2>
-                <p className="text-gray-500 text-lg leading-relaxed">
+                <h2 className="text-3xl font-bold mb-3" style={{ color: "var(--text-primary)", fontFamily: "var(--font-serif)" }}>NCM Health Analysis</h2>
+                <p className="text-lg leading-relaxed" style={{ color: "var(--text-muted)" }}>
                   Analyze your ECG, EEG, and EMG data using machine learning to assess cardiac risk, neural stress, and muscle fatigue.
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-4 max-w-lg w-full">
                 {[
-                  { icon: Icons.ecg, label: "ECG", desc: "Heart Signal", color: "text-rose-500 bg-rose-50 border-rose-200" },
-                  { icon: Icons.eeg, label: "EEG", desc: "Brain Activity", color: "text-violet-500 bg-violet-50 border-violet-200" },
-                  { icon: Icons.emg, label: "EMG", desc: "Muscle Signal", color: "text-blue-500 bg-blue-50 border-blue-200" },
+                  { icon: Icons.ecg, label: "ECG", desc: "Heart Signal", color: "var(--ok)" },
+                  { icon: Icons.eeg, label: "EEG", desc: "Brain Activity", color: "var(--cyan)" },
+                  { icon: Icons.emg, label: "EMG", desc: "Muscle Signal", color: "var(--blue)" },
                 ].map((s) => (
-                  <div key={s.label} className={`flex flex-col items-center gap-2 rounded-2xl border-2 ${s.color} px-4 py-5`}>
+                  <div key={s.label} className="flex flex-col items-center gap-2 rounded-2xl border-2 px-4 py-5"
+                    style={{ borderColor: s.color, background: `color-mix(in srgb, ${s.color} 8%, transparent)`, color: s.color }}>
                     <span>{s.icon("w-8 h-8")}</span>
                     <span className="font-bold text-sm">{s.label}</span>
                     <span className="text-xs opacity-60">{s.desc}</span>
@@ -88,10 +96,10 @@ export default function NCMAnalysisPage() {
                 ))}
               </div>
               <button onClick={runAnalysis}
-                className="w-full max-w-lg py-4 rounded-2xl bg-primary hover:bg-secondary text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all active:scale-[0.99]">
+                className="btn-primary w-full max-w-lg py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all active:scale-[0.99]">
                 Analyze ECG · EEG · EMG
               </button>
-              <p className="text-xs text-gray-400 text-center max-w-md">
+              <p className="text-xs text-center max-w-md" style={{ color: "var(--text-muted)" }}>
                 Data is fetched from your uploaded health records. Upload ECG, EEG, and EMG data from the Vitals Dashboard first.
               </p>
             </motion.div>
@@ -101,14 +109,15 @@ export default function NCMAnalysisPage() {
           {loading && (
             <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-              <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
+              <div className="w-24 h-24 rounded-full flex items-center justify-center"
+                style={{ background: "var(--teal-bg)", color: "var(--teal)" }}>
                 <Spinner size="h-10 w-10" />
               </div>
               <div className="text-center">
-                <p className="text-lg font-bold text-gray-800">Running NCM Analysis...</p>
-                <p className="text-sm text-gray-400 mt-2">Fetching biosignal data and computing predictions</p>
+                <p className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>Running NCM Analysis...</p>
+                <p className="text-sm mt-2" style={{ color: "var(--text-muted)" }}>Fetching biosignal data and computing predictions</p>
               </div>
-              <div className="flex items-center gap-8 text-xs text-gray-400">
+              <div className="flex items-center gap-8 text-xs" style={{ color: "var(--text-muted)" }}>
                 <span className="flex items-center gap-1.5">{Icons.ecg("w-4 h-4")} ECG</span>
                 <span className="flex items-center gap-1.5">{Icons.eeg("w-4 h-4")} EEG</span>
                 <span className="flex items-center gap-1.5">{Icons.emg("w-4 h-4")} EMG</span>
@@ -120,18 +129,19 @@ export default function NCMAnalysisPage() {
           {error && !loading && (
             <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-              <div className="w-20 h-20 rounded-full bg-red-50 border-2 border-red-200 flex items-center justify-center text-red-500">
+              <div className="w-20 h-20 rounded-full flex items-center justify-center"
+                style={{ background: "var(--danger-bg)", border: "2px solid var(--danger)", color: "var(--danger)" }}>
                 <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
                 </svg>
               </div>
               <div className="text-center">
-                <p className="text-lg font-bold text-gray-800">Analysis Failed</p>
-                <p className="text-sm text-red-500 mt-2 max-w-md">{error}</p>
+                <p className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>Analysis Failed</p>
+                <p className="text-sm mt-2 max-w-md" style={{ color: "var(--danger)" }}>{error}</p>
               </div>
               <div className="flex gap-3">
-                <button onClick={runAnalysis} className="px-6 py-3 rounded-2xl bg-primary text-white font-medium hover:bg-secondary transition-colors">Try Again</button>
-                <button onClick={() => router.push("/dynamic")} className="px-6 py-3 rounded-2xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-colors">Upload Data First</button>
+                <button onClick={runAnalysis} className="btn-primary px-6 py-3 rounded-2xl font-medium transition-colors">Try Again</button>
+                <button onClick={() => router.push("/dynamic")} className="btn-secondary px-6 py-3 rounded-2xl font-medium transition-colors">Upload Data First</button>
               </div>
             </motion.div>
           )}
@@ -141,24 +151,22 @@ export default function NCMAnalysisPage() {
             <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="max-w-5xl mx-auto flex flex-col gap-6">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-                className="card flex flex-col items-center gap-4 py-8">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-6 rounded-full bg-primary" />
-                  <h2 className="text-xl font-bold text-gray-900">NCM Health Index</h2>
-                </div>
+                className="prana-vessel flex flex-col items-center gap-4 py-8">
+                <div className="prana-sh text-xl">NCM Health Index</div>
                 <NCMGauge value={result.ncm_index} category={result.risk_category} />
-                <p className="text-sm text-gray-500 text-center max-w-md">
+                <p className="text-sm text-center max-w-md" style={{ color: "var(--text-muted)" }}>
                   Composite score fusing cardiac (40%), neural stress (35%), and muscle fatigue (25%). Lower is healthier.
                 </p>
-                <span className={`text-xs font-medium px-3 py-1 rounded-full ${result.model_source === "ml" ? "bg-violet-100 text-violet-700" : "bg-gray-100 text-gray-600"}`}>
+                <span className="text-xs font-medium px-3 py-1 rounded-full"
+                  style={result.model_source === "ml"
+                    ? { background: "var(--cyan-bg, rgba(24,216,245,0.1))", color: "var(--cyan)", border: "1px solid var(--border)" }
+                    : { background: "var(--bg-raised)", color: "var(--text-muted)", border: "1px solid var(--border)" }
+                  }>
                   {result.model_source === "ml" ? "ML Model Prediction" : "Formula-Based (ML offline)"}
                 </span>
               </motion.div>
 
-              <div className="flex items-center gap-3">
-                <div className="w-1.5 h-6 rounded-full bg-primary" />
-                <h2 className="text-xl font-bold text-gray-900">Signal Analysis</h2>
-              </div>
+              <div className="prana-sh text-xl">Signal Analysis</div>
               <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
                 <SignalCard title="ECG — Cardiac" subtitle="Heart rhythm & variability" icon={Icons.ecg}
                   prediction={result.predictions.cardiac} featureLabel="Heart Rate"

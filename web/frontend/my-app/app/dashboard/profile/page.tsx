@@ -23,8 +23,8 @@ export default function ProfilePage() {
   }, [loading, hasProfile, router]);
 
   if (loading) return (
-    <ProtectedRoute><div className="min-h-screen flex items-center justify-center bg-background pb-20">
-      <div className="w-12 h-12 rounded-full border-4 border-border-soft border-t-primary animate-spin" />
+    <ProtectedRoute><div className="min-h-screen flex items-center justify-center pb-20" style={{ background: "var(--bg-base)" }}>
+      <div className="w-12 h-12 rounded-full border-4 animate-spin" style={{ borderColor: "var(--border)", borderTopColor: "var(--teal)" }} />
       <BottomNav />
     </div></ProtectedRoute>
   );
@@ -33,23 +33,25 @@ export default function ProfilePage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-background pb-20">
+      <div className="min-h-screen pb-20" style={{ background: "var(--bg-base)" }}>
+        <div className="ekg-strip" />
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] relative overflow-hidden p-6">
-          <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent/30 rounded-full blur-3xl -z-10" />
-          <div className="absolute bottom-[-10%] right-[-15%] w-[40%] h-[50%] bg-status-low/20 rounded-full blur-3xl -z-10" />
+          {/* Ambient glow */}
+          <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full blur-3xl -z-10" style={{ background: "var(--teal-glow)" }} />
+          <div className="absolute bottom-[-10%] right-[-15%] w-[40%] h-[50%] rounded-full blur-3xl -z-10" style={{ background: "var(--ok-bg)" }} />
 
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}
-            className="w-[90vw] lg:w-[80vw] max-h-[80vh] bg-card rounded-[32px] border border-border-soft shadow-lg overflow-hidden flex flex-col">
+            className="prana-vessel w-[90vw] lg:w-[80vw] max-h-[80vh] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="px-8 py-6 border-b border-border-soft flex items-center justify-between bg-background/50">
+            <div className="px-8 py-6 flex items-center justify-between" style={{ borderBottom: "1px solid var(--border)", background: "var(--bg-surface)" }}>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-                  <HeartPulse className="text-primary w-5 h-5" />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "var(--teal-bg)", border: "1px solid var(--border-accent)" }}>
+                  <HeartPulse className="w-5 h-5" style={{ color: "var(--teal)" }} />
                 </div>
-                <h1 className="text-xl font-bold text-text-primary">Your Health Profile</h1>
+                <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>Your Health Profile</h1>
               </div>
               <button onClick={() => router.push("/dashboard/profile/setup")}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary hover:bg-primary/30 transition-colors text-sm font-medium">
+                className="btn-secondary flex items-center gap-2 !h-auto !py-2 !px-4 text-sm">
                 <HeartPulse className="w-4 h-4" /> Edit Profile
               </button>
             </div>
@@ -64,8 +66,8 @@ export default function ProfilePage() {
               <MedicalHistory familyHistory={profile.familyHistory} existingConditions={profile.existingConditions} />
 
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-                className="text-center text-sm text-text-secondary">
-                Last updated: <span className="text-text-primary font-medium">
+                className="text-center text-sm" style={{ color: "var(--text-muted)" }}>
+                Last updated: <span className="font-medium" style={{ color: "var(--text-primary)" }}>
                   {new Date(profile.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                 </span>
               </motion.div>

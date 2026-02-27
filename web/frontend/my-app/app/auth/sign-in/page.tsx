@@ -17,19 +17,13 @@ export default function SignInPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("[SignIn] Form submission started");
-    console.log("[SignIn] Email:", email);
     setError("");
     setLoading(true);
 
     try {
-      console.log("[SignIn] Calling Firebase signInWithEmailAndPassword...");
       await signInWithEmailAndPassword(auth, email, password);
-      console.log("[SignIn] ✓ Firebase authentication successful");
-      console.log("[SignIn] Redirecting to /dashboard...");
       router.push("/dashboard");
     } catch (err) {
-      console.error("[SignIn] ✗ Authentication failed:", err);
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -41,23 +35,37 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden selection:bg-accent selection:text-primary bg-background">
-      {/* Soft Background Blur Elements */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent/30 rounded-full blur-3xl -z-10 mix-blend-multiply" />
-      <div className="absolute bottom-[-10%] right-[-15%] w-[40%] h-[50%] bg-status-low/20 rounded-full blur-3xl -z-10 mix-blend-multiply" />
+    <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: "var(--bg-base)" }}>
+      {/* Ambient glow */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[120px] -z-10 opacity-20"
+        style={{ background: "var(--teal)" }} />
+      <div className="absolute bottom-[-10%] right-[-15%] w-[40%] h-[50%] rounded-full blur-[100px] -z-10 opacity-15"
+        style={{ background: "var(--cyan)" }} />
+
+      {/* EKG Strip */}
+      <div className="ekg-strip">
+        <svg className="ekg-mover" viewBox="0 0 600 44" preserveAspectRatio="none" fill="none" stroke="var(--ekg-color)" strokeWidth="1.2">
+          <polyline points="0,22 40,22 50,22 55,10 60,34 65,18 70,26 75,22 120,22 160,22 170,22 175,10 180,34 185,18 190,26 195,22 240,22 280,22 290,22 295,10 300,34 305,18 310,26 315,22 360,22 400,22 410,22 415,10 420,34 425,18 430,26 435,22 480,22 520,22 530,22 535,10 540,34 545,18 550,26 555,22 600,22" />
+        </svg>
+      </div>
 
       {/* Header */}
-      <nav className="w-full px-6 py-6 md:px-12 z-10">
+      <nav className="w-full px-6 py-5 md:px-12 z-10">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
           className="flex items-center gap-3"
         >
-          <div className="w-10 h-10 rounded-full bg-card flex items-center justify-center shadow-sm border border-border-soft">
-            <HeartPulse className="text-primary w-6 h-6" />
-          </div>
-          <span className="text-2xl font-bold text-primary tracking-tight">धन्वंतरी</span>
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center"
+              style={{ background: "var(--bg-card)", border: "1.5px solid var(--border-accent)" }}>
+              <HeartPulse className="w-6 h-6" style={{ color: "var(--teal)" }} />
+            </div>
+            <span className="text-2xl font-bold tracking-tight" style={{ color: "var(--teal)" }}>
+              PRĀṆA <span className="text-sm font-normal" style={{ color: "var(--text-muted)" }}>OS</span>
+            </span>
+          </Link>
         </motion.div>
       </nav>
 
@@ -69,17 +77,18 @@ export default function SignInPage() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
-          <div className="bg-card/80 backdrop-blur-xl rounded-[32px] p-10 md:p-12 border border-accent/30 shadow-[0_8px_32px_rgb(90_127_232_/_0.15)] hover:shadow-[0_8px_48px_rgb(90_127_232_/_0.25)] transition-all duration-300">
+          <div className="prana-vessel p-10 md:p-12"
+            style={{ borderRadius: "28px" }}>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <h1 className="text-3xl font-bold text-text-primary mb-2">
+              <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>
                 Welcome Back
               </h1>
-              <p className="text-text-secondary mb-8">
-                Sign in to access your health monitoring dashboard
+              <p className="mb-8" style={{ color: "var(--text-body)" }}>
+                Sign in to access your Vedic health dashboard
               </p>
             </motion.div>
 
@@ -88,9 +97,10 @@ export default function SignInPage() {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-status-high/10 border border-status-high/30 rounded-[16px] p-4"
+                  className="rounded-[16px] p-4"
+                  style={{ background: "var(--danger-bg)", border: "1.5px solid var(--danger-border)" }}
                 >
-                  <p className="text-status-high text-sm font-medium">{error}</p>
+                  <p className="text-sm font-medium" style={{ color: "var(--danger-text)" }}>{error}</p>
                 </motion.div>
               )}
 
@@ -99,7 +109,7 @@ export default function SignInPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
               >
-                <label className="block text-sm font-medium text-text-primary mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-primary)" }}>
                   Email Address
                 </label>
                 <input
@@ -117,7 +127,7 @@ export default function SignInPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <label className="block text-sm font-medium text-text-primary mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-primary)" }}>
                   Password
                 </label>
                 <input
@@ -147,14 +157,12 @@ export default function SignInPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="mt-8 pt-8 border-t border-border-soft"
+              className="mt-8 pt-8"
+              style={{ borderTop: "1.5px solid var(--border)" }}
             >
-              <p className="text-text-secondary text-sm text-center">
-                Don't have an account?{" "}
-                <Link
-                  href="/auth/sign-up"
-                  className="text-primary font-medium hover:underline"
-                >
+              <p className="text-sm text-center" style={{ color: "var(--text-body)" }}>
+                Don&apos;t have an account?{" "}
+                <Link href="/auth/sign-up" className="font-medium hover:underline" style={{ color: "var(--teal)" }}>
                   Sign up here
                 </Link>
               </p>
