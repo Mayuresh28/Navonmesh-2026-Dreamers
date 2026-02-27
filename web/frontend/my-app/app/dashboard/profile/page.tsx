@@ -5,10 +5,9 @@ import { ProtectedRoute } from "@/lib/protected-route";
 import { useProfileData } from "@/lib/profile-hook";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { Navbar } from "@/lib/navbar";
 import {
   HeartPulse,
-  Edit,
-  LogOut,
   Scale,
   Ruler,
   Flame,
@@ -17,8 +16,6 @@ import {
   AlertCircle,
   Users,
 } from "lucide-react";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import { useEffect } from "react";
 
 export default function ProfilePage() {
@@ -40,17 +37,6 @@ export default function ProfilePage() {
       console.log("[ProfilePage] Profile exists - displaying profile page");
     }
   }, [loading, hasProfile, router, user?.uid]);
-
-  const handleSignOut = async () => {
-    try {
-      console.log("[ProfilePage] Signing out...");
-      await signOut(auth);
-      console.log("[ProfilePage] Sign out successful, redirecting to home");
-      router.push("/");
-    } catch (error) {
-      console.error("[ProfilePage] Sign out error:", error);
-    }
-  };
 
   if (loading) {
     return (
@@ -87,57 +73,54 @@ export default function ProfilePage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden selection:bg-accent selection:text-primary bg-background p-6">
-        {/* Soft Background Blur Elements */}
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent/30 rounded-full blur-3xl -z-10 mix-blend-multiply" />
-        <div className="absolute bottom-[-10%] right-[-15%] w-[40%] h-[50%] bg-status-low/20 rounded-full blur-3xl -z-10 mix-blend-multiply" />
+      <div className="min-h-screen bg-background">
+        <Navbar activeTab="profile" onTabChange={(tab) => {
+          if (tab === "dashboard") {
+            router.push("/dashboard");
+          }
+        }} />
 
-        {/* Main Profile Container - 80vw x 80vh */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="w-[80vw] h-[80vh] bg-card rounded-[32px] border border-border-soft shadow-lg overflow-hidden flex flex-col"
-        >
-          {/* Header */}
-          <div className="px-8 py-6 border-b border-border-soft flex items-center justify-between bg-background/50">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              className="flex items-center gap-3"
-            >
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <HeartPulse className="text-primary w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-sm text-text-secondary">Your Health Profile</p>
-                <h1 className="text-2xl font-bold text-text-primary">धन्वंतरी Health Dashboard</h1>
-              </div>
-            </motion.div>
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-160px)] relative overflow-hidden selection:bg-accent selection:text-primary p-6">
+          {/* Soft Background Blur Elements */}
+          <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent/30 rounded-full blur-3xl -z-10 mix-blend-multiply" />
+          <div className="absolute bottom-[-10%] right-[-15%] w-[40%] h-[50%] bg-status-low/20 rounded-full blur-3xl -z-10 mix-blend-multiply" />
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              className="flex items-center gap-3"
-            >
-              <button
-                onClick={() => router.push("/dashboard/profile/setup")}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-accent/30 text-primary hover:bg-accent/50 transition-colors text-sm font-medium"
+          {/* Main Profile Container - Centered */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="w-[90vw] lg:w-[80vw] max-h-[80vh] bg-card rounded-[32px] border border-border-soft shadow-lg overflow-hidden flex flex-col"
+          >
+            {/* Header */}
+            <div className="px-8 py-6 border-b border-border-soft flex items-center justify-between bg-background/50">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className="flex items-center gap-3"
               >
-                <Edit className="w-4 h-4" />
-                Edit
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-status-high/20 text-status-high hover:bg-status-high/30 transition-colors text-sm font-medium"
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+                  <HeartPulse className="text-primary w-5 h-5" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-text-primary">Your Health Profile</h1>
+                </div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
               >
-                <LogOut className="w-4 h-4" />
-                Sign Out
-              </button>
-            </motion.div>
-          </div>
+                <button
+                  onClick={() => router.push("/dashboard/profile/setup")}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary hover:bg-primary/30 transition-colors text-sm font-medium"
+                >
+                  <HeartPulse className="w-4 h-4" />
+                  Edit Profile
+                </button>
+              </motion.div>
+            </div>
 
           {/* Content - Scrollable */}
           <div className="flex-1 overflow-y-auto px-8 py-8">
@@ -359,6 +342,7 @@ export default function ProfilePage() {
           </div>
         </motion.div>
       </div>
+    </div>
     </ProtectedRoute>
   );
 }

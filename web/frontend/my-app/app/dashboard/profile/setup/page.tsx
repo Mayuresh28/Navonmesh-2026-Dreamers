@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { useProfileData, type UserProfile } from "@/lib/profile-hook";
 import { motion } from "framer-motion";
-import { HeartPulse, ArrowRight, CheckCircle } from "lucide-react";
+import { HeartPulse, ArrowRight, CheckCircle, Activity, ShieldCheck } from "lucide-react";
 
 export default function ProfileSetupPage() {
   const router = useRouter();
@@ -124,8 +124,8 @@ export default function ProfileSetupPage() {
         console.log("[ProfileSetup] Profile creation successful");
         setSuccess(true);
         setTimeout(() => {
-          console.log("[ProfileSetup] Redirecting to profile page...");
-          router.push("/dashboard/profile");
+          console.log("[ProfileSetup] Redirecting to /dashboard...");
+          router.push("/dashboard");
         }, 1500);
       } else {
         console.error("[ProfileSetup] Profile creation failed");
@@ -166,7 +166,8 @@ export default function ProfileSetupPage() {
             transition={{ duration: 0.5 }}
             className="w-full max-w-2xl"
           >
-            <div className="bg-card rounded-[24px] p-8 md:p-10 border border-border-soft shadow-sm">
+            <div className="bg-gradient-to-br from-card/90 to-card/70 backdrop-blur-xl rounded-[32px] p-8 md:p-12 border border-accent/30 shadow-[0_8px_32px_rgb(90_127_232_/_0.15)]">
+              <div className="absolute inset-0 rounded-[32px] bg-gradient-to-br from-status-low/5 via-accent/5 to-transparent pointer-events-none" />
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -196,7 +197,7 @@ export default function ProfileSetupPage() {
                     Profile Saved Successfully!
                   </p>
                   <p className="text-text-secondary mt-2">
-                    Redirecting to your profile...
+                    Redirecting to dashboard...
                   </p>
                 </motion.div>
               ) : (
@@ -212,8 +213,9 @@ export default function ProfileSetupPage() {
                   )}
 
                   {/* Personal Information */}
-                  <div>
-                    <h2 className="text-lg font-semibold text-text-primary mb-6">
+                  <div className="p-6 rounded-[20px] bg-gradient-to-br from-accent/10 to-transparent border border-accent/20">
+                    <h2 className="text-lg font-semibold text-primary mb-6 flex items-center gap-2">
+                      <HeartPulse className="w-5 h-5" />
                       Personal Information
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -308,8 +310,9 @@ export default function ProfileSetupPage() {
                   </div>
 
                   {/* Lifestyle Information */}
-                  <div>
-                    <h2 className="text-lg font-semibold text-text-primary mb-6">
+                  <div className="p-6 rounded-[20px] bg-gradient-to-br from-status-low/10 to-transparent border border-status-low/20">
+                    <h2 className="text-lg font-semibold text-status-low mb-6 flex items-center gap-2">
+                      <Activity className="w-5 h-5" />
                       Lifestyle Information
                     </h2>
                     <div className="space-y-6">
@@ -374,8 +377,9 @@ export default function ProfileSetupPage() {
                   </div>
 
                   {/* Medical History */}
-                  <div>
-                    <h2 className="text-lg font-semibold text-text-primary mb-6">
+                  <div className="p-6 rounded-[20px] bg-gradient-to-br from-status-high/10 to-transparent border border-status-high/20">
+                    <h2 className="text-lg font-semibold text-status-high mb-6 flex items-center gap-2">
+                      <ShieldCheck className="w-5 h-5" />
                       Medical History
                     </h2>
                     <div className="space-y-6">
