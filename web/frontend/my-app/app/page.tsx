@@ -5,28 +5,59 @@ import { Activity, ShieldCheck, HeartPulse, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function LandingPage() {
   const { user } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    console.log("[LandingPage] Mounted");
+    console.log("[LandingPage] user:", user?.email || "not authenticated");
+    console.log("[LandingPage] uid:", user?.uid);
+  }, [user]);
+
+  const handleStartMonitoring = () => {
+    console.log("[LandingPage] Start Monitoring clicked");
+    console.log("[LandingPage] user authenticated?", !!user);
+    if (user) {
+      console.log("[LandingPage] Redirecting authenticated user to /dashboard/profile");
+      router.push('/dashboard/profile');
+    } else {
+      console.log("[LandingPage] Redirecting unauthenticated user to /auth/sign-up");
+      router.push('/auth/sign-up');
+    }
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
+        staggerChildren: 0.12,
+        delayChildren: 0.3,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 15 },
+    hidden: { opacity: 0, y: 25 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.4 }
+      transition: { duration: 0.6, ease: "easeOut" }
     },
+  };
+
+  const floatingVariants = {
+    animate: {
+      y: [0, -10, 0],
+      transition: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+    }
+  };
+
+  const scaleHoverVariants = {
+    whileHover: { scale: 1.05, transition: { duration: 0.2 } }
   };
 
   return (
@@ -55,7 +86,7 @@ export default function LandingPage() {
           transition={{ duration: 0.5 }}
         >
           {user ? (
-            <Link href="/dashboard" className="text-text-secondary hover:text-primary transition-colors text-sm font-medium px-4 py-2 rounded-full hover:bg-accent/30">
+            <Link href="/dashboard/profile" className="text-text-secondary hover:text-primary transition-colors text-sm font-medium px-4 py-2 rounded-full hover:bg-accent/30">
               Dashboard
             </Link>
           ) : (
@@ -95,7 +126,7 @@ export default function LandingPage() {
           </motion.p>
 
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <button onClick={() => user ? router.push('/dashboard') : router.push('/auth/sign-up')} className="btn-primary flex items-center justify-center gap-2 group">
+            <button onClick={handleStartMonitoring} className="btn-primary flex items-center justify-center gap-2 group">
               Start Monitoring
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>

@@ -18,24 +18,33 @@ export default function SignUpPage() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("[SignUp] Form submission started");
+    console.log("[SignUp] Email:", email);
     setError("");
 
     if (password !== confirmPassword) {
+      console.error("[SignUp] ✗ Passwords do not match");
       setError("Passwords do not match");
       return;
     }
 
     if (password.length < 6) {
+      console.error("[SignUp] ✗ Password too short");
       setError("Password must be at least 6 characters");
       return;
     }
 
     setLoading(true);
+    console.log("[SignUp] Validation passed");
 
     try {
+      console.log("[SignUp] Calling Firebase createUserWithEmailAndPassword...");
       await createUserWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard");
+      console.log("[SignUp] ✓ Firebase user created successfully");
+      console.log("[SignUp] Redirecting to /dashboard/profile/setup...");
+      router.push("/dashboard/profile/setup");
     } catch (err) {
+      console.error("[SignUp] ✗ Account creation failed:", err);
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -75,7 +84,7 @@ export default function SignUpPage() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
-          <div className="bg-card rounded-[24px] p-8 border border-border-soft shadow-sm">
+          <div className="bg-card/80 backdrop-blur-xl rounded-[32px] p-10 md:p-12 border border-accent/30 shadow-[0_8px_32px_rgb(90_127_232_/_0.15)] hover:shadow-[0_8px_48px_rgb(90_127_232_/_0.25)] transition-all duration-300">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

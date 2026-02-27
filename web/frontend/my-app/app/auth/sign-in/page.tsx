@@ -17,13 +17,19 @@ export default function SignInPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("[SignIn] Form submission started");
+    console.log("[SignIn] Email:", email);
     setError("");
     setLoading(true);
 
     try {
+      console.log("[SignIn] Calling Firebase signInWithEmailAndPassword...");
       await signInWithEmailAndPassword(auth, email, password);
+      console.log("[SignIn] ✓ Firebase authentication successful");
+      console.log("[SignIn] Redirecting to /dashboard...");
       router.push("/dashboard");
     } catch (err) {
+      console.error("[SignIn] ✗ Authentication failed:", err);
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -63,7 +69,7 @@ export default function SignInPage() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
-          <div className="bg-card rounded-[24px] p-8 border border-border-soft shadow-sm">
+          <div className="bg-card/80 backdrop-blur-xl rounded-[32px] p-10 md:p-12 border border-accent/30 shadow-[0_8px_32px_rgb(90_127_232_/_0.15)] hover:shadow-[0_8px_48px_rgb(90_127_232_/_0.25)] transition-all duration-300">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
