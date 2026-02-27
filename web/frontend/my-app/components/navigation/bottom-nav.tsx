@@ -3,13 +3,14 @@
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { Home, HeartPulse, Leaf, Sparkles, User } from "lucide-react";
 
 const TABS = [
-  { key: "home",    label: "Home",    icon: "🏠", href: "/dashboard" },
-  { key: "vitals",  label: "Vitals",  icon: "💗", href: "/dynamic" },
-  { key: "dosha",   label: "Dosha",   icon: "🌿", href: "/dashboard/ncm-analysis" },
-  { key: "predict", label: "Predict", icon: "🔮", href: "/dashboard/results" },
-  { key: "life",    label: "Life",    icon: "🌱", href: "/dashboard/profile" },
+  { key: "home",    label: "Home",    icon: Home,       href: "/dashboard" },
+  { key: "vitals",  label: "Vitals",  icon: HeartPulse, href: "/dynamic" },
+  { key: "dosha",   label: "Dosha",   icon: Leaf,       href: "/dashboard/ncm-analysis" },
+  { key: "predict", label: "Predict", icon: Sparkles,   href: "/dashboard/results" },
+  { key: "life",    label: "Life",    icon: User,       href: "/dashboard/profile" },
 ] as const;
 
 function activeKey(pathname: string) {
@@ -26,24 +27,31 @@ export function BottomNav() {
   const current  = activeKey(pathname);
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-50 bg-[#1a1f36]/95 backdrop-blur-lg border-t border-white/10 safe-bottom">
+    <nav className="fixed bottom-0 inset-x-0 z-50 backdrop-blur-xl safe-bottom"
+      style={{
+        background: "var(--nav-bg)",
+        borderTop: "1px solid var(--border)",
+      }}>
       <div className="max-w-lg mx-auto flex items-center justify-around px-2 py-1.5">
         {TABS.map((t) => {
           const active = current === t.key;
+          const Icon = t.icon;
           return (
             <button
               key={t.key}
               onClick={() => router.push(t.href)}
-              className={`flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all duration-200 ${
-                active
-                  ? "bg-white/10 ring-2 ring-white/20 scale-105"
-                  : "text-white/50 hover:text-white/80"
-              }`}
+              className="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all duration-200"
+              style={{
+                background: active ? "var(--teal-bg)" : "transparent",
+                boxShadow: active ? "0 0 0 2px var(--border-accent)" : "none",
+                transform: active ? "scale(1.05)" : "scale(1)",
+              }}
             >
-              <span className="text-xl leading-none">{t.icon}</span>
-              <span className={`text-[11px] font-semibold tracking-wide ${
-                active ? "text-white" : "text-white/50"
-              }`}>
+              <Icon className="w-5 h-5" style={{
+                color: active ? "var(--teal)" : "var(--text-faint)"
+              }} />
+              <span className="text-[11px] font-semibold tracking-wide"
+                style={{ color: active ? "var(--teal)" : "var(--text-faint)" }}>
                 {t.label}
               </span>
             </button>

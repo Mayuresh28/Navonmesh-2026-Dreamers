@@ -21,9 +21,9 @@ export function FeatureCards({ prediction }: { prediction: PredictionResult }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Input Features */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="card">
-        <h3 className="text-lg font-semibold text-text-primary mb-6 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-primary" />
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="prana-vessel">
+        <h3 className="text-lg font-semibold mb-6 flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+          <TrendingUp className="w-5 h-5" style={{ color: "var(--teal)" }} />
           Model Input Features
         </h3>
         <div className="grid grid-cols-2 gap-4">
@@ -36,7 +36,7 @@ export function FeatureCards({ prediction }: { prediction: PredictionResult }) {
               className={`p-4 rounded-[16px] ${feat.bgColor} border ${feat.borderColor} flex flex-col`}
             >
               <div className={`${feat.color} mb-2`}>{feat.icon}</div>
-              <span className="text-xs text-text-secondary mb-1">{feat.label}</span>
+              <span className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>{feat.label}</span>
               <span className={`text-xl font-bold ${feat.color}`}>{feat.value}</span>
             </motion.div>
           ))}
@@ -44,12 +44,12 @@ export function FeatureCards({ prediction }: { prediction: PredictionResult }) {
       </motion.div>
 
       {/* Engineered Features */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="card">
-        <h3 className="text-lg font-semibold text-text-primary mb-6 flex items-center gap-2">
-          <Brain className="w-5 h-5 text-primary" />
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="prana-vessel">
+        <h3 className="text-lg font-semibold mb-6 flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+          <Brain className="w-5 h-5" style={{ color: "var(--teal)" }} />
           Engineered Features
         </h3>
-        <p className="text-text-secondary text-sm mb-5">
+        <p className="text-sm mb-5" style={{ color: "var(--text-body)" }}>
           These features are computed internally by the model pipeline for enhanced prediction accuracy.
         </p>
         <div className="space-y-4">
@@ -62,10 +62,10 @@ export function FeatureCards({ prediction }: { prediction: PredictionResult }) {
               className={`p-4 rounded-[16px] bg-gradient-to-r ${feat.color} border ${feat.borderColor}`}
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="font-medium text-text-primary">{feat.label}</span>
-                <span className="text-lg font-bold text-text-primary">{feat.value.toFixed(4)}</span>
+                <span className="font-medium" style={{ color: "var(--text-primary)" }}>{feat.label}</span>
+                <span className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>{feat.value.toFixed(4)}</span>
               </div>
-              <span className="text-xs text-text-secondary font-mono">{feat.formula}</span>
+              <span className="text-xs font-mono" style={{ color: "var(--text-muted)" }}>{feat.formula}</span>
             </motion.div>
           ))}
         </div>

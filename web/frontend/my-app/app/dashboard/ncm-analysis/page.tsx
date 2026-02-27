@@ -54,12 +54,13 @@ export default function NCMAnalysisPage() {
             {Icons.arrowLeft()}
           </button>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-              {Icons.activity("w-5 h-5")}
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
+              style={{ background: "var(--teal-bg)", border: "1px solid var(--border)" }}>
+              <span style={{ color: "var(--teal)" }}>{Icons.activity("w-5 h-5")}</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">NCM Analysis</h1>
-              <p className="text-xs text-gray-500">Neuro-Cardio-Muscular Health Assessment</p>
+              <h1 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>NCM Analysis</h1>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>Neuro-Cardio-Muscular Health Assessment</p>
             </div>
           </div>
         </div>
@@ -163,7 +164,7 @@ export default function NCMAnalysisPage() {
                 className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-card border border-border-soft"
               >
                 <NCMGauge value={result.ncm_index} category={result.risk_category} />
-                <p className="text-sm text-gray-500 text-center max-w-md">
+                <p className="text-sm text-center max-w-md" style={{ color: "var(--text-muted)" }}>
                   Composite score fusing cardiac (40%), neural stress (35%), and muscle fatigue (25%). Lower is healthier.
                 </p>
                 <span
@@ -177,10 +178,7 @@ export default function NCMAnalysisPage() {
                 </span>
               </motion.div>
 
-              <div className="flex items-center gap-3">
-                <div className="w-1.5 h-6 rounded-full bg-primary" />
-                <h2 className="text-xl font-bold text-gray-900">Signal Analysis</h2>
-              </div>
+              <div className="prana-sh text-xl">Signal Analysis</div>
               <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
                 <SignalCard
                   title="ECG — Cardiac" subtitle="Heart rhythm & variability" icon={Icons.ecg}

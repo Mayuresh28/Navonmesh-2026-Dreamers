@@ -10,10 +10,10 @@ export function ProbabilityBars({ prediction }: { prediction: PredictionResult }
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="card"
+      className="prana-vessel"
     >
-      <h3 className="text-lg font-semibold text-text-primary mb-6 flex items-center gap-2">
-        <Activity className="w-5 h-5 text-primary" />
+      <h3 className="text-lg font-semibold mb-6 flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+        <Activity className="w-5 h-5" style={{ color: "var(--teal)" }} />
         Class Probabilities
       </h3>
 
@@ -31,15 +31,17 @@ export function ProbabilityBars({ prediction }: { prediction: PredictionResult }
                 transition={{ delay: 0.4 + idx * 0.1 }}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className={`font-medium ${isMax ? colors.text : "text-text-primary"} flex items-center gap-2`}>
+                  <span className={`font-medium flex items-center gap-2 ${isMax ? colors.text : ""}`}
+                    style={isMax ? {} : { color: "var(--text-primary)" }}>
                     {isMax && <span className={`w-2 h-2 rounded-full ${colors.bg} animate-pulse`} />}
                     {label}
                   </span>
-                  <span className={`font-bold text-lg ${isMax ? colors.text : "text-text-secondary"}`}>
+                  <span className={`font-bold text-lg ${isMax ? colors.text : ""}`}
+                    style={isMax ? {} : { color: "var(--text-muted)" }}>
                     {percentage.toFixed(1)}%
                   </span>
                 </div>
-                <div className="h-3 rounded-full bg-border-soft/50 overflow-hidden">
+                <div className="h-3 rounded-full overflow-hidden" style={{ background: "var(--bg-raised)" }}>
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${percentage}%` }}

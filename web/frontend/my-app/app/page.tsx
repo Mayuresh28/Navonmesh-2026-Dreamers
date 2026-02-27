@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/auth-context";
+import { useTheme } from "@/lib/theme-context";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -136,6 +137,7 @@ function InfinityStat({ label }: { label: string }) {
 
 export default function LandingPage() {
   const { user } = useAuth();
+  const { theme, toggle } = useTheme();
   const router = useRouter();
   const cursorRef = useRef<HTMLDivElement>(null);
   const cursorRingRef = useRef<HTMLDivElement>(null);
