@@ -59,7 +59,7 @@ export default function NCMAnalysisPage() {
               <span style={{ color: "var(--teal)" }}>{Icons.activity("w-5 h-5")}</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>NCM Analysis</h1>
+              <h1 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>Neuro-Cardio-Muscular Analysis</h1>
               <p className="text-xs" style={{ color: "var(--text-muted)" }}>Neuro-Cardio-Muscular Health Assessment</p>
             </div>
           </div>
@@ -96,7 +96,7 @@ export default function NCMAnalysisPage() {
                 </div>
               </motion.div>
               <div className="text-center space-y-3">
-                <h2 className="text-2xl font-bold text-gray-900">NCM Health Assessment</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Neuro-Cardio-Muscular Health Assessment</h2>
                 <p className="text-gray-500 max-w-md">
                   Analyze your neuro-cardio-muscular health using biosignal data
                 </p>
