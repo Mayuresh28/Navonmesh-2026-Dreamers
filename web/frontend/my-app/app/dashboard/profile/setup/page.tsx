@@ -12,6 +12,7 @@ import { PersonalInfo } from "@/components/profile-setup/personal-info";
 import { LifestyleForm } from "@/components/profile-setup/lifestyle-form";
 import { MedicalHistoryForm } from "@/components/profile-setup/medical-history-form";
 import { ComputedPreview } from "@/components/profile-setup/computed-preview";
+import { BottomNav } from "@/components/navigation/bottom-nav";
 
 export default function ProfileSetupPage() {
   const router = useRouter();
@@ -128,6 +129,7 @@ export default function ProfileSetupPage() {
             </div>
           </motion.div>
         </main>
+        <BottomNav />
       </div>
     </ProtectedRoute>
   );

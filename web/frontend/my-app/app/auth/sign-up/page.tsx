@@ -150,7 +150,7 @@ export default function SignUpPage() {
             </Link>
 
             <h1 className="auth-heading">Create Account</h1>
-            <p className="auth-sub">Begin your Vedic health journey with Dhanvantari</p>
+            <p className="auth-sub">Begin your health journey with Dhanvantari</p>
 
             <AnimatePresence>
               {error && (

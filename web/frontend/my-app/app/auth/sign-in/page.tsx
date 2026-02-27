@@ -138,7 +138,7 @@ export default function SignInPage() {
             </Link>
 
             <h1 className="auth-heading">Welcome Back</h1>
-            <p className="auth-sub">Sign in to continue your Vedic health journey</p>
+            <p className="auth-sub">Sign in to continue your health journey</p>
 
             <AnimatePresence>
               {error && (
