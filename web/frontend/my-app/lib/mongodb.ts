@@ -1,162 +1,138 @@
-import { MongoClient, Db, Collection } from "mongodb";
+import { MongoClient, Db, Collection, MongoClientOptions } from "mongodb";
 
-const MONGODB_URI = "mongodb+srv://dhanvantari-static:dhanvantari1234@cluster0.ccev0.mongodb.net/";
+// ─── Connection Configuration ────────────────────────────────────────────────
+const MONGODB_URI =
+  process.env.MONGO_URI ||
+  "mongodb+srv://dhanvantari-static:dhanvantari1234@cluster0.ccev0.mongodb.net/";
 const DB_NAME = "dhanvantari";
-const COLLECTION_NAME = "user_profiles";
+const PROFILE_COLLECTION = "user_profiles";
+const options: MongoClientOptions = {};
 
-console.log("[MongoDB] Initializing MongoDB connection");
-console.log("[MongoDB] URI:", MONGODB_URI?.substring(0, 30) + "...");
-console.log("[MongoDB] Database:", DB_NAME);
-console.log("[MongoDB] Collection:", COLLECTION_NAME);
+// ─── Shared client promise (used by health-analyze / dynamic_data) ───────────
+let client: MongoClient;
+let clientPromise: Promise<MongoClient>;
 
-let cachedClient: MongoClient | null = null;
-let cachedDb: Db | null = null;
-
-async function connectToDatabase() {
-  console.log("[MongoDB] connectToDatabase() called");
-  console.log("[MongoDB] Cache status - Client:", !!cachedClient, "DB:", !!cachedDb);
-
-  if (cachedClient && cachedDb) {
-    console.log("[MongoDB] ✓ Using cached connection");
-    return { client: cachedClient, db: cachedDb };
-  }
-
-  console.log("[MongoDB] Creating new MongoDB connection...");
-  const client = new MongoClient(MONGODB_URI);
-
-  try {
-    console.log("[MongoDB] Attempting to connect...");
-    await client.connect();
-    console.log("[MongoDB] ✓ Connected to MongoDB server");
-
-    const db = client.db(DB_NAME);
-    console.log("[MongoDB] ✓ Database instance created:", DB_NAME);
-
-    cachedClient = client;
-    cachedDb = db;
-
-    console.log("[MongoDB] ✓ Connection cached");
-    return { client, db };
-  } catch (error) {
-    console.error("[MongoDB] ✗ Connection failed:", error);
-    throw new Error("Failed to connect to database");
-  }
+declare global {
+  var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
-export async function getProfileCollection(): Promise<Collection> {
-  console.log("[MongoDB] getProfileCollection() called");
-  try {
-    const { db } = await connectToDatabase();
-    const collection = db.collection(COLLECTION_NAME);
-    console.log("[MongoDB] ✓ Collection retrieved:", COLLECTION_NAME);
-    return collection;
-  } catch (error) {
-    console.error("[MongoDB] ✗ Failed to get collection:", error);
-    throw error;
+if (process.env.NODE_ENV === "development") {
+  // In dev mode, preserve across HMR reloads via a global variable.
+  if (!global._mongoClientPromise) {
+    client = new MongoClient(MONGODB_URI, options);
+    global._mongoClientPromise = client.connect();
   }
+  clientPromise = global._mongoClientPromise;
+} else {
+  client = new MongoClient(MONGODB_URI, options);
+  clientPromise = client.connect();
+}
+
+// Default export — consumed by health-analyze route (dynamic_data collection)
+export default clientPromise;
+
+// ─── Helper: get database instance from the shared client ────────────────────
+async function getDb(): Promise<Db> {
+  const c = await clientPromise;
+  return c.db(DB_NAME);
+}
+
+// ─── Compute derived health parameters from raw profile data ─────────────────
+function computeDerivedFields(data: Record<string, unknown>): Record<string, unknown> {
+  const age = Number(data.age) || 0;
+  const height = Number(data.height) || 0; // cm
+  const weight = Number(data.weight) || 0; // kg
+  const familyHistory = String(data.familyHistory ?? "").trim();
+  const smokingStatus = String(data.smokingStatus ?? "never");
+  const alcoholUse = String(data.alcoholUse ?? "never");
+
+  // 1) BMI = Weight / (Height_m)^2
+  const heightM = height / 100;
+  const bmi = heightM > 0 ? parseFloat((weight / (heightM * heightM)).toFixed(1)) : 0;
+
+  // 2) Genetic Risk Score (weighted 0–1)
+  //    Family history + smoking + alcohol contributions
+  let geneticRiskScore = 0;
+  if (familyHistory.length > 0) geneticRiskScore += 0.4;
+  if (smokingStatus === "current") geneticRiskScore += 0.3;
+  else if (smokingStatus === "former") geneticRiskScore += 0.15;
+  if (alcoholUse === "heavy") geneticRiskScore += 0.3;
+  else if (alcoholUse === "moderate") geneticRiskScore += 0.15;
+  else if (alcoholUse === "occasional") geneticRiskScore += 0.05;
+  geneticRiskScore = parseFloat(Math.min(geneticRiskScore, 1).toFixed(2));
+
+  // 3) Age Risk Multiplier = 1 + Age/100, boosted by lifestyle
+  let ageRiskMultiplier = 1 + age / 100;
+  if (smokingStatus === "current") ageRiskMultiplier += 0.15;
+  else if (smokingStatus === "former") ageRiskMultiplier += 0.05;
+  if (alcoholUse === "heavy") ageRiskMultiplier += 0.1;
+  else if (alcoholUse === "moderate") ageRiskMultiplier += 0.05;
+  ageRiskMultiplier = parseFloat(ageRiskMultiplier.toFixed(2));
+
+  return { bmi, geneticRiskScore, ageRiskMultiplier };
+}
+
+// ─── Profile collection helpers (user_profiles collection) ───────────────────
+export async function getProfileCollection(): Promise<Collection> {
+  const db = await getDb();
+  return db.collection(PROFILE_COLLECTION);
 }
 
 export async function getUserProfile(userId: string) {
-  console.log("[MongoDB] getUserProfile() called for userId:", userId);
-  try {
-    const collection = await getProfileCollection();
-    console.log("[MongoDB] Querying for profile with userId:", userId);
-
-    const profile = await collection.findOne({ userId });
-
-    if (profile) {
-      console.log("[MongoDB] ✓ Profile found:", profile._id);
-    } else {
-      console.log("[MongoDB] Profile not found for userId:", userId);
-    }
-
-    return profile;
-  } catch (error) {
-    console.error("[MongoDB] ✗ Error fetching profile:", error);
-    throw new Error("Failed to fetch profile");
-  }
+  const collection = await getProfileCollection();
+  return collection.findOne({ userId });
 }
 
-export async function createUserProfile(userId: string, profileData: any) {
-  console.log("[MongoDB] createUserProfile() called for userId:", userId);
-  console.log("[MongoDB] Profile data:", profileData);
+export async function createUserProfile(userId: string, profileData: Record<string, unknown>) {
+  const collection = await getProfileCollection();
+  const derived = computeDerivedFields(profileData);
 
-  try {
-    const collection = await getProfileCollection();
+  const newProfile = {
+    userId,
+    ...profileData,
+    ...derived,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
 
-    const newProfile = {
-      userId,
-      ...profileData,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    console.log("[MongoDB] Inserting profile into database...");
-    const result = await collection.insertOne(newProfile);
-
-    console.log("[MongoDB] ✓ Profile created with ID:", result.insertedId);
-    console.log("[MongoDB] Inserted document:", newProfile);
-
-    return newProfile;
-  } catch (error) {
-    console.error("[MongoDB] ✗ Error creating profile:", error);
-    throw new Error("Failed to create profile");
-  }
+  await collection.insertOne(newProfile);
+  return newProfile;
 }
 
-export async function updateUserProfile(userId: string, profileData: any) {
-  console.log("[MongoDB] updateUserProfile() called for userId:", userId);
-  console.log("[MongoDB] Update data:", profileData);
+export async function updateUserProfile(userId: string, profileData: Record<string, unknown>) {
+  const collection = await getProfileCollection();
 
-  try {
-    const collection = await getProfileCollection();
+  // Merge existing data with incoming to recompute derived fields
+  const existing = await collection.findOne({ userId });
+  const merged = { ...(existing ?? {}), ...profileData };
+  const derived = computeDerivedFields(merged);
 
-    console.log("[MongoDB] Updating profile in database...");
-    const result = await collection.updateOne(
-      { userId },
-      {
-        $set: {
-          ...profileData,
-          updatedAt: new Date().toISOString(),
-        },
-      }
-    );
-
-    console.log("[MongoDB] Update result - Matched:", result.matchedCount, "Modified:", result.modifiedCount);
-
-    if (result.matchedCount === 0) {
-      console.error("[MongoDB] ✗ Profile not found for update");
-      throw new Error("Profile not found");
+  const result = await collection.updateOne(
+    { userId },
+    {
+      $set: {
+        ...profileData,
+        ...derived,
+        updatedAt: new Date().toISOString(),
+      },
     }
+  );
 
-    console.log("[MongoDB] ✓ Profile updated successfully");
-    return result;
-  } catch (error) {
-    console.error("[MongoDB] ✗ Error updating profile:", error);
-    throw new Error("Failed to update profile");
+  if (result.matchedCount === 0) {
+    throw new Error("Profile not found");
   }
+
+  return result;
 }
 
 export async function deleteUserProfile(userId: string) {
-  console.log("[MongoDB] deleteUserProfile() called for userId:", userId);
+  const collection = await getProfileCollection();
 
-  try {
-    const collection = await getProfileCollection();
+  const result = await collection.deleteOne({ userId });
 
-    console.log("[MongoDB] Deleting profile from database...");
-    const result = await collection.deleteOne({ userId });
-
-    console.log("[MongoDB] Delete result - Deleted:", result.deletedCount);
-
-    if (result.deletedCount === 0) {
-      console.error("[MongoDB] ✗ Profile not found for deletion");
-      throw new Error("Profile not found");
-    }
-
-    console.log("[MongoDB] ✓ Profile deleted successfully");
-    return result;
-  } catch (error) {
-    console.error("[MongoDB] ✗ Error deleting profile:", error);
-    throw new Error("Failed to delete profile");
+  if (result.deletedCount === 0) {
+    throw new Error("Profile not found");
   }
+
+  return result;
 }
