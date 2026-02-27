@@ -3,18 +3,20 @@
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { Home, HeartPulse, Leaf, Sparkles, User } from "lucide-react";
+import { Home, HeartPulse, Leaf, Sparkles, User, FlaskConical } from "lucide-react";
 
 const TABS = [
-  { key: "home",    label: "Home",    icon: Home,       href: "/dashboard" },
-  { key: "vitals",  label: "Vitals",  icon: HeartPulse, href: "/dynamic" },
-  { key: "dosha",   label: "Dosha",   icon: Leaf,       href: "/dashboard/ncm-analysis" },
-  { key: "predict", label: "Predict", icon: Sparkles,   href: "/dashboard/results" },
-  { key: "life",    label: "Life",    icon: User,       href: "/dashboard/profile" },
+  { key: "home",     label: "Home",     icon: Home,         href: "/dashboard" },
+  { key: "vitals",   label: "Vitals",   icon: HeartPulse,   href: "/dynamic" },
+  { key: "dosha",    label: "Dosha",    icon: Leaf,         href: "/dashboard/ncm-analysis" },
+  { key: "remedies", label: "Remedies", icon: FlaskConical, href: "/dashboard/remedies" },
+  { key: "predict",  label: "Predict",  icon: Sparkles,     href: "/dashboard/results" },
+  { key: "life",     label: "Life",     icon: User,         href: "/dashboard/profile" },
 ] as const;
 
 function activeKey(pathname: string) {
   if (pathname.startsWith("/dashboard/ncm-analysis")) return "dosha";
+  if (pathname.startsWith("/dashboard/remedies"))     return "remedies";
   if (pathname.startsWith("/dashboard/results"))       return "predict";
   if (pathname.startsWith("/dashboard/profile"))       return "life";
   if (pathname.startsWith("/dynamic"))                 return "vitals";
@@ -32,7 +34,7 @@ export function BottomNav() {
         background: "var(--nav-bg)",
         borderTop: "1px solid var(--border)",
       }}>
-      <div className="max-w-lg mx-auto flex items-center justify-around px-2 py-1.5">
+      <div className="max-w-lg mx-auto flex items-center justify-around px-1 py-1.5">
         {TABS.map((t) => {
           const active = current === t.key;
           const Icon = t.icon;
@@ -40,7 +42,7 @@ export function BottomNav() {
             <button
               key={t.key}
               onClick={() => router.push(t.href)}
-              className="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl transition-all duration-200"
+              className="flex flex-col items-center gap-0.5 px-2 py-2 rounded-2xl transition-all duration-200"
               style={{
                 background: active ? "var(--teal-bg)" : "transparent",
                 boxShadow: active ? "0 0 0 2px var(--border-accent)" : "none",
@@ -50,7 +52,7 @@ export function BottomNav() {
               <Icon className="w-5 h-5" style={{
                 color: active ? "var(--teal)" : "var(--text-faint)"
               }} />
-              <span className="text-[11px] font-semibold tracking-wide"
+              <span className="text-[10px] font-semibold tracking-wide"
                 style={{ color: active ? "var(--teal)" : "var(--text-faint)" }}>
                 {t.label}
               </span>
