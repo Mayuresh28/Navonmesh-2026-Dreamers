@@ -18,7 +18,7 @@ export function ComputedPreview({ age, height, weight, familyHistory, smokingSta
   const h = parseInt(height) / 100;
   const bmi = parseFloat((parseInt(weight) / (h * h)).toFixed(1));
   const bmiCategory = bmi < 18.5 ? "Underweight" : bmi < 25 ? "Normal" : bmi < 30 ? "Overweight" : "Obese";
-  const bmiColor = bmi < 18.5 ? "text-status-medium" : bmi < 25 ? "text-status-low" : bmi < 30 ? "text-status-medium" : "text-status-high";
+  const bmiColor = bmi < 18.5 ? "text-status-mod" : bmi < 25 ? "text-status-low" : bmi < 30 ? "text-status-mod" : "text-status-high";
 
   let grs = 0;
   if (familyHistory.trim().length > 0) grs += 0.4;
@@ -28,7 +28,7 @@ export function ComputedPreview({ age, height, weight, familyHistory, smokingSta
   else if (alcoholUse === "moderate") grs += 0.15;
   else if (alcoholUse === "occasional") grs += 0.05;
   grs = parseFloat(Math.min(grs, 1).toFixed(2));
-  const grsColor = grs >= 0.5 ? "text-status-high" : grs > 0 ? "text-status-medium" : "text-status-low";
+  const grsColor = grs >= 0.5 ? "text-status-high" : grs > 0 ? "text-status-mod" : "text-status-low";
 
   let arm = 1 + parseInt(age) / 100;
   if (smokingStatus === "current") arm += 0.15;

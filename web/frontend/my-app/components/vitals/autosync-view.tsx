@@ -14,11 +14,12 @@ export function AutosyncView({ loading, autoProgress, onSync }: AutosyncViewProp
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-8 gap-8">
       <div className="text-center max-w-lg">
-        <div className="w-20 h-20 rounded-2xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center text-primary mx-auto mb-6">
-          {Icons.shield("w-10 h-10")}
+        <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
+          style={{ background: "var(--teal-bg)", border: "2px solid var(--border)" }}>
+          <span style={{ color: "var(--teal)" }}>{Icons.shield("w-10 h-10")}</span>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">Auto Sync</h1>
-        <p className="text-base text-gray-500 mt-3 leading-relaxed">
+        <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>Auto Sync</h1>
+        <p className="text-base mt-3 leading-relaxed" style={{ color: "var(--text-muted)" }}>
           Automatically sync and analyze all your health data in one click.
           This combines everything you have uploaded so far to give you the most accurate picture of your health.
         </p>
@@ -31,11 +32,15 @@ export function AutosyncView({ loading, autoProgress, onSync }: AutosyncViewProp
           return (
             <div key={p.key}
               className={`flex flex-col items-center gap-2 rounded-2xl border-2 px-3 py-4 text-center transition-all duration-200 ${
-                loading ? "border-primary/30 bg-primary/5 animate-pulse" : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm"
-              }`}>
-              <div className="text-gray-400">{PIcon ? PIcon("w-6 h-6") : Icons.activity("w-6 h-6")}</div>
-              <span className="text-xs font-semibold text-gray-600 leading-tight">{p.label}</span>
-              {p.optional && <span className="text-[10px] text-gray-400 -mt-0.5">Optional</span>}
+                loading ? "animate-pulse" : ""
+              }`}
+              style={loading
+                ? { borderColor: "var(--teal)", background: "var(--teal-bg)" }
+                : { borderColor: "var(--border)", background: "var(--bg-card)" }
+              }>
+              <div style={{ color: "var(--text-muted)" }}>{PIcon ? PIcon("w-6 h-6") : Icons.activity("w-6 h-6")}</div>
+              <span className="text-xs font-semibold leading-tight" style={{ color: "var(--text-body)" }}>{p.label}</span>
+              {p.optional && <span className="text-[10px] -mt-0.5" style={{ color: "var(--text-muted)" }}>Optional</span>}
             </div>
           );
         })}
@@ -45,18 +50,18 @@ export function AutosyncView({ loading, autoProgress, onSync }: AutosyncViewProp
       {loading && (
         <div className="w-full max-w-lg">
           <div className="flex justify-between mb-2">
-            <span className="text-sm text-gray-500 font-medium">Loading your health data...</span>
-            <span className="text-sm font-bold text-primary">{autoProgress}%</span>
+            <span className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>Loading your health data...</span>
+            <span className="text-sm font-bold" style={{ color: "var(--teal)" }}>{autoProgress}%</span>
           </div>
-          <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-primary rounded-full transition-all duration-200 ease-out"
-              style={{ width: `${autoProgress}%` }} />
+          <div className="h-3 rounded-full overflow-hidden" style={{ background: "var(--bg-raised)" }}>
+            <div className="h-full rounded-full transition-all duration-200 ease-out"
+              style={{ width: `${autoProgress}%`, background: "var(--teal)" }} />
           </div>
         </div>
       )}
 
       <button onClick={onSync} disabled={loading}
-        className="w-full max-w-lg py-4 rounded-2xl bg-primary hover:bg-secondary text-white font-bold text-lg tracking-wide shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed">
+        className="btn-primary w-full max-w-lg py-4 rounded-2xl font-bold text-lg tracking-wide shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed">
         {loading ? (
           <span className="flex items-center justify-center gap-3"><Spinner /> Loading Report...</span>
         ) : (

@@ -24,7 +24,7 @@ export function RiskCard({ prediction, onRerun }: { prediction: PredictionResult
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, delay: 0.1 }}
-      className={`relative overflow-hidden rounded-[28px] p-8 md:p-10 border ${riskColors.border}/30 bg-gradient-to-br from-card to-card/80 shadow-lg`}
+      className="prana-vessel relative overflow-hidden p-8 md:p-10"
     >
       <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
         <div className="flex flex-col items-center">
@@ -41,23 +41,24 @@ export function RiskCard({ prediction, onRerun }: { prediction: PredictionResult
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
             className={`text-3xl md:text-4xl font-bold ${riskColors.text} tracking-tight`}
+            style={{ fontFamily: "var(--font-serif)" }}
           >
             {prediction.predicted_class}
           </motion.span>
-          <span className="text-text-secondary text-sm mt-1">Risk Level</span>
+          <span className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>Risk Level</span>
         </div>
 
         <div className="flex-1 text-center md:text-left">
-          <h2 className="text-2xl font-bold text-text-primary mb-3">
+          <h2 className="text-2xl font-bold mb-3" style={{ color: "var(--text-primary)" }}>
             {getRiskMessage(prediction.predicted_class)}
           </h2>
-          <p className="text-text-secondary leading-relaxed">
+          <p className="leading-relaxed" style={{ color: "var(--text-body)" }}>
             This assessment is based on your BMI, genetic risk factors, age-adjusted risk,
             and baseline health indicators analyzed by our Random Forest ML model.
           </p>
           <button
             onClick={onRerun}
-            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-[12px] bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
+            className="mt-4 btn-secondary inline-flex items-center gap-2 px-4 py-2 rounded-[12px] text-sm font-medium"
           >
             <RefreshCw className="w-4 h-4" />
             Re-run Analysis
