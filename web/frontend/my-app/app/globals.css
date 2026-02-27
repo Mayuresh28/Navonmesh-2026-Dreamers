@@ -1,22 +1,48 @@
 @import "tailwindcss";
 
-@theme {
-  --color-primary-blue: #7EA6F7;
-  --color-secondary-blue: #5B7BEA;
-  --color-accent-blue: #CFE0FF;
-  --color-bg-light: #F4F7FB;
-  --color-card-bg: #FFFFFF;
-  --color-border-light: #E3EAF5;
+@theme inline {
+  --color-primary: #7EA6F7;
+  --color-secondary: #5B7BEA;
+  --color-accent: #CFE0FF;
+  --color-background: #F4F7FB;
+  --color-card: #FFFFFF;
+  --color-border-soft: #E3EAF5;
   --color-text-primary: #1F2937;
   --color-text-secondary: #6B7280;
-  
-  --color-risk-low: #86E3A3;
-  --color-risk-moderate: #FFD580;
-  --color-risk-high: #FF9C9C;
+
+  --color-status-low: #86E3A3;
+  --color-status-mod: #FFD580;
+  --color-status-high: #FF9C9C;
+
+  --font-sans: var(--font-inter);
+}
+
+:root {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
 }
 
 body {
-  background-color: var(--color-bg-light);
-  color: var(--color-text-primary);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Base components following UI Design System */
+@layer components {
+  .card {
+    @apply bg-card rounded-[20px] md:rounded-[24px] p-5 shadow-[0_4px_24px_rgba(126, 166, 247, 0.06)] border border-border-soft;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white rounded-[16px] h-12 px-6 font-medium transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(126, 166, 247, 0.3)] active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-accent text-primary rounded-[16px] h-12 px-6 font-medium transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-opacity-90 active:scale-95;
+  }
+
+  .input-field {
+    @apply rounded-[16px] border border-border-soft px-4 py-3 outline-none transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-text-secondary/60;
+  }
 }

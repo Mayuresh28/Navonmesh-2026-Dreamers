@@ -1,141 +1,143 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, Mail, Lock, ArrowRight, UserPlus, LogIn, AlertCircle } from "lucide-react";
-import Link from "next/link";
-// import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { useRouter } from "next/navigation";
+import { Activity, ShieldCheck, HeartPulse, ArrowRight } from "lucide-react";
 
-export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+export default function LandingPage() {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
 
-  const router = useRouter();
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.4, ease: "easeOut" }
+    },
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  return (
+    <div className="min-h-screen flex flex-col relative overflow-hidden selection:bg-accent selection:text-primary">
+      {/* Soft Background Blur Elements */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent/30 rounded-full blur-3xl -z-10 mix-blend-multiply" />
+      <div className="absolute top-[20%] right-[-10%] w-[30%] h-[40%] bg-status-low/20 rounded-full blur-3xl -z-10 mix-blend-multiply" />
 
-    //   try {
-    //     if (isLogin) {
-    //       await signInWithEmailAndPassword(auth, email, password);
-    //       // Navigate or show success
-    //     } else {
-    //       await createUserWithEmailAndPassword(auth, email, password);
-    //       // Navigate or show success
-    //     }
-    //     router.push("/dashboard"); // Redirect to a placeholder dashboard page after login/register
-    //   } catch (err: any) {
-    //     setError(err.message || "An error occurred during authentication.");
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-
-    return (
-      <div className="min-h-screen bg-[var(--color-bg-light)] flex items-center justify-center p-6 selection:bg-[var(--color-accent-blue)]">
-        {/* Background Soft Gradients */}
-        <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-[#E3EAF5] opacity-60 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[50%] h-[50%] bg-[var(--color-accent-blue)] opacity-30 rounded-full blur-[120px] pointer-events-none" />
+      {/* Navigation */}
+      <nav className="w-full px-6 py-6 md:px-12 flex items-center justify-between z-10 max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex items-center gap-3"
+        >
+          <div className="w-10 h-10 rounded-full bg-card flex items-center justify-center shadow-sm border border-border-soft">
+            <HeartPulse className="text-primary w-6 h-6" />
+          </div>
+          <span className="text-2xl font-bold text-primary tracking-tight">धन्वंतरी</span>
+        </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="w-full max-w-md bg-white rounded-[24px] shadow-[0px_10px_40px_rgba(0,0,0,0.04)] border border-[var(--color-border-light)] p-8 relative z-10"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          <div className="flex flex-col items-center mb-8">
-            <Link href="/">
-              <div className="bg-[var(--color-bg-light)] p-3 rounded-full mb-4 cursor-pointer hover:scale-105 transition-transform">
-                <ShieldCheck className="w-8 h-8 text-[var(--color-primary-blue)]" />
-              </div>
-            </Link>
-            <h2 className="text-2xl font-semibold text-[var(--color-text-primary)]">
-              {isLogin ? "Welcome Back" : "Create Account"}
-            </h2>
-            <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-              {isLogin ? "Sign in to access your health dashboard" : "Join धन्वंतरी for proactive health monitoring"}
-            </p>
-          </div>
-
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              className="flex items-start gap-2 text-[var(--color-risk-high)] bg-[#FFF5F5] p-3 rounded-xl text-sm mb-6 border border-[#FFE0E0]"
-            >
-              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-              <p>{error}</p>
-            </motion.div>
-          )}
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="space-y-1">
-              <label className="text-[13px] font-medium text-[var(--color-text-primary)] ml-1">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-text-secondary)] pointer-events-none" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full bg-[var(--color-bg-light)] border border-[var(--color-border-light)] rounded-[16px] pl-10 pr-4 py-3 text-[14px] text-[var(--color-text-primary)] placeholder-[var(--color-text-secondary)] focus:outline-none focus:border-[var(--color-primary-blue)] focus:ring-4 focus:ring-[var(--color-accent-blue)] transition-all"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-[13px] font-medium text-[var(--color-text-primary)] ml-1">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-text-secondary)] pointer-events-none" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-[var(--color-bg-light)] border border-[var(--color-border-light)] rounded-[16px] pl-10 pr-4 py-3 text-[14px] text-[var(--color-text-primary)] placeholder-[var(--color-text-secondary)] focus:outline-none focus:border-[var(--color-primary-blue)] focus:ring-4 focus:ring-[var(--color-accent-blue)] transition-all"
-                />
-              </div>
-            </div>
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              disabled={loading}
-              className="w-full bg-[var(--color-primary-blue)] text-white font-medium py-3.5 rounded-[16px] flex items-center justify-center gap-2 mt-4 hover:bg-[var(--color-secondary-blue)] shadow-[0px_6px_20px_rgba(126,166,247,0.2)] transition-colors disabled:opacity-70"
-              type="submit"
-            >
-              {loading ? (
-                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : isLogin ? (
-                <>Sign In <LogIn className="w-4 h-4 ml-1" /></>
-              ) : (
-                <>Create Account <UserPlus className="w-4 h-4 ml-1" /></>
-              )}
-            </motion.button>
-          </form>
-
-          <div className="mt-8 text-center border-t border-[var(--color-border-light)] pt-6">
-            <p className="text-sm text-[var(--color-text-secondary)]">
-              {isLogin ? "Don't have an account?" : "Already have an account?"}
-              <button
-                type="button"
-                onClick={() => setIsLogin(!isLogin)}
-                className="ml-2 font-medium text-[var(--color-primary-blue)] hover:text-[var(--color-secondary-blue)] transition-colors"
-              >
-                {isLogin ? "Sign Up" : "Sign In"}
-              </button>
-            </p>
-          </div>
+          <button className="text-text-secondary hover:text-primary transition-colors text-sm font-medium px-4 py-2 rounded-full hover:bg-accent/30">
+            Sign In
+          </button>
         </motion.div>
-      </div>
-    );
-  }
+      </nav>
+
+      {/* Main Content */}
+      <main className="flex-grow flex flex-col justify-center items-center px-6 md:px-12 text-center w-full max-w-5xl mx-auto z-10 mt-12 mb-20">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col items-center max-w-3xl"
+        >
+          <motion.div variants={itemVariants} className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-[16px] bg-accent/50 text-primary text-sm font-medium border border-primary/10 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            Navonmesh Hackathon 2026
+          </motion.div>
+
+          <motion.h1
+            variants={itemVariants}
+            className="text-4xl md:text-5xl lg:text-7xl font-bold text-text-primary leading-[1.15] mb-6"
+          >
+            Proactive Care,<br />
+            <span className="text-primary tracking-tight">Empowered Living.</span>
+          </motion.h1>
+
+          <motion.p
+            variants={itemVariants}
+            className="text-text-secondary text-base md:text-lg mb-10 max-w-xl leading-relaxed font-normal"
+          >
+            Welcome to <b className="text-text-primary text-[1.1em] font-semibold">धन्वंतरी</b>. A preventive health monitoring and early risk detection framework designed to bridge gaps and protect your future.
+          </motion.p>
+
+          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <button className="btn-primary flex items-center justify-center gap-2 group">
+              Start Monitoring
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button className="btn-secondary flex items-center justify-center">
+              Learn More
+            </button>
+          </motion.div>
+        </motion.div>
+
+        {/* Feature Cards */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24 w-full text-left"
+        >
+          {[
+            {
+              icon: <Activity className="text-primary w-6 h-6" />,
+              title: "Continuous Monitoring",
+              desc: "Real-time health parameter tracking at scale for proactive care and analytics."
+            },
+            {
+              icon: <ShieldCheck className="text-status-low w-6 h-6" />,
+              title: "Early Detection",
+              desc: "Identify potential health risks early before they become critical medical emergencies."
+            },
+            {
+              icon: <HeartPulse className="text-status-mod w-6 h-6" />,
+              title: "Accessible Insights",
+              desc: "Bridging the digital divide with actionable insights for every socio-economic group."
+            }
+          ].map((feature, idx) => (
+            <motion.div
+              key={idx}
+              variants={itemVariants}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="card group flex flex-col relative overflow-hidden"
+            >
+              {/* Subtle gradient hover effect on card */}
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/0 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+              <div className="w-12 h-12 rounded-[16px] bg-accent/40 flex items-center justify-center mb-5 mt-1 border border-border-soft group-hover:scale-[1.05] transition-transform duration-300">
+                {feature.icon}
+              </div>
+              <h3 className="text-[18px] font-semibold text-text-primary mb-2.5 tracking-tight">{feature.title}</h3>
+              <p className="text-[14px] text-text-secondary leading-relaxed font-normal">
+                {feature.desc}
+              </p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </main>
+    </div>
+  );
+}
