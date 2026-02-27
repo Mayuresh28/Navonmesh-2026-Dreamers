@@ -1,7 +1,7 @@
 "use client";
 
 /* ═══════════════════════════════════════════════════════════════════
-   PRĀṆA OS — Risk Level Types, Helpers & Color Mappings
+   Dhanvantari — Risk Level Types, Helpers & Color Mappings
    Uses CSS custom properties for theme-aware colors.
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -35,7 +35,7 @@ export const RISK_COLORS = {
     border: "border-emerald-200",
     text: "text-emerald-700",
     bar: "",           // now rendered via inline style
-    barColor: "#0de5a8", // PRĀṆA ok / teal
+    barColor: "#0de5a8", // Dhanvantari ok / teal
     icon: "text-emerald-600",
     cardBorder: "border-l-emerald-500",
     badge: "bg-emerald-100 text-emerald-800",
@@ -45,7 +45,7 @@ export const RISK_COLORS = {
     border: "border-amber-200",
     text: "text-amber-700",
     bar: "",
-    barColor: "#f5c542", // PRĀṆA warn
+    barColor: "#f5c542", // Dhanvantari warn
     icon: "text-amber-600",
     cardBorder: "border-l-amber-500",
     badge: "bg-amber-100 text-amber-800",
@@ -65,7 +65,7 @@ export const RISK_COLORS = {
     border: "border-red-200",
     text: "text-red-700",
     bar: "",
-    barColor: "#ff4d6a", // PRĀṆA danger
+    barColor: "#ff4d6a", // Dhanvantari danger
     icon: "text-red-600",
     cardBorder: "border-l-red-500",
     badge: "bg-red-100 text-red-800",

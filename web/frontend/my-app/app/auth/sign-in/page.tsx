@@ -63,7 +63,7 @@ export default function SignInPage() {
               <HeartPulse className="w-6 h-6" style={{ color: "var(--teal)" }} />
             </div>
             <span className="text-2xl font-bold tracking-tight" style={{ color: "var(--teal)" }}>
-              PRĀṆA <span className="text-sm font-normal" style={{ color: "var(--text-muted)" }}>OS</span>
+              Dhanvantari
             </span>
           </Link>
         </motion.div>

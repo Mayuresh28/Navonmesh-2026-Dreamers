@@ -71,7 +71,7 @@ export default function LandingPage() {
             <HeartPulse className="w-6 h-6" style={{ color: "var(--teal)" }} />
           </div>
           <span className="text-2xl font-bold tracking-tight" style={{ color: "var(--teal)" }}>
-            PRĀṆA <span className="font-normal text-sm" style={{ color: "var(--text-muted)" }}>OS</span>
+            Dhanvantari
           </span>
         </motion.div>
 
@@ -120,7 +120,7 @@ export default function LandingPage() {
           {/* Live badge */}
           <motion.div variants={itemVariants} className="live-badge mb-8">
             <span className="live-dot" />
-            PRĀṆA OS · Vedic Health Intelligence
+            Dhanvantari · Vedic Health Intelligence
           </motion.div>
 
           <motion.h1
@@ -137,7 +137,7 @@ export default function LandingPage() {
             className="text-base md:text-lg mb-10 max-w-xl leading-relaxed"
             style={{ color: "var(--text-body)" }}
           >
-            Welcome to <strong style={{ color: "var(--text-primary)" }}>PRĀṆA OS</strong> — a preventive health monitoring and early risk detection framework merging Vedic wisdom with modern biometrics.
+            Welcome to <strong style={{ color: "var(--text-primary)" }}>Dhanvantari</strong> — a preventive health monitoring and early risk detection framework merging Vedic wisdom with modern biometrics.
           </motion.p>
 
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">

@@ -48,7 +48,7 @@ export const Navbar: FC<NavbarProps> = ({ activeTab, onTabChange }) => {
             <HeartPulse className="w-5 h-5" style={{ color: "var(--teal)" }} />
           </div>
           <span className="text-lg font-bold tracking-tight" style={{ color: "var(--teal)" }}>
-            PRĀṆA <span className="text-xs font-normal" style={{ color: "var(--text-muted)" }}>OS</span>
+            Dhanvantari
           </span>
         </motion.div>
 

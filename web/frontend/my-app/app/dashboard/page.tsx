@@ -24,8 +24,7 @@ export default function DashboardPage() {
         {/* Topbar */}
         <div className="prana-topbar">
           <div className="flex items-center gap-2">
-            <span className="text-lg font-bold" style={{ color: "var(--teal)" }}>PRĀṆA</span>
-            <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>OS</span>
+            <span className="text-lg font-bold" style={{ color: "var(--teal)" }}>Dhanvantari</span>
           </div>
           <div className="flex items-center gap-3">
             <div className="live-badge">
@@ -77,7 +76,7 @@ export default function DashboardPage() {
 
               <h2 className="text-3xl md:text-4xl font-bold text-center"
                 style={{ color: "var(--text-primary)", fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}>
-                PRĀṆA OS
+                Dhanvantari
               </h2>
               <p className="text-base text-center max-w-lg" style={{ color: "var(--text-body)" }}>
                 Real-time Vedic health monitoring and analytics with personalized Ayurvedic insights

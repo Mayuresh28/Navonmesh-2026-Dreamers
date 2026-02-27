@@ -17,7 +17,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "PRĀṆA OS — Vedic Health System",
+  title: "Dhanvantari — Vedic Health System",
   description: "Advanced Vedic health monitoring with Ayurvedic intelligence",
 };
 

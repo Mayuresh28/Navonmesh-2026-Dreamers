@@ -37,7 +37,7 @@ export function NCMGauge({ value, category }: { value: number; category: string 
           margin: 0 auto;
         }
 
-        /* Decorative spinning rings — matches PRĀṆA score ring deco */
+        /* Decorative spinning rings — matches Dhanvantari score ring deco */
         .prana-deco-outer {
           position: absolute;
           inset: -14px;

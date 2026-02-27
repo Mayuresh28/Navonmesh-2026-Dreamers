@@ -137,7 +137,7 @@ export default function HealthDashboard() {
                         {Icons.logo("w-5 h-5")}
                     </div>
                     <div>
-                        <span className="text-lg font-bold tracking-tight" style={{ color: "var(--teal)" }}>PRĀṆA</span>
+                        <span className="text-lg font-bold tracking-tight" style={{ color: "var(--teal)" }}>Dhanvantari</span>
                         <p className="text-xs font-medium hidden sm:block" style={{ color: "var(--text-muted)" }}>Health Analysis</p>
                     </div>
                 </div>

@@ -19,7 +19,7 @@ export function SignalCard({ title, subtitle, icon, prediction, featureLabel, fe
   const pStyle = getPredictionStyle(prediction.risk_level);
   const prob = prediction.probability * 100;
 
-  /* Map risk_level to PRĀṆA color tokens */
+  /* Map risk_level to Dhanvantari color tokens */
   const isLow  = prediction.risk_level === "low";
   const isHigh = prediction.risk_level === "high";
   const tone   = isLow ? "ok" : isHigh ? "bad" : "warn";

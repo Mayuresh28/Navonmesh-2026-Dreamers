@@ -75,7 +75,7 @@ export default function SignUpPage() {
               <HeartPulse className="w-6 h-6" style={{ color: "var(--teal)" }} />
             </div>
             <span className="text-2xl font-bold tracking-tight" style={{ color: "var(--teal)" }}>
-              PRĀṆA <span className="text-sm font-normal" style={{ color: "var(--text-muted)" }}>OS</span>
+              Dhanvantari
             </span>
           </Link>
         </motion.div>
@@ -99,7 +99,7 @@ export default function SignUpPage() {
                 Create Account
               </h1>
               <p className="mb-8" style={{ color: "var(--text-body)" }}>
-                Start your Vedic health journey with PRĀṆA OS
+                Start your Vedic health journey with Dhanvantari
               </p>
             </motion.div>
 
