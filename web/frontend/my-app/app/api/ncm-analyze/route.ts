@@ -137,8 +137,40 @@ async function callMLApi(rawData: {
             throw new Error(`ML API returned ${res.status}`);
         }
 
-        const result = await res.json();
-        return { ...result, model_source: "ml" };
+        const raw = await res.json();
+
+        // Transform flat ML API response into the nested shape the frontend expects
+        const result = {
+            features: {
+                heart_rate: raw.heart_rate ?? (rawData.heart_rate.length > 0 ? mean(rawData.heart_rate) : 72),
+                hrv_sdnn: raw.hrv_sdnn ?? 50,
+                stress_ratio: raw.stress_ratio ?? 1,
+                emg_rms: raw.emg_rms ?? 0.3,
+            },
+            predictions: {
+                cardiac: {
+                    state: raw.cardiac_state ?? "Unknown",
+                    probability: raw.cardiac_prob ?? 0,
+                    risk_level: (raw.cardiac_prob ?? 0) > 0.5 ? "high" : "low",
+                },
+                stress: {
+                    state: raw.stress_state ?? "Unknown",
+                    probability: raw.stress_prob ?? 0,
+                    risk_level: (raw.stress_prob ?? 0) > 0.5 ? "high" : "low",
+                },
+                muscle: {
+                    state: raw.muscle_state ?? "Unknown",
+                    probability: raw.fatigue_prob ?? 0,
+                    risk_level: (raw.fatigue_prob ?? 0) > 0.5 ? "high" : "low",
+                },
+            },
+            ncm_index: raw.ncm_index ?? 0,
+            systemic_flag: raw.systemic_flag ?? "Stable",
+            risk_category: raw.risk_category ?? "Low",
+            model_source: "ml" as const,
+        };
+
+        return result;
     } catch {
         clearTimeout(timeout);
         return null; // Fallback to formula-based
