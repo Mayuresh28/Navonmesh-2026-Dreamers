@@ -9,7 +9,7 @@ from xgboost import XGBClassifier
 # Load Dataset
 # ==============================
 
-df = pd.read_csv("meta_dataset_30k.csv")
+df = pd.read_csv("meta_dataset_realistic_balanced.csv")
 
 X = df.drop("Disease_Class", axis=1)
 y = df["Disease_Class"]

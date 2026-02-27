@@ -1,65 +1,118 @@
 import numpy as np
 import pandas as pd
+from scipy.special import softmax
 
 np.random.seed(42)
 
-n = 30000
+n = 40000
 
-# ==============================
-# Simulated Base Model Outputs
-# ==============================
+# ==========================================
+# Base Clinical Probabilities
+# ==========================================
 
-heart_prob = np.random.beta(2, 5, n)
-diabetes_prob = np.random.beta(2, 4, n)
-stroke_prob = np.random.beta(2, 6, n)
+heart_prob = np.random.beta(2.3, 3.7, n)
+diabetes_prob = np.random.beta(2.3, 3.7, n)
+stroke_prob = np.random.beta(2.4, 3.6, n)
 
-ecg_prob = np.random.beta(2, 5, n)
-eeg_prob = np.random.beta(2, 5, n)
-emg_prob = np.random.beta(2, 5, n)
+# ==========================================
+# Signal Probabilities
+# ==========================================
 
-static_risk = np.random.beta(2, 3, n)
-ncm_index = np.random.uniform(20, 90, n)
+ecg_prob = np.random.beta(2.3, 3.2, n)
+eeg_prob = np.random.beta(2.3, 3.2, n)
+emg_prob = np.random.beta(2.4, 3.0, n)
 
-# ==============================
-# Engineered Cross-Organ Features
-# ==============================
+# ==========================================
+# Static Risk
+# ==========================================
+
+static_risk = (
+    0.25 * heart_prob +
+    0.25 * diabetes_prob +
+    0.20 * stroke_prob +
+    0.15 * ecg_prob +
+    0.15 * eeg_prob
+)
+
+# ==========================================
+# Engineered Features
+# ==========================================
 
 cardio_combined = (heart_prob + ecg_prob) / 2
-neuro_combined = (stroke_prob + eeg_prob) / 2
+neuro_combined = (stroke_prob + eeg_prob + emg_prob) / 3
 metabolic_combined = (diabetes_prob + static_risk) / 2
 fatigue_index = (emg_prob + eeg_prob) / 2
 
-# ==============================
-# Deterministic Disease Scoring
-# ==============================
+ncm_index = (
+    0.22 * heart_prob +
+    0.22 * diabetes_prob +
+    0.20 * stroke_prob +
+    0.14 * ecg_prob +
+    0.12 * eeg_prob +
+    0.10 * static_risk
+) * 100
+
+# ==========================================
+# BALANCED NORMALIZED SCORING
+# (No artificial multiplier explosion)
+# ==========================================
+
+score_chd = cardio_combined
+score_stroke = stroke_prob
+score_diabetes = diabetes_prob
+score_hypertension = static_risk
+score_arrhythmia = ecg_prob
+score_metabolic = metabolic_combined
+score_neuro = neuro_combined
+score_epilepsy = (eeg_prob + emg_prob) / 2
+score_healthy = 1 - static_risk
+
+scores = np.vstack([
+    score_chd,          # 0
+    score_stroke,       # 1
+    score_diabetes,     # 2
+    score_hypertension, # 3
+    score_arrhythmia,   # 4
+    score_metabolic,    # 5
+    score_neuro,        # 6
+    score_epilepsy,     # 7
+    score_healthy       # 8
+]).T
+
+# ==========================================
+# STRUCTURED DOMINANCE WITH CONTROLLED OVERLAP
+# ==========================================
 
 disease = []
 
-for i in range(n):
+for row in scores:
 
-    disease_scores = np.array([
+    sorted_indices = np.argsort(row)[::-1]
+    top_class = sorted_indices[0]
+    second_class = sorted_indices[1]
 
-        cardio_combined[i],
-        stroke_prob[i],
-        diabetes_prob[i],
-        static_risk[i],
-        ecg_prob[i],
-        metabolic_combined[i],
-        (static_risk[i] + metabolic_combined[i]) / 2,
-        eeg_prob[i],
-        neuro_combined[i],
-        eeg_prob[i] * 1.05,
-        fatigue_index[i],
-        emg_prob[i],
-        eeg_prob[i] * 1.1
+    margin = row[top_class] - row[second_class]
 
-    ])
+    # Strong dominance → deterministic
+    if margin > 0.07:
+        label = top_class
+    else:
+        # Borderline → probabilistic between top 2
+        probs = softmax(row[sorted_indices[:2]] * 2)
+        label = np.random.choice(
+            sorted_indices[:2],
+            p=probs
+        )
 
-    disease.append(np.argmax(disease_scores))
+    # Small structured noise (5%)
+    if np.random.rand() < 0.05:
+        label = np.random.randint(0, 9)
 
-# ==============================
-# Create DataFrame
-# ==============================
+    disease.append(label)
+
+# ==========================================
+# Build Dataset
+# ==========================================
 
 df = pd.DataFrame({
     "heart_prob": heart_prob,
@@ -77,18 +130,8 @@ df = pd.DataFrame({
     "Disease_Class": disease
 })
 
-# ==============================
-# BALANCE THE DATASET
-# ==============================
+df.to_csv("meta_dataset_realistic_balanced.csv", index=False)
 
-min_samples = df["Disease_Class"].value_counts().min()
-
-df_balanced = df.groupby("Disease_Class").apply(
-    lambda x: x.sample(min_samples, random_state=42)
-).reset_index(drop=True)
-
-df_balanced.to_csv("meta_dataset_30k.csv", index=False)
-
-print("Balanced Meta dataset generated successfully!")
+print("Balanced realistic meta dataset generated!")
 print("\nClass Distribution:")
-print(df_balanced["Disease_Class"].value_counts())
+print(df["Disease_Class"].value_counts(normalize=True))
