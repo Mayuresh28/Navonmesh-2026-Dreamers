@@ -1904,6 +1904,384 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
+   RESULTS — TAB BAR & CHART COMPONENTS
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Tab Bar ── */
+.res-tab-bar {
+  display: flex !important;
+  gap: 4px !important;
+  margin: 10px 20px 14px !important;
+  padding: 4px !important;
+  border-radius: 16px !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+}
+.res-tab-btn {
+  flex: 1 !important;
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 10px 0 !important;
+  border-radius: 12px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--text-muted) !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: color 0.25s !important;
+  font-family: var(--font-syne, 'Syne', sans-serif) !important;
+  letter-spacing: 0.3px !important;
+}
+.res-tab-btn.active {
+  color: var(--text-primary) !important;
+}
+.res-tab-indicator {
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 12px !important;
+  background: var(--bg-raised) !important;
+  border: 1px solid var(--border-accent) !important;
+  z-index: -1 !important;
+  box-shadow: 0 2px 8px rgba(13,229,168,0.08) !important;
+}
+
+/* ── Section wrappers ── */
+.res-section {
+  margin: 12px 20px !important;
+}
+.res-section-head {
+  margin-bottom: 10px !important;
+}
+.res-section-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-syne, 'Syne', sans-serif) !important;
+  letter-spacing: 0.3px !important;
+}
+.res-section-desc {
+  font-size: 11px !important;
+  color: var(--text-muted) !important;
+  margin-top: 4px !important;
+  line-height: 1.5 !important;
+}
+
+/* ── Chart wrapper (pie/radar) ── */
+.res-chart-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 18px !important;
+  border-radius: 20px !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+}
+.res-chart-legend {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 10px 18px !important;
+}
+.res-legend-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+.res-legend-dot {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  flex-shrink: 0 !important;
+}
+.res-legend-label {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: var(--text-muted) !important;
+}
+.res-legend-val {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  font-family: var(--font-playfair, 'Playfair Display', serif) !important;
+}
+
+/* ── Bar Chart Card ── */
+.res-bar-card {
+  padding: 16px 18px !important;
+  border-radius: 20px !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+}
+.res-bar-header {
+  margin-bottom: 12px !important;
+}
+.res-bar-title {
+  display: block !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-syne, 'Syne', sans-serif) !important;
+}
+.res-bar-sub {
+  display: block !important;
+  font-size: 10px !important;
+  color: var(--text-muted) !important;
+  margin-top: 2px !important;
+}
+.res-bar-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 8px !important;
+}
+.res-bar-label {
+  width: 90px !important;
+  flex-shrink: 0 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: var(--text-body) !important;
+  text-align: right !important;
+}
+.res-bar-track {
+  flex: 1 !important;
+  height: 10px !important;
+  border-radius: 6px !important;
+  background: var(--bg-base) !important;
+  overflow: hidden !important;
+}
+.res-bar-fill {
+  height: 100% !important;
+  border-radius: 6px !important;
+}
+.res-bar-val {
+  width: 60px !important;
+  flex-shrink: 0 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  font-family: var(--font-playfair, 'Playfair Display', serif) !important;
+  text-align: left !important;
+}
+
+/* ── Scatter Card ── */
+.res-scatter-card {
+  padding: 16px 18px !important;
+  border-radius: 20px !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+}
+.res-scatter-svg {
+  display: block !important;
+  margin-top: 8px !important;
+}
+
+/* ── Mini Gauge ── */
+.res-mini-gauge {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+.res-mini-gauge-desc {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  color: var(--text-muted) !important;
+  text-transform: capitalize !important;
+  text-align: center !important;
+}
+.res-gauges-row {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 20px !important;
+  padding: 14px !important;
+  border-radius: 20px !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* ── Feature Tiles (Dynamic) ── */
+.res-features-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+}
+.res-feature-tile {
+  padding: 14px !important;
+  border-radius: 16px !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-left: 3px solid !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+.res-feature-tile:hover {
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06) !important;
+}
+.res-feature-tile-icon {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 8px !important;
+}
+.res-feature-tile-val {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  font-family: var(--font-playfair, 'Playfair Display', serif) !important;
+  margin-bottom: 2px !important;
+}
+.res-feature-tile-label {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: var(--text-body) !important;
+}
+.res-feature-tile-desc {
+  font-size: 9px !important;
+  color: var(--text-faint) !important;
+  margin-top: 2px !important;
+}
+
+/* ── Systemic Card ── */
+.res-systemic-card {
+  padding: 16px !important;
+  border-radius: 18px !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-left: 4px solid !important;
+}
+.res-systemic-flag {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  font-family: var(--font-syne, 'Syne', sans-serif) !important;
+  margin-bottom: 6px !important;
+}
+.res-systemic-desc {
+  font-size: 12px !important;
+  color: var(--text-body) !important;
+  line-height: 1.5 !important;
+}
+
+/* ── Data Pills (NCM summary) ── */
+.res-data-pills {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+.res-data-pill {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  padding: 10px 14px !important;
+  border-radius: 14px !important;
+  background: var(--bg-card) !important;
+  border: 1px solid !important;
+  min-width: 72px !important;
+}
+.res-data-pill-count {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  font-family: var(--font-playfair, 'Playfair Display', serif) !important;
+}
+.res-data-pill-label {
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  opacity: 0.65 !important;
+}
+
+/* ── Model Badge ── */
+.res-model-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 5px 12px !important;
+  border-radius: 10px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  border: 1px solid !important;
+  background: var(--bg-card) !important;
+}
+
+/* ── Diagnosis Hero Card ── */
+.res-diagnosis-card {
+  margin: 12px 20px !important;
+  padding: 20px !important;
+  border-radius: 20px !important;
+  background: var(--bg-card) !important;
+  border: 1.5px solid !important;
+  backdrop-filter: blur(12px) !important;
+}
+.res-diagnosis-name {
+  font-family: var(--font-syne, 'Syne', sans-serif) !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  margin-bottom: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.res-diagnosis-desc {
+  font-size: 12px !important;
+  color: var(--text-muted) !important;
+  line-height: 1.5 !important;
+}
+
+/* ── Heatmap Grid ── */
+.res-heatmap-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 10px !important;
+  padding: 0 20px !important;
+}
+.res-heatmap-cell {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px 8px !important;
+  border-radius: 16px !important;
+  border: 1px solid !important;
+  backdrop-filter: blur(8px) !important;
+  cursor: default !important;
+  text-align: center !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.res-heatmap-icon {
+  margin-bottom: 6px !important;
+}
+.res-heatmap-val {
+  font-family: var(--font-playfair, 'Playfair Display', serif) !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  margin-bottom: 2px !important;
+}
+.res-heatmap-label {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  color: var(--text-faint) !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+}
+
+/* ── Overall Assessment Card ── */
+.res-overall-card {
+  margin: 0 20px !important;
+  padding: 16px !important;
+  border-radius: 16px !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-left: 3px solid !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
    FLOATING DOCK NAVBAR
    ═══════════════════════════════════════════════════════════════════════════════ */
 

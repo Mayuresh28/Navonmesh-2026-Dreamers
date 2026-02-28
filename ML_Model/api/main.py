@@ -19,10 +19,13 @@ app = FastAPI(title="Multi-Disease Risk Prediction API")
 
 # ===============================
 # Load Models
-# ===============================
-heart_data = joblib.load("heart/heart_model.pkl")
-diabetes_data = joblib.load("diabetes/diabetes_model.pkl")
-stroke_data = joblib.load("stroke/stroke_model.pkl")
+# ============
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
+
+heart_data = joblib.load(os.path.join(ROOT_DIR, "heart", "heart_model.pkl"))
+diabetes_data = joblib.load(os.path.join(ROOT_DIR, "diabetes", "diabetes_model.pkl"))
+stroke_data = joblib.load(os.path.join(ROOT_DIR, "stroke", "stroke_model.pkl"))
 
 heart_model = heart_data["model"]
 heart_threshold = heart_data["threshold"]
