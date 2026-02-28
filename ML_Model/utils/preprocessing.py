@@ -11,7 +11,9 @@ def preprocess_heart(df):
         0.04 * df["Sleep"]
     )
 
-    return df
+    # Return only the expected features for heart model
+    return df[["BP", "HeartRate", "Glucose", "SpO2", "Sleep", "Steps", 
+               "PulsePressure", "ActivityScore", "SleepDeficit", "CardioStressIndex"]]
 
 def preprocessing_stroke(df):
 
@@ -25,4 +27,30 @@ def preprocessing_stroke(df):
         0.2 * df["SpO2"]
     )
 
-    return df
+    # Return only the expected features for stroke model
+    return df[["BP", "HeartRate", "Glucose", "SpO2", "Sleep", "Steps", 
+               "PulsePressure", "ActivityScore", "OxygenDeficit", "StrokeRiskIndex"]]
+
+def preprocess_ecg(df):
+    """Extract ECG features from heart rate data"""
+    # ECG uses heart_rate and hrv_sdnn
+    df["heart_rate"] = df["HeartRate"]
+    df["hrv_sdnn"] = df.get("hrv_sdnn", 50.0)  # Default if not provided
+    
+    return df[["heart_rate", "hrv_sdnn"]]
+
+def preprocess_eeg(df):
+    """Extract EEG features from stress and sleep data"""
+    # EEG uses stress_ratio and sleep_hours
+    df["stress_ratio"] = df.get("stress_ratio", 0.5)  # Default if not provided
+    df["sleep_hours"] = df["Sleep"]
+    
+    return df[["stress_ratio", "sleep_hours"]]
+
+def preprocess_emg(df):
+    """Extract EMG features from activity data"""
+    # EMG uses emg_rms and activity_level
+    df["emg_rms"] = df.get("emg_rms", 0.5)  # Default if not provided
+    df["activity_level"] = df["Steps"] / 10000  # Normalize steps to 0-1 range
+    
+    return df[["emg_rms", "activity_level"]]

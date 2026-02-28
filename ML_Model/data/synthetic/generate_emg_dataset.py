@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import os
 
 np.random.seed(42)
 
@@ -30,6 +31,7 @@ df = pd.DataFrame({
     "EMG_Abnormal": emg_abnormal
 })
 
-df.to_csv("../data/emg_synthetic_10k.csv", index=False)
+os.makedirs("../data/data", exist_ok=True)
+df.to_csv("../data/data/emg_synthetic_10k.csv", index=False)
 
-print("Improved EMG dataset generated!")
+print("✅ Improved EMG dataset generated! (10000 rows)")

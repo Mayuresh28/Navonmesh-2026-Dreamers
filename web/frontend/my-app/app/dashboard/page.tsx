@@ -5,14 +5,15 @@ import { useState, useEffect, useMemo } from "react";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { BottomNav } from "@/components/navigation/bottom-nav";
 import { motion } from "framer-motion";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, AlertTriangle, CheckCircle, ShieldCheck, Activity, Heart, Brain, Zap, TrendingUp } from "lucide-react";
 import { useTheme } from "@/lib/theme-context";
 import { useAuth } from "@/lib/auth-context";
 import { useProfileData } from "@/lib/profile-hook";
+import { profileToModelInput, type PredictionResult } from "@/components/predict/types";
 import type { AnalysisResult } from "@/app/dynamic/healthEngine";
 
 /* ── Constants ── */
-const CIRCUMFERENCE = 534; // 2 * π * 85
+const CIRCUMFERENCE = 440; // 2 * π * 70
 
 /* ── Helpers ── */
 function paramToFriendlyName(param: string): string {
@@ -59,7 +60,6 @@ function riskToBadge(risk: number): string {
   return "High";
 }
 function trendInfo(slope: number, riskScore: number): { icon: string; label: string; tc: string } {
-  // If risk is high, prioritize showing absolute status
   if (riskScore >= 0.60) {
     if (slope > 0.5) return { icon: "↑", label: "Rising (High)", tc: "up" };
     if (slope < -0.5) return { icon: "↓", label: "Improving", tc: "down" };
@@ -70,19 +70,25 @@ function trendInfo(slope: number, riskScore: number): { icon: string; label: str
     if (slope < -0.5) return { icon: "↓", label: "Improving", tc: "down" };
     return { icon: "⚠", label: "Elevated", tc: "warn" };
   }
-  
-  // Normal range - show trend direction
   if (slope > 0.5) return { icon: "↑", label: "Trending up", tc: "up" };
   if (slope < -0.5) return { icon: "↓", label: "Trending down", tc: "down" };
   return { icon: "✓", label: "Normal", tc: "ok" };
 }
 
+/* ── Prediction severity helpers ── */
+function severityLevel(cls: string): { label: string; color: string; bg: string; border: string } {
+  const c = cls.toLowerCase();
+  if (c === "low") return { label: "Low Severity", color: "var(--ok-text)", bg: "var(--ok-bg)", border: "var(--ok-border)" };
+  if (c === "high") return { label: "High Severity", color: "var(--danger-text)", bg: "var(--danger-bg)", border: "var(--danger-border)" };
+  return { label: "Moderate Severity", color: "var(--warn-text)", bg: "var(--warn-bg)", border: "var(--warn-border)" };
+}
+
 /* ── Framer stagger preset ── */
 const stagger = {
-  container: { hidden: {}, show: { transition: { staggerChildren: 0.06 } } },
+  container: { hidden: {}, show: { transition: { staggerChildren: 0.07 } } },
   item: {
-    hidden: { opacity: 0, y: 14 },
-    show:   { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const } },
+    hidden: { opacity: 0, y: 16 },
+    show:   { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const } },
   },
 };
 
@@ -110,6 +116,24 @@ export default function DashboardPage() {
     })();
   }, []);
 
+  /* ── Fetch disease prediction ── */
+  const [prediction, setPrediction] = useState<PredictionResult | null>(null);
+  useEffect(() => {
+    if (!profile) return;
+    (async () => {
+      try {
+        const res = await fetch("/api/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(profileToModelInput(profile)),
+        });
+        if (res.ok) setPrediction(await res.json());
+      } catch (e) {
+        console.error("Prediction failed:", e);
+      }
+    })();
+  }, [profile]);
+
   /* ── Animated score ring offset ── */
   const vitality = useMemo(() => {
     if (!analysis) return null;
@@ -124,90 +148,79 @@ export default function DashboardPage() {
     }
   }, [vitality]);
 
-  /* ── Derived dashboard values from real data ── */
+  /* ── Derived values ── */
   const riskCategory = analysis?.overall.riskCategory ?? "—";
 
   const doshaNote = useMemo(() => {
     if (!profile) return "";
-    if (profile.bmi < 18.5) return "Vāta-dominant constitution";
+    if (profile.bmi < 18.5) return "Vāta-dominant";
     if (profile.bmi < 25)   return "Balanced Prakriti";
     if (profile.bmi < 30)   return "Kapha-elevated";
-    return "Kapha-dominant constitution";
+    return "Kapha-dominant";
   }, [profile]);
 
-  /* Build metric cards from analysis */
-  const metricCards = useMemo(() => {
+  /* Build metric items from analysis */
+  const vitalItems = useMemo(() => {
     if (!analysis) return [];
     const m = analysis.metrics;
-    type Card = { icon: string; label: string; value: string; unit: string; badge: string; status: "ok" | "warn"; pbar: number; ref: string; trend: string; tc: string; pbc?: string };
-    const cards: Card[] = [];
+    type Item = { icon: string; label: string; value: string; unit: string; badge: string; status: "ok" | "warn"; riskPct: number; ref: string; trend: string; tc: string };
+    const items: Item[] = [];
 
     if (m.glucose) {
       const t = trendInfo(m.glucose.slope, m.glucose.riskScore);
-      cards.push({ icon: "🩸", label: "Blood Sugar", value: m.glucose.mean.toFixed(0), unit: " mg/dL", badge: riskToBadge(m.glucose.riskScore), status: riskToStatus(m.glucose.riskScore), pbar: Math.round((1 - m.glucose.riskScore) * 100), ref: "Normal: 70-140", trend: `${t.icon} ${t.label}`, tc: t.tc });
+      items.push({ icon: "🩸", label: "Blood Sugar", value: m.glucose.mean.toFixed(0), unit: "mg/dL", badge: riskToBadge(m.glucose.riskScore), status: riskToStatus(m.glucose.riskScore), riskPct: Math.round(m.glucose.riskScore * 100), ref: "70–140 mg/dL", trend: `${t.icon} ${t.label}`, tc: t.tc });
     }
     if (m.heart_rate) {
       const t = trendInfo(m.heart_rate.slope, m.heart_rate.riskScore);
-      cards.push({ icon: "💓", label: "Heart Rate", value: m.heart_rate.mean.toFixed(0), unit: " bpm", badge: riskToBadge(m.heart_rate.riskScore), status: riskToStatus(m.heart_rate.riskScore), pbar: Math.round((1 - m.heart_rate.riskScore) * 100), ref: "Normal: 60-100", trend: `${t.icon} ${t.label}`, tc: t.tc, pbc: "blue" });
+      items.push({ icon: "💓", label: "Heart Rate", value: m.heart_rate.mean.toFixed(0), unit: "bpm", badge: riskToBadge(m.heart_rate.riskScore), status: riskToStatus(m.heart_rate.riskScore), riskPct: Math.round(m.heart_rate.riskScore * 100), ref: "60–100 bpm", trend: `${t.icon} ${t.label}`, tc: t.tc });
     }
     if (m.spo2) {
       const t = trendInfo(m.spo2.slope, m.spo2.riskScore);
-      cards.push({ icon: "🫁", label: "Oxygen Level", value: m.spo2.mean.toFixed(0), unit: "%", badge: riskToBadge(m.spo2.riskScore), status: riskToStatus(m.spo2.riskScore), pbar: Math.round((1 - m.spo2.riskScore) * 100), ref: "Normal: 95-100", trend: `${t.icon} ${t.label}`, tc: t.tc });
+      items.push({ icon: "🫁", label: "Oxygen", value: m.spo2.mean.toFixed(0), unit: "%", badge: riskToBadge(m.spo2.riskScore), status: riskToStatus(m.spo2.riskScore), riskPct: Math.round(m.spo2.riskScore * 100), ref: "95–100%", trend: `${t.icon} ${t.label}`, tc: t.tc });
     }
     if (m.blood_pressure) {
       const t = trendInfo(m.blood_pressure.slope, m.blood_pressure.riskScore);
-      cards.push({ icon: "🩺", label: "Blood Pressure", value: m.blood_pressure.mean.toFixed(0), unit: " mmHg", badge: riskToBadge(m.blood_pressure.riskScore), status: riskToStatus(m.blood_pressure.riskScore), pbar: Math.round((1 - m.blood_pressure.riskScore) * 100), ref: "Normal: Under 120/80", trend: `${t.icon} ${t.label}`, tc: t.tc });
+      items.push({ icon: "🩺", label: "Blood Pressure", value: m.blood_pressure.mean.toFixed(0), unit: "mmHg", badge: riskToBadge(m.blood_pressure.riskScore), status: riskToStatus(m.blood_pressure.riskScore), riskPct: Math.round(m.blood_pressure.riskScore * 100), ref: "<120/80", trend: `${t.icon} ${t.label}`, tc: t.tc });
     }
-    return cards;
-  }, [analysis]);
-
-  /* Build status pills from analysis */
-  const statusPills = useMemo(() => {
-    if (!analysis) return [];
-    const m = analysis.metrics;
-    const pills: { icon: string; text: string; status: string }[] = [];
-    if (m.glucose)        pills.push({ icon: "🩸", text: `Sugar ${m.glucose.mean.toFixed(0)}`,      status: riskToStatus(m.glucose.riskScore) });
-    if (m.heart_rate)     pills.push({ icon: "💓", text: `Heart ${m.heart_rate.mean.toFixed(0)}`,        status: riskToStatus(m.heart_rate.riskScore) });
-    if (m.spo2)           pills.push({ icon: "🫁", text: `Oxygen ${m.spo2.mean.toFixed(0)}%`,          status: riskToStatus(m.spo2.riskScore) });
-    if (m.blood_pressure) pills.push({ icon: "🩺", text: `Pressure ${m.blood_pressure.mean.toFixed(0)}`,    status: riskToStatus(m.blood_pressure.riskScore) });
-    return pills;
+    return items;
   }, [analysis]);
 
   /* Build alerts from real analysis + profile */
   const alerts = useMemo(() => {
-    const list: { icon: string; status: string; title: string; desc: string; time: string }[] = [];
+    const list: { icon: string; status: string; title: string; desc: string }[] = [];
 
     if (analysis) {
-      const ts = new Date(analysis.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
       if (analysis.overall.overallRisk >= 0.50) {
         const p = analysis.overall.highestRiskParameter.replace(/_/g, " ");
-        list.push({ icon: "⚠️", status: "warn", title: `Your ${p.charAt(0).toUpperCase() + p.slice(1)} Needs Attention`, desc: `Your current risk level is ${(analysis.overall.overallRisk * 100).toFixed(0)}%. We recommend consulting with your healthcare provider.`, time: ts });
+        list.push({ icon: "⚠️", status: "warn", title: `${p.charAt(0).toUpperCase() + p.slice(1)} needs attention`, desc: `Risk level at ${(analysis.overall.overallRisk * 100).toFixed(0)}%. Consult your healthcare provider.` });
       }
       for (const [param, data] of Object.entries(analysis.metrics)) {
         if (data.riskScore >= 0.60) {
           const n = param.replace(/_/g, " ");
-          list.push({ icon: "🔔", status: "warn", title: `${n.charAt(0).toUpperCase() + n.slice(1)} Is Elevated`, desc: `Your reading is ${data.mean.toFixed(1)} with ${(data.riskScore * 100).toFixed(0)}% risk level. ${data.slope > 0 ? "Trending upward" : "Currently stable"}.`, time: ts });
+          list.push({ icon: "🔔", status: "warn", title: `${n.charAt(0).toUpperCase() + n.slice(1)} is elevated`, desc: `Reading: ${data.mean.toFixed(1)} — ${(data.riskScore * 100).toFixed(0)}% risk. ${data.slope > 0 ? "Trending upward." : "Currently stable."}` });
         }
       }
       if (analysis.overall.riskCategory === "Low") {
-        list.push({ icon: "🎉", status: "ok", title: "All Your Health Readings Look Great!", desc: "Your health measurements are all within healthy ranges. Keep up the excellent work!", time: ts });
+        list.push({ icon: "🎉", status: "ok", title: "All readings look great!", desc: "Your vitals are within healthy ranges. Keep it up!" });
       }
     }
 
     if (profile) {
       if (profile.bmi >= 25)
-        list.push({ icon: "⚖️", status: "warn", title: `Your BMI is ${profile.bmi.toFixed(1)} - ${profile.bmi >= 30 ? "Obese" : "Overweight"}`, desc: "Consider adopting an Ayurvedic Kapha-balancing diet to support healthy metabolism.", time: "Profile" });
-      if (profile.smokingStatus === "current")
-        list.push({ icon: "🚬", status: "warn", title: "Current Smoker", desc: "Breathing exercises (Prāṇāyāma) can support your journey to quit smoking.", time: "Profile" });
-      if (profile.alcoholUse === "heavy")
-        list.push({ icon: "🍷", status: "warn", title: "Heavy Alcohol Consumption", desc: "Reducing alcohol intake gradually can improve your liver and heart health.", time: "Profile" });
+        list.push({ icon: "⚖️", status: "warn", title: `BMI ${profile.bmi.toFixed(1)} — ${profile.bmi >= 30 ? "Obese" : "Overweight"}`, desc: "Consider an Ayurvedic Kapha-balancing diet." });
     }
 
     if (list.length === 0)
-      list.push({ icon: "📊", status: "ok", title: "Upload Your Health Information", desc: "Go to the Vitals tab to add your health readings and get personalized insights about your wellness.", time: "Now" });
+      list.push({ icon: "📊", status: "ok", title: "Upload your vitals", desc: "Go to the Vitals tab to get personalized insights." });
 
     return list;
   }, [analysis, profile]);
+
+  /* ── Sorted probabilities for prediction ── */
+  const sortedProbs = useMemo(() => {
+    if (!prediction) return [];
+    return Object.entries(prediction.probabilities).sort(([, a], [, b]) => b - a);
+  }, [prediction]);
 
   const isLoading = profileLoading || analysisLoading;
 
@@ -223,7 +236,7 @@ export default function DashboardPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "var(--bg-base)" }}>
             <div className="flex flex-col items-center gap-4">
               <div className="w-12 h-12 rounded-full border-4 animate-spin" style={{ borderColor: "var(--border)", borderTopColor: "var(--teal)" }} />
-              <span style={{ color: "var(--text-muted)", fontSize: "15px", fontWeight: 600 }}>Loading your health data…</span>
+              <span style={{ color: "var(--text-muted)", fontSize: "16px", fontWeight: 600 }}>Loading your health data…</span>
             </div>
           </div>
         )}
@@ -246,7 +259,7 @@ export default function DashboardPage() {
             }}>
               Dhanvantari
             </span>
-            <span style={{ fontSize: "8px", letterSpacing: "3px", color: "var(--text-faint)", textTransform: "uppercase" }}>
+            <span style={{ fontSize: "9px", letterSpacing: "3px", color: "var(--text-faint)", textTransform: "uppercase" }}>
               Health
             </span>
           </div>
@@ -273,196 +286,370 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        {/* ── Hero Score Ring ── */}
-        <section className="flex flex-col items-center gap-0 py-4 px-5">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="score-ring-container"
-          >
-            <svg className="score-svg" viewBox="0 0 200 200">
-              <defs>
-                <linearGradient id="scoreGradient" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#0de5a8" />
-                  <stop offset="100%" stopColor="#18d8f5" />
-                </linearGradient>
-              </defs>
-              {/* Decorative ticks */}
-              <g stroke="rgba(240,248,255,0.08)" strokeWidth="1">
-                {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((d) => (
-                  <line key={d} x1="100" y1="8" x2="100" y2={d % 90 === 0 ? 16 : 14}
-                    transform={`rotate(${d} 100 100)`} />
-                ))}
-              </g>
-              <circle className="score-track" cx="100" cy="100" r="85" />
-              <circle className="score-fill" cx="100" cy="100" r="85"
-                style={{ animation: "none", strokeDasharray: CIRCUMFERENCE, strokeDashoffset: ringOffset, transition: "stroke-dashoffset 1.4s cubic-bezier(0.22,1,0.36,1)" }} />
-              <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(13,229,168,0.08)" strokeWidth="1" strokeDasharray="3 6" />
-            </svg>
-            <div className="deco-ring" />
-            <div className="score-inner">
-              <div className="score-number">{vitality ?? "—"}</div>
-              <div className="score-label">Vitality</div>
-              <div className="score-sub">
-                {analysis
-                  ? `${riskCategory}${doshaNote ? ` — ${doshaNote}` : ""}`
-                  : "Upload vitals to see your score"}
+        {/* ═══ MAIN CONTENT ═══ */}
+        <motion.div
+          variants={stagger.container} initial="hidden" animate="show"
+          className="max-w-xl mx-auto px-6 sm:px-8 pb-6 space-y-6"
+        >
+
+          {/* ────── 1. VITALITY SCORE (compact) ────── */}
+          <motion.div variants={stagger.item} className="flex flex-col items-center pt-4">
+            <div className="relative" style={{ width: 160, height: 160 }}>
+              <svg viewBox="0 0 160 160" width="160" height="160">
+                <defs>
+                  <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#0de5a8" />
+                    <stop offset="100%" stopColor="#18d8f5" />
+                  </linearGradient>
+                </defs>
+                <circle cx="80" cy="80" r="70" fill="none" stroke="var(--border-strong)" strokeWidth="8" />
+                <circle cx="80" cy="80" r="70" fill="none"
+                  stroke="url(#scoreGrad)" strokeWidth="8" strokeLinecap="round"
+                  strokeDasharray={CIRCUMFERENCE}
+                  strokeDashoffset={ringOffset}
+                  style={{ transition: "stroke-dashoffset 1.4s cubic-bezier(0.22,1,0.36,1)", transform: "rotate(-90deg)", transformOrigin: "50% 50%" }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span style={{
+                  fontFamily: "var(--font-playfair, 'Playfair Display', serif)",
+                  fontSize: "48px", fontWeight: 700, lineHeight: 1,
+                  background: "linear-gradient(160deg, var(--text-primary) 40%, var(--teal))",
+                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                }}>{vitality ?? "—"}</span>
+                <span style={{ fontSize: "11px", letterSpacing: "3px", textTransform: "uppercase", color: "var(--teal)", fontWeight: 700, marginTop: 2 }}>Vitality</span>
               </div>
             </div>
-          </motion.div>
-        </section>
-
-        {/* ── Status Pills ── */}
-        <div className="status-row">
-          {statusPills.length > 0 ? statusPills.map((p, i) => (
-            <motion.div key={i}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + i * 0.06, duration: 0.32 }}
-              className={`status-pill ${p.status}`}>
-              <span className="text-xs">{p.icon}</span>{p.text}
-            </motion.div>
-          )) : (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="status-pill ok">
-              <span className="text-xs">📊</span>No data yet — upload vitals
-            </motion.div>
-          )}
-        </div>
-
-        {/* ── Home Panel Content ── */}
-        <motion.div variants={stagger.container} initial="hidden" animate="show" className="px-5 pb-4">
-
-          {/* Section: Your Health Readings */}
-          <motion.div variants={stagger.item} className="dash-sec">
-            <div className="dash-sec-title">Your <em>Health</em></div>
-            <div className="dash-sec-tag">
-              {analysis ? new Date(analysis.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Today"}
-            </div>
+            <p style={{
+              fontFamily: "var(--font-playfair, 'Playfair Display', serif)",
+              fontSize: "14px", fontStyle: "italic", color: "var(--text-muted)", marginTop: 8, textAlign: "center",
+            }}>
+              {analysis ? `${riskCategory}${doshaNote ? ` — ${doshaNote}` : ""}` : "Upload vitals to see your score"}
+            </p>
           </motion.div>
 
-          {/* Metric Cards (from real analysis) */}
-          {metricCards.length > 0 && (
-            <motion.div variants={stagger.item} className="metric-grid">
-              {metricCards.map((m, i) => (
-                <div key={i} className={`metric-card ${m.status}`}>
-                  <div className="mc-head">
-                    <div className={`mc-icon ${m.status}`}>{m.icon}</div>
-                    <div className={`mc-badge ${m.status}`}>{m.badge}</div>
-                  </div>
-                  <div className="mc-label">{m.label}</div>
-                  <div className="mc-value">{m.value}<span className="mc-unit">{m.unit}</span></div>
-                  <div className="prana-pbar" style={{ marginTop: "10px" }}>
-                    <div
-                      className={`prana-pbar-fill ${m.pbc || m.status}`}
-                      style={{ width: `${m.pbar}%`, transition: "width 1.2s cubic-bezier(0.22,1,0.36,1)" }}
-                    />
-                  </div>
-                  <div className="mc-ref">{m.ref}</div>
-                  <div className={`mc-trend ${m.tc}`}>{m.trend}</div>
+          {/* ────── 2. DISEASE PREDICTION INSIGHTS ────── */}
+          {prediction && (
+            <motion.section variants={stagger.item}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "var(--teal-bg)", border: "1px solid var(--border-accent)" }}>
+                  <Activity className="w-5 h-5" style={{ color: "var(--teal)" }} />
                 </div>
-              ))}
-            </motion.div>
-          )}
+                <div>
+                  <h2 style={{ fontSize: "20px", fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}>
+                    Disease <em style={{ color: "var(--teal)", fontStyle: "italic" }}>Insights</em>
+                  </h2>
+                  <p style={{ fontSize: "13px", color: "var(--text-muted)" }}>AI-powered risk prediction</p>
+                </div>
+              </div>
 
-          {/* ── Profile Summary (from real profile) ── */}
-          {profile && (
-            <>
-              <motion.hr variants={stagger.item} className="prana-hr" />
-              <motion.div variants={stagger.item} className="dash-sec">
-                <div className="dash-sec-title">Your <em>Profile</em></div>
-                <div className="dash-sec-tag">
-                  {new Date(profile.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                </div>
-              </motion.div>
-              <motion.div variants={stagger.item} className="metric-grid">
-                <div className="metric-card ok">
-                  <div className="mc-head"><div className="mc-icon ok">👤</div><div className="mc-badge ok">{profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)}</div></div>
-                  <div className="mc-label">Age</div>
-                  <div className="mc-value">{profile.age}<span className="mc-unit"> yrs</span></div>
-                </div>
-                <div className={`metric-card ${profile.bmi >= 25 ? "warn" : "ok"}`}>
-                  <div className="mc-head"><div className={`mc-icon ${profile.bmi >= 25 ? "warn" : "ok"}`}>⚖️</div><div className={`mc-badge ${profile.bmi >= 25 ? "warn" : "ok"}`}>{profile.bmi < 18.5 ? "Underweight" : profile.bmi < 25 ? "Normal" : profile.bmi < 30 ? "Overweight" : "Obese"}</div></div>
-                  <div className="mc-label">BMI</div>
-                  <div className="mc-value">{profile.bmi.toFixed(1)}<span className="mc-unit"> kg/m²</span></div>
-                  <div className="mc-ref">{profile.height} cm · {profile.weight} kg</div>
-                </div>
-                <div className={`metric-card ${profile.geneticRiskScore > 0 ? "warn" : "ok"}`}>
-                  <div className="mc-head"><div className={`mc-icon ${profile.geneticRiskScore > 0 ? "warn" : "ok"}`}>🧬</div><div className={`mc-badge ${profile.geneticRiskScore > 0 ? "warn" : "ok"}`}>{profile.geneticRiskScore > 0 ? "At Risk" : "Low Risk"}</div></div>
-                  <div className="mc-label">Genetic Risk</div>
-                  <div className="mc-value">{profile.geneticRiskScore > 0 ? "Yes" : "No"}<span className="mc-unit"> family hx</span></div>
-                </div>
-                <div className="metric-card ok">
-                  <div className="mc-head"><div className="mc-icon ok">📐</div><div className="mc-badge ok">Multiplier</div></div>
-                  <div className="mc-label">Age Risk</div>
-                  <div className="mc-value">{profile.ageRiskMultiplier.toFixed(2)}<span className="mc-unit">×</span></div>
-                  <div className="mc-ref">Formula: 1 + Age / 100</div>
-                </div>
-              </motion.div>
-            </>
-          )}
-
-          {/* ── Health Overview Chart ── */}
-          {analysis && Object.keys(analysis.metrics).length > 0 && (
-            <>
-              <motion.hr variants={stagger.item} className="prana-hr" />
-              <motion.div variants={stagger.item} className="dash-sec">
-                <div className="dash-sec-title">Health <em>Overview</em></div>
-                <div className="dash-sec-tag">{analysis.overall.parametersCount} readings</div>
-              </motion.div>
-
-              <motion.div variants={stagger.item} className="overview-grid">
-                {Object.entries(analysis.metrics).map(([param, data]) => {
-                  const pct = Math.round(data.riskScore * 100);
-                  const status = data.riskScore >= 0.50 ? "warn" : "ok";
-                  return (
-                    <div key={param} className={`overview-row ${status}`}>
-                      <div className="ov-icon">{paramToIcon(param)}</div>
-                      <div className="ov-body">
-                        <div className="ov-top">
-                          <span className="ov-name">{paramToFriendlyName(param)}</span>
-                          <span className={`ov-badge ${status}`}>{riskLabel(data.riskScore)}</span>
+              {/* Main prediction card */}
+              {(() => {
+                const sev = severityLevel(prediction.predicted_class);
+                const topProb = sortedProbs[0]?.[1] ?? 0;
+                return (
+                  <div className="rounded-2xl p-5 mb-4" style={{ background: "var(--bg-card)", border: `1.5px solid ${sev.border}`, boxShadow: "var(--card-shadow)" }}>
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: sev.bg, border: `1.5px solid ${sev.border}` }}>
+                        {prediction.predicted_class.toLowerCase() === "low" ? (
+                          <CheckCircle className="w-7 h-7" style={{ color: sev.color }} />
+                        ) : prediction.predicted_class.toLowerCase() === "high" ? (
+                          <AlertTriangle className="w-7 h-7" style={{ color: sev.color }} />
+                        ) : (
+                          <ShieldCheck className="w-7 h-7" style={{ color: sev.color }} />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div style={{ fontSize: "28px", fontWeight: 700, color: sev.color, fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}>
+                          {prediction.predicted_class} Risk
                         </div>
-                        <div className="ov-bar-track">
-                          <div className={`ov-bar-fill ${status}`} style={{ width: `${pct}%` }} />
-                        </div>
-                        <div className="ov-bottom">
-                          <span className="ov-samples">{data.sampleCount} samples</span>
-                          <span className="ov-pct">{pct}%</span>
+                        <div style={{ fontSize: "14px", color: "var(--text-muted)", fontWeight: 500 }}>
+                          {sev.label} — {topProb.toFixed(1)}% probability
                         </div>
                       </div>
                     </div>
-                  );
-                })}
-              </motion.div>
-              <motion.div variants={stagger.item} className="ov-footer">
-                Based on {Object.values(analysis.metrics).reduce((s, m) => s + m.sampleCount, 0)} data points across {analysis.overall.parametersCount} parameters
-              </motion.div>
-            </>
+
+                    {/* Mini probability breakdown */}
+                    <div className="space-y-3">
+                      {sortedProbs.map(([label, pct], idx) => {
+                        const isMax = label === prediction.predicted_class;
+                        return (
+                          <div key={label}>
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span style={{ fontSize: "14px", fontWeight: isMax ? 700 : 500, color: isMax ? sev.color : "var(--text-primary)" }}>
+                                {isMax && <span className="inline-block w-2 h-2 rounded-full mr-2" style={{
+                                  background: sev.color,
+                                  animation: "pulse 2s infinite",
+                                }} />}
+                                {label}
+                              </span>
+                              <span style={{ fontSize: "16px", fontWeight: 700, color: isMax ? sev.color : "var(--text-muted)", fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}>
+                                {pct.toFixed(1)}%
+                              </span>
+                            </div>
+                            <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "var(--bg-raised)" }}>
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${pct}%` }}
+                                transition={{ duration: 1, delay: 0.3 + idx * 0.1, ease: "easeOut" }}
+                                className="h-full rounded-full"
+                                style={{
+                                  background: isMax
+                                    ? `linear-gradient(90deg, ${sev.color}, ${sev.color}cc)`
+                                    : "var(--border-strong)",
+                                  opacity: isMax ? 1 : 0.5,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Feature summary row */}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { icon: <Heart className="w-4 h-4" />, label: "BMI", val: prediction.input_features.BMI.toFixed(1) },
+                  { icon: <Brain className="w-4 h-4" />, label: "Genetic Risk", val: prediction.input_features.Genetic_Risk.toFixed(2) },
+                  { icon: <Zap className="w-4 h-4" />, label: "Age Risk", val: prediction.input_features.Age_Risk_Multiplier.toFixed(2) + "×" },
+                  { icon: <TrendingUp className="w-4 h-4" />, label: "Baseline", val: prediction.input_features.Baseline_Risk.toFixed(3) },
+                ].map((f, i) => (
+                  <div key={i} className="rounded-xl p-3.5 flex items-center gap-3"
+                    style={{ background: "var(--bg-card)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow)" }}>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "var(--teal-bg)", color: "var(--teal)" }}>
+                      {f.icon}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "11px", color: "var(--text-faint)", letterSpacing: "0.5px", textTransform: "uppercase", fontWeight: 600 }}>{f.label}</div>
+                      <div style={{ fontSize: "18px", fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}>{f.val}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.section>
           )}
 
-          {/* Health Insights */}
-          <motion.hr variants={stagger.item} className="prana-hr" />
-          <motion.div variants={stagger.item} className="dash-sec">
-            <div className="dash-sec-title">Health <em>Insights</em></div>
-          </motion.div>
+          {/* ────── 3. VITALS — BAR CHART ────── */}
+          {vitalItems.length > 0 && (
+            <motion.section variants={stagger.item}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 style={{ fontSize: "20px", fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}>
+                  Your <em style={{ color: "var(--teal)", fontStyle: "italic" }}>Vitals</em>
+                </h2>
+                <span style={{ fontSize: "11px", letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-muted)", padding: "4px 10px", borderRadius: "8px", border: "1px solid var(--border)", fontWeight: 600 }}>
+                  {analysis ? new Date(analysis.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Today"}
+                </span>
+              </div>
 
-          <motion.div variants={stagger.item} className="flex flex-col gap-2">
-            {alerts.map((a, i) => (
-              <div key={i} className={`dash-alert ${a.status}`}>
-                <span className="text-lg shrink-0 mt-0.5">{a.icon}</span>
-                <div>
-                  <div className="dash-alert-title">{a.title}</div>
-                  <div className="dash-alert-desc">{a.desc}</div>
-                  <div className="dash-alert-time">{a.time}</div>
+              {/* Horizontal bar chart */}
+              <div className="rounded-2xl p-5" style={{ background: "var(--bg-card)", border: "1.5px solid var(--border-strong)", boxShadow: "var(--card-shadow)" }}>
+                <div className="space-y-5">
+                  {vitalItems.map((v, i) => (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          <span style={{ fontSize: "22px" }}>{v.icon}</span>
+                          <div>
+                            <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>{v.label}</div>
+                            <div style={{ fontSize: "12px", color: "var(--text-faint)" }}>{v.ref}</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div style={{
+                            fontSize: "24px", fontWeight: 700, color: "var(--text-primary)",
+                            fontFamily: "var(--font-playfair, 'Playfair Display', serif)",
+                          }}>
+                            {v.value}
+                            <span style={{ fontSize: "13px", fontWeight: 400, color: "var(--text-muted)", marginLeft: "3px" }}>{v.unit}</span>
+                          </div>
+                        </div>
+                      </div>
+                      {/* Bar */}
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 h-3 rounded-full overflow-hidden" style={{ background: "var(--border)" }}>
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${v.riskPct}%` }}
+                            transition={{ duration: 1, delay: 0.2 + i * 0.1, ease: "easeOut" }}
+                            className="h-full rounded-full"
+                            style={{
+                              background: v.status === "ok"
+                                ? "linear-gradient(90deg, #09b885, #0de5a8, #18d8f5)"
+                                : "linear-gradient(90deg, #d4820a, #ffb83f, #ffe08a)",
+                              boxShadow: v.status === "ok"
+                                ? "0 0 8px rgba(13,229,168,0.3)"
+                                : "0 0 8px rgba(255,184,63,0.3)",
+                            }}
+                          />
+                        </div>
+                        <span style={{
+                          fontSize: "13px", fontWeight: 700, minWidth: "38px", textAlign: "right",
+                          color: v.status === "ok" ? "var(--ok-text)" : "var(--warn-text)",
+                        }}>{v.riskPct}%</span>
+                      </div>
+                      {/* Trend */}
+                      <div className="flex items-center justify-between mt-1.5">
+                        <span className={`text-xs font-semibold`}
+                          style={{ color: v.status === "ok" ? "var(--ok-text)" : "var(--warn-text)" }}>
+                          {v.badge}
+                        </span>
+                        <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-muted)" }}>
+                          {v.trend}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-          </motion.div>
+            </motion.section>
+          )}
 
-          {/* Mantra Banner */}
-          <motion.div variants={stagger.item} className="mantra-banner mt-4">
-            <span style={{ fontSize: "36px", display: "block", marginBottom: "10px" }}>🕉</span>
+          {/* ────── 4. PROFILE SUMMARY ────── */}
+          {profile && (
+            <motion.section variants={stagger.item}>
+              <h2 className="mb-4" style={{ fontSize: "20px", fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}>
+                Your <em style={{ color: "var(--teal)", fontStyle: "italic" }}>Profile</em>
+              </h2>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { icon: "👤", label: "Age", value: `${profile.age}`, unit: "yrs", badge: profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1), status: "ok" as const },
+                  { icon: "⚖️", label: "BMI", value: profile.bmi.toFixed(1), unit: "kg/m²", badge: profile.bmi < 18.5 ? "Underweight" : profile.bmi < 25 ? "Normal" : profile.bmi < 30 ? "Overweight" : "Obese", status: (profile.bmi >= 25 ? "warn" : "ok") as "ok" | "warn" },
+                  { icon: "🧬", label: "Genetic Risk", value: profile.geneticRiskScore > 0 ? "Yes" : "No", unit: "", badge: profile.geneticRiskScore > 0 ? "At Risk" : "Low Risk", status: (profile.geneticRiskScore > 0 ? "warn" : "ok") as "ok" | "warn" },
+                  { icon: "📐", label: "Age Risk", value: profile.ageRiskMultiplier.toFixed(2), unit: "×", badge: "Multiplier", status: "ok" as const },
+                ].map((c, i) => (
+                  <div key={i} className="rounded-2xl p-4" style={{
+                    background: "var(--bg-card)",
+                    border: `1.5px solid ${c.status === "warn" ? "var(--warn-border)" : "var(--ok-border)"}`,
+                    boxShadow: "var(--card-shadow)",
+                  }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span style={{ fontSize: "20px" }}>{c.icon}</span>
+                      <span style={{
+                        fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase", fontWeight: 700,
+                        padding: "3px 8px", borderRadius: "8px",
+                        color: c.status === "warn" ? "var(--warn-text)" : "var(--ok-text)",
+                        background: c.status === "warn" ? "var(--warn-bg)" : "var(--ok-bg)",
+                        border: `1px solid ${c.status === "warn" ? "var(--warn-border)" : "var(--ok-border)"}`,
+                      }}>{c.badge}</span>
+                    </div>
+                    <div style={{ fontSize: "12px", color: "var(--text-faint)", letterSpacing: "1px", textTransform: "uppercase", fontWeight: 600, marginBottom: "4px" }}>{c.label}</div>
+                    <div style={{
+                      fontSize: "28px", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1,
+                      fontFamily: "var(--font-playfair, 'Playfair Display', serif)",
+                    }}>
+                      {c.value}
+                      {c.unit && <span style={{ fontSize: "14px", fontWeight: 400, color: "var(--text-muted)", marginLeft: "3px" }}>{c.unit}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.section>
+          )}
+
+          {/* ────── 5. HEALTH OVERVIEW CHART ────── */}
+          {analysis && Object.keys(analysis.metrics).length > 0 && (
+            <motion.section variants={stagger.item}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 style={{ fontSize: "20px", fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}>
+                  Risk <em style={{ color: "var(--teal)", fontStyle: "italic" }}>Chart</em>
+                </h2>
+                <span style={{ fontSize: "11px", letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600 }}>
+                  {analysis.overall.parametersCount} parameters
+                </span>
+              </div>
+
+              {/* SVG Bar Chart */}
+              <div className="rounded-2xl p-5" style={{ background: "var(--bg-card)", border: "1.5px solid var(--border-strong)", boxShadow: "var(--card-shadow)" }}>
+                {(() => {
+                  const entries = Object.entries(analysis.metrics);
+                  const barH = 32;
+                  const gap = 14;
+                  const chartH = entries.length * (barH + gap) - gap + 20;
+                  const labelW = 100;
+                  const chartW = 300;
+                  return (
+                    <svg viewBox={`0 0 ${labelW + chartW + 60} ${chartH}`} className="w-full" style={{ overflow: "visible" }}>
+                      {entries.map(([param, data], i) => {
+                        const pct = Math.round(data.riskScore * 100);
+                        const y = i * (barH + gap) + 10;
+                        const isWarn = data.riskScore >= 0.50;
+                        return (
+                          <g key={param}>
+                            {/* Label */}
+                            <text x="0" y={y + barH / 2 + 5}
+                              style={{ fontSize: "13px", fontWeight: 600, fill: "var(--text-primary)" }}>
+                              {paramToIcon(param)} {paramToFriendlyName(param)}
+                            </text>
+                            {/* Track */}
+                            <rect x={labelW + 10} y={y} width={chartW} height={barH} rx="8"
+                              style={{ fill: "var(--border)" }} />
+                            {/* Fill */}
+                            <motion.rect
+                              x={labelW + 10} y={y} height={barH} rx="8"
+                              initial={{ width: 0 }}
+                              animate={{ width: chartW * (pct / 100) }}
+                              transition={{ duration: 1.2, delay: 0.2 + i * 0.15, ease: "easeOut" }}
+                              style={{
+                                fill: isWarn
+                                  ? "url(#warnGrad)"
+                                  : "url(#okGrad)",
+                              }}
+                            />
+                            {/* Percentage */}
+                            <text x={labelW + chartW + 18} y={y + barH / 2 + 5}
+                              style={{ fontSize: "14px", fontWeight: 700, fill: isWarn ? "var(--warn-text)" : "var(--ok-text)" }}>
+                              {pct}%
+                            </text>
+                          </g>
+                        );
+                      })}
+                      <defs>
+                        <linearGradient id="okGrad" x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0%" stopColor="#09b885" />
+                          <stop offset="100%" stopColor="#18d8f5" />
+                        </linearGradient>
+                        <linearGradient id="warnGrad" x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0%" stopColor="#d4820a" />
+                          <stop offset="100%" stopColor="#ffb83f" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  );
+                })()}
+                <div style={{ fontSize: "12px", color: "var(--text-muted)", textAlign: "center", marginTop: "12px", fontWeight: 500 }}>
+                  Based on {Object.values(analysis.metrics).reduce((s, m) => s + m.sampleCount, 0)} data points across {analysis.overall.parametersCount} parameters
+                </div>
+              </div>
+            </motion.section>
+          )}
+
+          {/* ────── 6. HEALTH INSIGHTS ────── */}
+          <motion.section variants={stagger.item}>
+            <h2 className="mb-4" style={{ fontSize: "20px", fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}>
+              Health <em style={{ color: "var(--teal)", fontStyle: "italic" }}>Insights</em>
+            </h2>
+            <div className="space-y-3">
+              {alerts.map((a, i) => (
+                <div key={i} className="flex gap-4 items-start rounded-2xl p-4" style={{
+                  background: a.status === "warn" ? "var(--warn-bg)" : "var(--ok-bg)",
+                  border: `1.5px solid ${a.status === "warn" ? "var(--warn-border)" : "var(--ok-border)"}`,
+                }}>
+                  <span style={{ fontSize: "22px", flexShrink: 0, marginTop: "2px" }}>{a.icon}</span>
+                  <div>
+                    <div style={{ fontSize: "16px", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1.3 }}>{a.title}</div>
+                    <div style={{ fontSize: "14px", color: "var(--text-body)", lineHeight: 1.6, marginTop: "4px" }}>{a.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.section>
+
+          {/* ────── 7. MANTRA BANNER ────── */}
+          <motion.div variants={stagger.item} className="mantra-banner">
+            <span style={{ fontSize: "32px", display: "block", marginBottom: "8px" }}>🕉</span>
             <div className="mantra-text">
               &ldquo;Sarve bhavantu sukhinaḥ, sarve santu nirāmayāḥ&rdquo;
             </div>
@@ -473,6 +660,7 @@ export default function DashboardPage() {
               — Bṛhadāraṇyaka Upaniṣad
             </div>
           </motion.div>
+
         </motion.div>
 
         <BottomNav />

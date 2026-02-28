@@ -9,4 +9,6 @@ def preprocess_diabetes(df):
         0.03 * df["Sleep"]
     )
 
-    return df
+    # Return only the expected features for diabetes model
+    return df[["BP", "HeartRate", "Glucose", "SpO2", "Sleep", "Steps",
+               "GlucoseStress", "ActivityScore", "SleepDeficit", "MetabolicIndex"]]

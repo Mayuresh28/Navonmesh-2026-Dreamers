@@ -1,12 +1,37 @@
-# Ignore datasets
+# Ignore large datasets (generated locally)
 data/synthetic/*.csv
+data/data/*.csv
 
-# Ignore model files
-*.pkl
+# IMPORTANT: DO NOT ignore model .pkl files - they are needed for deployment!
+# Model files should be committed to Git for Render deployment
 
 # Ignore Python cache
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+
+# Ignore virtual environments
+venv/
+env/
+ENV/
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
 
 # Ignore local info folder
 info/
+
+# Ignore test outputs
+test_output/

@@ -38,7 +38,7 @@ df = pd.DataFrame({
     "EEG_Abnormal": eeg_abnormal
 })
 
-os.makedirs("../data", exist_ok=True)
-df.to_csv("../data/eeg_synthetic_10k.csv", index=False)
+os.makedirs("../data/data", exist_ok=True)
+df.to_csv("../data/data/eeg_synthetic_10k.csv", index=False)
 
 print("EEG dataset generated!")

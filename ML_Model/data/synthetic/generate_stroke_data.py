@@ -50,5 +50,7 @@ df = pd.DataFrame({
     "Stroke": stroke_risk
 })
 
-df.to_csv("stroke_synthetic_10k.csv", index=False)
-print("Stroke dataset generated!")
+import os
+os.makedirs(".", exist_ok=True)
+df.to_csv("./stroke_synthetic_10k.csv", index=False)
+print("✅ Stroke dataset generated! (10000 rows)")
