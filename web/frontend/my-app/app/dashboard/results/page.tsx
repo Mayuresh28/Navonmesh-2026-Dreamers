@@ -8,7 +8,7 @@ import {
   AlertTriangle, Brain, RefreshCw, Activity, HeartPulse,
   Sun, Moon, Shield, Droplets, Wind, Footprints,
   BedDouble, Zap, Sparkles, TrendingUp, Heart, Stethoscope,
-  ThermometerSun, CheckCircle2, AlertCircle, XCircle,
+  ThermometerSun, CheckCircle2, AlertCircle, XCircle, ArrowRight,
 } from "lucide-react";
 import { useTheme } from "@/lib/theme-context";
 import type { NCMResult } from "@/components/dosha/types";
@@ -550,18 +550,18 @@ export default function ResultsPage() {
 
                       {/* 1. HERO */}
                       {pred && dInfo && (
-                        <motion.div custom={0} variants={fade} initial="hidden" animate="show" className="rr-card rr-diagnosis-hero" style={{ borderTopColor: dInfo.color }}>
+                        <motion.div custom={0} variants={fade} initial="hidden" animate="show" className="rr-card rr-diagnosis-hero" style={{ borderTopColor: sev.color }}>
                           <div className="rr-diag-top">
                             <span className="rr-diag-emoji">{dInfo.emoji}</span>
                             <div>
                               <div className="rr-diag-label">Predicted Condition</div>
-                              <div className="rr-diag-name" style={{ color: dInfo.color }}>{pred.final_diagnosis}</div>
+                              <div className="rr-diag-name" style={{ color: sev.color }}>{pred.final_diagnosis}</div>
                             </div>
                           </div>
 
                           <div className="rr-diag-stats">
                             <div className="rr-diag-stat">
-                              <div className="rr-diag-stat-val" style={{ color: dInfo.color }}>{(confPct * 100).toFixed(0)}%</div>
+                              <div className="rr-diag-stat-val" style={{ color: sev.color }}>{(pred.confidence * 100).toFixed(0)}%</div>
                               <div className="rr-diag-stat-label">Confidence</div>
                             </div>
                             <div className="rr-ring-box">
@@ -571,7 +571,7 @@ export default function ResultsPage() {
                           </div>
 
                           <div className="rr-diag-advice">
-                            <ArrowRight className="w-4 h-4" style={{ color: dInfo.color, flexShrink: 0, marginTop: 2 }} />
+                            <ArrowRight className="w-4 h-4" style={{ color: sev.color, flexShrink: 0, marginTop: 2 }} />
                             <span>{dInfo.advice}</span>
                           </div>
 
