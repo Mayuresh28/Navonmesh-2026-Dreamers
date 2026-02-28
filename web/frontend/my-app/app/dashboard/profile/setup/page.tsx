@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { ProtectedRoute } from "@/lib/protected-route";
@@ -18,10 +18,12 @@ export default function ProfileSetupPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { theme, toggle } = useTheme();
-  const { createProfile } = useProfileData(user?.uid);
+  const { profile, loading: profileLoading, createProfile, updateProfile } = useProfileData(user?.uid);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  const isEditMode = !!profile;
 
   const [formData, setFormData] = useState({
     age: "", gender: "male" as "male" | "female" | "other",
@@ -30,6 +32,22 @@ export default function ProfileSetupPage() {
     alcoholUse: "never" as "never" | "occasional" | "moderate" | "heavy",
     existingConditions: [] as string[],
   });
+
+  /* Pre-populate form when profile data loads (edit mode) */
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        age: String(profile.age),
+        gender: profile.gender,
+        height: String(profile.height),
+        weight: String(profile.weight),
+        familyHistory: profile.familyHistory || "",
+        smokingStatus: profile.smokingStatus,
+        alcoholUse: profile.alcoholUse,
+        existingConditions: profile.existingConditions || [],
+      });
+    }
+  }, [profile]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -70,8 +88,15 @@ export default function ProfileSetupPage() {
         geneticRiskScore: formData.familyHistory.trim().length > 0 ? 1 : 0,
         ageRiskMultiplier: parseFloat((1 + age / 100).toFixed(2)),
       };
-      const ok = await createProfile(profileData);
-      if (ok) { setSuccess(true); setTimeout(() => router.push("/dashboard"), 1500); }
+
+      let ok: boolean;
+      if (isEditMode) {
+        ok = await updateProfile(profileData);
+      } else {
+        ok = await createProfile(profileData);
+      }
+
+      if (ok) { setSuccess(true); setTimeout(() => router.push("/dashboard/results"), 1500); }
       else setError("Failed to save profile");
     } finally { setLoading(false); }
   };
@@ -114,14 +139,14 @@ export default function ProfileSetupPage() {
         <main className="flex-grow flex items-center justify-center px-6 md:px-12 z-10 pb-12">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-2xl">
             <div className="prana-vessel p-8 md:p-12">
-              <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>Complete Your Profile</h1>
-              <p className="mb-8" style={{ color: "var(--text-muted)" }}>Help us understand your health better</p>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>{isEditMode ? "Update Your Profile" : "Complete Your Profile"}</h1>
+              <p className="mb-8" style={{ color: "var(--text-muted)" }}>{isEditMode ? "Edit your health details below" : "Help us understand your health better"}</p>
 
               {success ? (
                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center py-12">
                   <CheckCircle className="w-16 h-16 mb-4" style={{ color: "var(--teal)" }} />
-                  <p className="text-lg font-semibold" style={{ color: "var(--teal)" }}>Profile Saved Successfully!</p>
-                  <p className="mt-2" style={{ color: "var(--text-muted)" }}>Redirecting to dashboard...</p>
+                  <p className="text-lg font-semibold" style={{ color: "var(--teal)" }}>{isEditMode ? "Profile Updated!" : "Profile Saved Successfully!"}</p>
+                  <p className="mt-2" style={{ color: "var(--text-muted)" }}>Redirecting to results...</p>
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-8">
@@ -140,7 +165,7 @@ export default function ProfileSetupPage() {
                   <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
                     type="submit" disabled={loading}
                     className="btn-primary w-full flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed mt-8">
-                    {loading ? "Saving Profile..." : "Complete Profile"}
+                    {loading ? "Saving..." : isEditMode ? "Update Profile" : "Complete Profile"}
                     {!loading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
                   </motion.button>
                 </form>

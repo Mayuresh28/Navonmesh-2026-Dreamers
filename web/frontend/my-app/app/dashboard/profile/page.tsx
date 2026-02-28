@@ -8,8 +8,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BottomNav } from "@/components/navigation/bottom-nav";
 import {
   Sun, Moon, Edit3, Activity, Heart, Shield, Dna, Scale, Ruler,
-  Calendar, Cigarette, Wine, AlertCircle, FileText, Bell, Share2,
+  Calendar, Cigarette, Wine, AlertCircle, FileText, LogOut,
 } from "lucide-react";
+import { handleSignOut } from "@/components/navigation/bottom-nav";
 import { useTheme } from "@/lib/theme-context";
 import { useEffect, useMemo } from "react";
 import Image from "next/image";
@@ -147,8 +148,7 @@ export default function ProfilePage() {
   const actionBtns = [
     { icon: <FileText className="w-4 h-4" />, label: "Full Report", color: "#0de5a8", btnClass: "btn-teal", onClick: () => router.push("/dashboard/results") },
     { icon: <Edit3 className="w-4 h-4" />,    label: "Edit Profile", color: "#4a9eff", btnClass: "btn-cyan", onClick: () => router.push("/dashboard/profile/setup") },
-    { icon: <Bell className="w-4 h-4" />,     label: "Reminders", color: "#ffb83f", btnClass: "btn-amber", onClick: () => {} },
-    { icon: <Share2 className="w-4 h-4" />,   label: "Share", color: "#a78bfa", btnClass: "btn-purple", onClick: () => { if (navigator.share) navigator.share({ title: "My Dhanvantari Profile", text: `${dosha.dosha} | BMI: ${profile.bmi.toFixed(1)}` }).catch(() => {}); } },
+    { icon: <LogOut className="w-4 h-4" />,    label: "Sign Out",     color: "#ff607a", btnClass: "btn-danger", onClick: () => handleSignOut(router) },
   ];
 
   return (

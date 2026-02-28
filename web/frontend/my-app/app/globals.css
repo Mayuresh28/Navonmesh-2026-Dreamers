@@ -1025,6 +1025,14 @@
   background: rgba(167,139,250,0.08) !important;
   box-shadow: 0 4px 16px rgba(167,139,250,0.12) !important;
 }
+.prof-action-btn.btn-danger {
+  border-color: rgba(255,96,122,0.35) !important;
+}
+.prof-action-btn.btn-danger:hover {
+  border-color: #ff607a !important;
+  background: rgba(255,96,122,0.08) !important;
+  box-shadow: 0 4px 16px rgba(255,96,122,0.12) !important;
+}
 
 /* ── RIGHT COLUMN ── */
 .prof-right {
