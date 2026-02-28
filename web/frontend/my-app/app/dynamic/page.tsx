@@ -135,7 +135,8 @@ export default function HealthDashboard() {
             {/* ══ HEADER ══════════════════════════════════════════════════════════ */}
             <header className="prana-topbar shrink-0">
                 {/* LEFT — Logo */}
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-center gap-2">
+                    <img src="/imgs/logo.png" alt="" width={28} height={28} className="prana-logo" />
                     <span style={{
                       fontFamily: "var(--font-playfair, 'Playfair Display', serif)",
                       fontSize: "22px", fontWeight: 700, letterSpacing: "1px",

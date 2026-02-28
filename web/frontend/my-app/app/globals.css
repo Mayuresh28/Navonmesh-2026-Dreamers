@@ -190,6 +190,11 @@
   backdrop-filter: blur(20px);
   position: sticky; top: 0; z-index: 60;
 }
+.prana-logo {
+  width: 28px; height: 28px; border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
 
 /* ═══ LIVE BADGE ═══ */
 .live-badge {

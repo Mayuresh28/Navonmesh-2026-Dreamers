@@ -146,7 +146,7 @@ export default function LandingPage() {
   const trailRefs = useRef<HTMLDivElement[]>([]);
 
   const handleCta = () => {
-    if (user) router.push("/dashboard");
+    if (user) router.push("/dashboard/results");
     else router.push("/auth/sign-up");
   };
 
@@ -215,7 +215,8 @@ export default function LandingPage() {
 
       {/* ══ NAV ══ */}
       <nav className="landing-nav">
-        <div className="nav-logo">
+        <div className="nav-logo" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <img src="/imgs/logo.png" alt="" width={32} height={32} style={{ borderRadius: "50%" }} />
           धन्वंतरी
         </div>
       </nav>
