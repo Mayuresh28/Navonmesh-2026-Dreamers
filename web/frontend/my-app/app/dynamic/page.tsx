@@ -10,6 +10,8 @@ import { AutosyncView } from "@/components/vitals/autosync-view";
 import { HealthCard } from "@/components/vitals/health-card";
 import { OverallSummary } from "@/components/vitals/overall-summary";
 import { BottomNav } from "@/components/navigation/bottom-nav";
+import { Sun, Moon } from "lucide-react";
+import { useTheme } from "@/lib/theme-context";
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    MAIN PAGE
@@ -19,6 +21,7 @@ type Mode = "manual" | "autosync";
 type View = "form" | "results";
 
 export default function HealthDashboard() {
+    const { theme, toggle } = useTheme();
     const [mode, setMode] = useState<Mode>("manual");
     const [view, setView] = useState<View>("form");
     const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -130,44 +133,52 @@ export default function HealthDashboard() {
             </div>
 
             {/* ══ HEADER ══════════════════════════════════════════════════════════ */}
-            <header className="shrink-0 h-16 px-6 sm:px-8 flex items-center justify-between gap-4"
-              style={{ background: "var(--bg-surface)", borderBottom: "1px solid var(--border)" }}>
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{ background: "var(--teal-bg)", border: "1.5px solid var(--border-accent)" }}>
-                        {Icons.logo("w-5 h-5")}
-                    </div>
-                    <div>
-                        <span className="text-lg font-bold tracking-tight" style={{ color: "var(--teal)" }}>Dhanvantari</span>
-                        <p className="text-xs font-medium hidden sm:block" style={{ color: "var(--text-muted)" }}>Health Analysis</p>
-                    </div>
+            <header className="prana-topbar shrink-0">
+                {/* LEFT — Logo */}
+                <div className="flex items-center gap-2">
+                    <img src="/imgs/logo.png" alt="" width={28} height={28} className="prana-logo" />
+                    <span style={{
+                      fontFamily: "var(--font-playfair, 'Playfair Display', serif)",
+                      fontSize: "22px", fontWeight: 700, letterSpacing: "1px",
+                      background: "linear-gradient(135deg, var(--teal), var(--cyan))",
+                      WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                    }}>
+                      Dhanvantari
+                    </span>
+                    <span style={{ fontSize: "8px", letterSpacing: "3px", color: "var(--text-faint)", textTransform: "uppercase" }}>
+                      Dynamic
+                    </span>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    {view === "form" && (
-                        <div className="flex items-center rounded-xl p-1"
-                          style={{ background: "var(--bg-raised)", border: "1.5px solid var(--border)" }}>
-                            {(["manual", "autosync"] as Mode[]).map(m => (
-                                <button
-                                    key={m}
-                                    onClick={() => switchMode(m)}
-                                    className="px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200"
-                                    style={{
-                                      background: mode === m ? "var(--teal-bg)" : "transparent",
-                                      color: mode === m ? "var(--teal)" : "var(--text-muted)",
-                                      border: mode === m ? "1.5px solid var(--border-accent)" : "1.5px solid transparent",
-                                    }}
-                                >
-                                    {m === "manual" ? "Upload Data" : "Auto Sync"}
-                                </button>
-                            ))}
-                        </div>
-                    )}
+                {/* CENTER — Mode toggle tabs (only in form view) */}
+                {view === "form" ? (
+                    <div className="absolute left-1/2 -translate-x-1/2 flex items-center rounded-xl p-1"
+                      style={{ background: "var(--bg-raised)", border: "1.5px solid var(--border)" }}>
+                        {(["manual", "autosync"] as Mode[]).map(m => (
+                            <button
+                                key={m}
+                                onClick={() => switchMode(m)}
+                                className="px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200"
+                                style={{
+                                  background: mode === m ? "var(--teal-bg)" : "transparent",
+                                  color: mode === m ? "var(--teal)" : "var(--text-muted)",
+                                  border: mode === m ? "1.5px solid var(--border-accent)" : "1.5px solid transparent",
+                                }}
+                            >
+                                {m === "manual" ? "Upload Data" : "Auto Sync"}
+                            </button>
+                        ))}
+                    </div>
+                ) : (
+                    <div />
+                )}
 
+                {/* RIGHT — Back button (results) + theme toggle */}
+                <div className="flex items-center gap-2.5">
                     {view === "results" && (
                         <button
                             onClick={handleBack}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200"
                             style={{
                               background: "var(--bg-card)",
                               border: "1.5px solid var(--border-strong)",
@@ -178,6 +189,13 @@ export default function HealthDashboard() {
                             Back
                         </button>
                     )}
+                    <button onClick={toggle}
+                      className="w-8.5 h-8.5 rounded-full flex items-center justify-center transition-all"
+                      style={{ background: "var(--bg-raised)", border: "1px solid var(--border)" }}>
+                      {theme === "dark"
+                        ? <Sun className="w-3.5 h-3.5" style={{ color: "var(--warn-text)" }} />
+                        : <Moon className="w-3.5 h-3.5" style={{ color: "var(--text-muted)" }} />}
+                    </button>
                 </div>
             </header>
 
@@ -213,6 +231,18 @@ export default function HealthDashboard() {
                             if (!m) return null;
                             return <HealthCard key={id} eKey={id} m={m} />;
                         })}
+                    </div>
+
+                    {/* Mantra Banner */}
+                    <div className="mantra-banner mt-2">
+                        <span className="mantra-symbol">ॐ</span>
+                        <div className="mantra-text">
+                            &ldquo;Prayatnaḥ svasthya rakṣaṇe&rdquo;
+                        </div>
+                        <div className="mantra-trans-text">
+                            Effort should be made to protect one&apos;s health
+                        </div>
+                        <div className="mantra-src-text">— Aṣṭāṅga Hṛdayam</div>
                     </div>
                 </div>
             )}

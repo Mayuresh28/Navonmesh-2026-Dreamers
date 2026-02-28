@@ -169,7 +169,8 @@ export default function RemediesPage() {
 
         {/* ── Top Bar ── */}
         <header className="prana-topbar">
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-center gap-2">
+            <img src="/imgs/logo.png" alt="" width={28} height={28} className="prana-logo" />
             <span style={{
               fontFamily: "var(--font-playfair, 'Playfair Display', serif)",
               fontSize: "22px", fontWeight: 700, letterSpacing: "1px",
@@ -521,7 +522,7 @@ export default function RemediesPage() {
 
             {/* ── Vedic Wisdom Banner ── */}
             <motion.div variants={stagger.item} className="mantra-banner mt-6">
-              <span style={{ fontSize: "36px", display: "block", marginBottom: "10px" }}>🪷</span>
+              <span className="mantra-symbol">☸</span>
               <div className="mantra-text">
                 &ldquo;Rogāstu doṣa-vaiṣamya, doṣa-sāmyam arogatā&rdquo;
               </div>

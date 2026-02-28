@@ -55,9 +55,17 @@ export default function SignInPage() {
     setSuccess(false);
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const cred = await signInWithEmailAndPassword(auth, email, password);
       setSuccess(true);
-      setTimeout(() => router.push("/dashboard"), 800);
+      // Check if user has a profile — first-time users go to setup
+      try {
+        const res = await fetch(`/api/profile?userId=${cred.user.uid}`);
+        if (res.status === 404) {
+          setTimeout(() => router.push("/dashboard/profile/setup"), 800);
+          return;
+        }
+      } catch { /* profile check failed, default to results */ }
+      setTimeout(() => router.push("/dashboard/results"), 800);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to sign in");
     } finally {

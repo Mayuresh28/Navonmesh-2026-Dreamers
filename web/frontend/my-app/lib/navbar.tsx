@@ -43,10 +43,7 @@ export const Navbar: FC<NavbarProps> = ({ activeTab, onTabChange }) => {
           transition={{ duration: 0.5 }}
           className="flex items-center gap-2"
         >
-          <div className="w-9 h-9 rounded-full flex items-center justify-center"
-            style={{ background: "var(--teal-bg)", border: "1.5px solid var(--border-accent)" }}>
-            <HeartPulse className="w-5 h-5" style={{ color: "var(--teal)" }} />
-          </div>
+          <img src="/imgs/logo.png" alt="" width={32} height={32} className="rounded-full" />
           <span className="text-lg font-bold tracking-tight" style={{ color: "var(--teal)" }}>
             Dhanvantari
           </span>

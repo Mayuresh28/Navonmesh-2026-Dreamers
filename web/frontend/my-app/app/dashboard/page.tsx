@@ -250,7 +250,8 @@ export default function DashboardPage() {
 
         {/* ── Top Bar ── */}
         <header className="prana-topbar">
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-center gap-2">
+            <img src="/imgs/logo.png" alt="" width={28} height={28} className="prana-logo" />
             <span style={{
               fontFamily: "var(--font-playfair, 'Playfair Display', serif)",
               fontSize: "22px", fontWeight: 700, letterSpacing: "1px",
@@ -265,10 +266,6 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
-            <div className="live-badge">
-              <span className="live-dot" />
-              Live
-            </div>
             <button onClick={toggle}
               className="w-8.5 h-8.5 rounded-full flex items-center justify-center transition-all"
               style={{ background: "var(--bg-raised)", border: "1px solid var(--border)" }}>
@@ -276,13 +273,14 @@ export default function DashboardPage() {
                 ? <Sun className="w-3.5 h-3.5" style={{ color: "var(--warn-text)" }} />
                 : <Moon className="w-3.5 h-3.5" style={{ color: "var(--text-muted)" }} />}
             </button>
-            <div className="w-8.5 h-8.5 rounded-full overflow-hidden"
+            <button onClick={() => router.push("/dashboard/profile")}
+              className="w-8.5 h-8.5 rounded-full overflow-hidden cursor-pointer transition-transform hover:scale-105"
               style={{ border: "1.5px solid var(--teal)", boxShadow: "0 0 0 3px rgba(13,229,168,0.12)" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={user?.photoURL || `https://api.dicebear.com/7.x/lorelei/svg?seed=${user?.uid || "dhanvantari"}&backgroundColor=065f46,0e7490&backgroundType=gradientLinear`}
                 alt="Profile" className="w-full h-full object-cover" />
-            </div>
+            </button>
           </div>
         </header>
 

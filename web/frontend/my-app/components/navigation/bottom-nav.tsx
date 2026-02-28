@@ -8,7 +8,7 @@ import { FloatingDock, type DockItem } from "@/components/ui/floating-dock";
 
 /* ── Tab accent colors — contrasting, not all green ── */
 const TABS = [
-  { key: "result",   label: "Result",   Icon: Activity,   href: "/dashboard",          accent: "#4a9eff" },   // blue
+  { key: "result",   label: "Result",   Icon: Activity,   href: "/dashboard/results",   accent: "#4a9eff" },   // blue
   { key: "remedies", label: "Remedies", Icon: Leaf,       href: "/dashboard/remedies",  accent: "#0de5a8" },   // teal-green
   { key: "dynamic",  label: "Dynamic",  Icon: HeartPulse, href: "/dynamic",             accent: "#ff607a" },   // coral-red
   { key: "profile",  label: "Profile",  Icon: User,       href: "/dashboard/profile",   accent: "#ffb83f" },   // amber
@@ -17,6 +17,7 @@ const TABS = [
 function activeKey(pathname: string) {
   if (pathname.startsWith("/dashboard/remedies")) return "remedies";
   if (pathname.startsWith("/dashboard/profile"))  return "profile";
+  if (pathname.startsWith("/dashboard/results"))  return "result";
   if (pathname.startsWith("/dynamic"))            return "dynamic";
   return "result";
 }
