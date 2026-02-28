@@ -17,6 +17,7 @@ const TABS = [
 function activeKey(pathname: string) {
   if (pathname.startsWith("/dashboard/remedies")) return "remedies";
   if (pathname.startsWith("/dashboard/profile"))  return "profile";
+  if (pathname.startsWith("/dashboard/results"))  return "result";
   if (pathname.startsWith("/dynamic"))            return "dynamic";
   return "result";
 }

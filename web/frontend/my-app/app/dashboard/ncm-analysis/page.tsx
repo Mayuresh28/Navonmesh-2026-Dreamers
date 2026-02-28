@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
 import { Icons } from "@/components/icons/health-icons";
@@ -10,10 +9,12 @@ import { SignalCard } from "@/components/dosha/signal-card";
 import { SystemicBanner } from "@/components/dosha/systemic-banner";
 import { DataDetails } from "@/components/dosha/data-details";
 import { BottomNav } from "@/components/navigation/bottom-nav";
+import { Sun, Moon } from "lucide-react";
+import { useTheme } from "@/lib/theme-context";
 import type { NCMResult } from "@/components/dosha/types";
 
 export default function NCMAnalysisPage() {
-  const router = useRouter();
+  const { theme, toggle } = useTheme();
   const [result, setResult] = useState<NCMResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,35 +45,47 @@ export default function NCMAnalysisPage() {
     <div className="min-h-screen bg-transparent flex flex-col">
       <GlassmorphicBackground />
 
+      {/* ── EKG Strip ── */}
+      <div className="ekg-strip shrink-0">
+        <svg className="ekg-mover" viewBox="0 0 600 44" preserveAspectRatio="none" fill="none" stroke="var(--ekg-color)" strokeWidth="1.2">
+          <polyline points="0,22 40,22 50,22 55,10 60,34 65,18 70,26 75,22 120,22 160,22 170,22 175,10 180,34 185,18 190,26 195,22 240,22 280,22 290,22 295,10 300,34 305,18 310,26 315,22 360,22 400,22 410,22 415,10 420,34 425,18 430,26 435,22 480,22 520,22 530,22 535,10 540,34 545,18 550,26 555,22 600,22" />
+        </svg>
+      </div>
+
       {/* ── Top Bar ── */}
-      <header className="shrink-0 px-6 py-4 flex items-center justify-between border-b border-border-soft bg-card/80 backdrop-blur-md">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => router.push("/dynamic")}
-            className="p-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-500"
-          >
-            {Icons.arrowLeft()}
-          </button>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
-              style={{ background: "var(--teal-bg)", border: "1px solid var(--border)" }}>
-              <span style={{ color: "var(--teal)" }}>{Icons.activity("w-5 h-5")}</span>
-            </div>
-            <div>
-              <h1 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>Neuro-Cardio-Muscular Analysis</h1>
-              <p className="text-xs" style={{ color: "var(--text-muted)" }}>Neuro-Cardio-Muscular Health Assessment</p>
-            </div>
-          </div>
+      <header className="prana-topbar">
+        <div className="flex items-baseline gap-2">
+          <span style={{
+            fontFamily: "var(--font-playfair, 'Playfair Display', serif)",
+            fontSize: "22px", fontWeight: 700, letterSpacing: "1px",
+            background: "linear-gradient(135deg, var(--teal), var(--cyan))",
+            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+          }}>
+            Dhanvantari
+          </span>
+          <span style={{ fontSize: "8px", letterSpacing: "3px", color: "var(--text-faint)", textTransform: "uppercase" }}>
+            NCM
+          </span>
         </div>
-        {result && (
-          <button
-            onClick={runAnalysis}
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-600 disabled:opacity-50"
-          >
-            {Icons.refresh("w-4 h-4")} Re-analyze
+        <div className="flex items-center gap-2.5">
+          {result && (
+            <button
+              onClick={runAnalysis}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 disabled:opacity-50"
+              style={{ background: "var(--bg-card)", border: "1.5px solid var(--border-strong)", color: "var(--text-body)" }}
+            >
+              {Icons.refresh("w-4 h-4")} Re-analyze
+            </button>
+          )}
+          <button onClick={toggle}
+            className="w-8.5 h-8.5 rounded-full flex items-center justify-center transition-all"
+            style={{ background: "var(--bg-raised)", border: "1px solid var(--border)" }}>
+            {theme === "dark"
+              ? <Sun className="w-3.5 h-3.5" style={{ color: "var(--warn-text)" }} />
+              : <Moon className="w-3.5 h-3.5" style={{ color: "var(--text-muted)" }} />}
           </button>
-        )}
+        </div>
       </header>
 
       {/* ── Content ── */}
@@ -91,19 +104,21 @@ export default function NCMAnalysisPage() {
                 animate={{ y: [0, -12, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               >
-                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-accent via-primary/50 to-primary/20 flex items-center justify-center shadow-[0_16px_48px_rgb(90_127_232_/_0.3)] border border-accent/50">
+                <div className="w-32 h-32 rounded-full flex items-center justify-center"
+                  style={{ background: "linear-gradient(135deg, var(--teal), var(--cyan))", boxShadow: "0 16px 48px rgba(13,229,168,0.25)", border: "1px solid var(--border-accent)" }}>
                   {Icons.activity("w-14 h-14 text-white")}
                 </div>
               </motion.div>
               <div className="text-center space-y-3">
-                <h2 className="text-2xl font-bold text-gray-900">Neuro-Cardio-Muscular Health Assessment</h2>
-                <p className="text-gray-500 max-w-md">
+                <h2 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>Neuro-Cardio-Muscular Assessment</h2>
+                <p style={{ color: "var(--text-muted)" }} className="max-w-md">
                   Analyze your neuro-cardio-muscular health using biosignal data
                 </p>
               </div>
               <button
                 onClick={runAnalysis}
-                className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors shadow-lg"
+                className="flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold transition-all"
+                style={{ background: "var(--teal)", color: "#fff" }}
               >
                 {Icons.activity("w-5 h-5")} Run Analysis
               </button>
@@ -119,8 +134,8 @@ export default function NCMAnalysisPage() {
               exit={{ opacity: 0 }}
               className="flex flex-col items-center justify-center min-h-[60vh] gap-6"
             >
-              <div className="w-16 h-16 rounded-full border-4 border-border-soft border-t-primary animate-spin" />
-              <p className="text-gray-500 font-medium">Running analysis...</p>
+              <div className="w-16 h-16 rounded-full border-4 animate-spin" style={{ borderColor: "var(--border)", borderTopColor: "var(--teal)" }} />
+              <p className="font-medium" style={{ color: "var(--text-muted)" }}>Running analysis...</p>
             </motion.div>
           )}
 
@@ -133,16 +148,17 @@ export default function NCMAnalysisPage() {
               exit={{ opacity: 0 }}
               className="flex flex-col items-center justify-center min-h-[60vh] gap-6"
             >
-              <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-                {Icons.alertTriangle("w-8 h-8 text-red-500")}
+              <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: "var(--danger-bg)" }}>
+                {Icons.alertTriangle("w-8 h-8")}
               </div>
               <div className="text-center space-y-2">
-                <h3 className="text-lg font-bold text-gray-900">Analysis Failed</h3>
-                <p className="text-red-500">{error}</p>
+                <h3 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>Analysis Failed</h3>
+                <p style={{ color: "var(--danger-text)" }}>{error}</p>
               </div>
               <button
                 onClick={runAnalysis}
-                className="px-6 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
+                className="px-6 py-3 rounded-xl font-semibold transition-all"
+                style={{ background: "var(--teal)", color: "#fff" }}
               >
                 Try Again
               </button>
@@ -161,18 +177,20 @@ export default function NCMAnalysisPage() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-card border border-border-soft"
+                className="flex flex-col items-center gap-4 p-8 rounded-3xl"
+                style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}
               >
                 <NCMGauge value={result.ncm_index} category={result.risk_category} />
                 <p className="text-sm text-center max-w-md" style={{ color: "var(--text-muted)" }}>
                   Composite score fusing cardiac (40%), neural stress (35%), and muscle fatigue (25%). Lower is healthier.
                 </p>
                 <span
-                  className={`text-xs font-medium px-3 py-1 rounded-full ${
-                    result.model_source === "ml"
-                      ? "bg-violet-100 text-violet-700"
-                      : "bg-gray-100 text-gray-600"
-                  }`}
+                  className="text-xs font-medium px-3 py-1 rounded-full"
+                  style={{
+                    background: result.model_source === "ml" ? "var(--teal-bg)" : "var(--bg-raised)",
+                    color: result.model_source === "ml" ? "var(--teal)" : "var(--text-muted)",
+                    border: "1px solid var(--border)",
+                  }}
                 >
                   {result.model_source === "ml" ? "ML Model Prediction" : "Formula-Based (ML offline)"}
                 </span>
@@ -199,6 +217,18 @@ export default function NCMAnalysisPage() {
 
               <SystemicBanner flag={result.systemic_flag} ncmIndex={result.ncm_index} />
               <DataDetails result={result} />
+
+              {/* Mantra Banner */}
+              <div className="mantra-banner mt-4">
+                <span className="mantra-symbol">&#x0950;</span>
+                <div className="mantra-text">
+                  &ldquo;Nidrā svasthasya rogāṇāṃ praśamanaṃ&rdquo;
+                </div>
+                <div className="mantra-trans-text">
+                  Proper rest brings relief from all ailments
+                </div>
+                <div className="mantra-src-text">— Suśruta Saṃhitā</div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

@@ -6,8 +6,8 @@ import { useAuth } from "@/lib/auth-context";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { useProfileData, type UserProfile } from "@/lib/profile-hook";
 import { motion } from "framer-motion";
-import { HeartPulse, ArrowRight, CheckCircle, Activity, ShieldCheck, Calculator } from "lucide-react";
-import { GlassmorphicBackground } from "@/lib/glassmorphic-bg";
+import { ArrowRight, CheckCircle, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/lib/theme-context";
 import { PersonalInfo } from "@/components/profile-setup/personal-info";
 import { LifestyleForm } from "@/components/profile-setup/lifestyle-form";
 import { MedicalHistoryForm } from "@/components/profile-setup/medical-history-form";
@@ -17,6 +17,7 @@ import { BottomNav } from "@/components/navigation/bottom-nav";
 export default function ProfileSetupPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { theme, toggle } = useTheme();
   const { createProfile } = useProfileData(user?.uid);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -77,20 +78,37 @@ export default function ProfileSetupPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: "var(--bg-base)" }}>
-        <div className="ekg-strip" />
-        {/* Ambient glow */}
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full blur-3xl -z-10" style={{ background: "var(--teal-glow)" }} />
-        <div className="absolute bottom-[-10%] right-[-15%] w-[40%] h-[50%] rounded-full blur-3xl -z-10" style={{ background: "var(--ok-bg)" }} />
+      <div className="min-h-screen flex flex-col relative" style={{ background: "var(--bg-base)" }}>
+        {/* ── EKG Strip ── */}
+        <div className="ekg-strip shrink-0">
+          <svg className="ekg-mover" viewBox="0 0 600 44" preserveAspectRatio="none" fill="none" stroke="var(--ekg-color)" strokeWidth="1.2">
+            <polyline points="0,22 40,22 50,22 55,10 60,34 65,18 70,26 75,22 120,22 160,22 170,22 175,10 180,34 185,18 190,26 195,22 240,22 280,22 290,22 295,10 300,34 305,18 310,26 315,22 360,22 400,22 410,22 415,10 420,34 425,18 430,26 435,22 480,22 520,22 530,22 535,10 540,34 545,18 550,26 555,22 600,22" />
+          </svg>
+        </div>
 
-        <nav className="w-full px-6 py-6 md:px-12 z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
-              <HeartPulse className="w-6 h-6" style={{ color: "var(--teal)" }} />
-            </div>
-            <span className="text-2xl font-bold tracking-tight" style={{ color: "var(--teal)" }}>धन्वंतरी</span>
+        {/* ── Top Bar ── */}
+        <header className="prana-topbar">
+          <div className="flex items-baseline gap-2">
+            <span style={{
+              fontFamily: "var(--font-playfair, 'Playfair Display', serif)",
+              fontSize: "22px", fontWeight: 700, letterSpacing: "1px",
+              background: "linear-gradient(135deg, var(--teal), var(--cyan))",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            }}>
+              Dhanvantari
+            </span>
+            <span style={{ fontSize: "8px", letterSpacing: "3px", color: "var(--text-faint)", textTransform: "uppercase" }}>
+              Setup
+            </span>
           </div>
-        </nav>
+          <button onClick={toggle}
+            className="w-8.5 h-8.5 rounded-full flex items-center justify-center transition-all"
+            style={{ background: "var(--bg-raised)", border: "1px solid var(--border)" }}>
+            {theme === "dark"
+              ? <Sun className="w-3.5 h-3.5" style={{ color: "var(--warn-text)" }} />
+              : <Moon className="w-3.5 h-3.5" style={{ color: "var(--text-muted)" }} />}
+          </button>
+        </header>
 
         <main className="flex-grow flex items-center justify-center px-6 md:px-12 z-10 pb-12">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-2xl">
@@ -128,6 +146,18 @@ export default function ProfileSetupPage() {
               )}
             </div>
           </motion.div>
+
+          {/* Mantra Banner */}
+          <div className="mantra-banner mt-8">
+            <span className="mantra-symbol">&#x2638;</span>
+            <div className="mantra-text">
+              &ldquo;Svasthasya svāsthya rakṣaṇam, āturasya vikāra praśamanam&rdquo;
+            </div>
+            <div className="mantra-trans-text">
+              Protect the health of the healthy, cure the disease of the diseased
+            </div>
+            <div className="mantra-src-text">— Charaka Saṃhitā</div>
+          </div>
         </main>
         <BottomNav />
       </div>

@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from "react";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { BottomNav } from "@/components/navigation/bottom-nav";
 import { motion } from "framer-motion";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, Brain } from "lucide-react";
 import { useTheme } from "@/lib/theme-context";
 import { useAuth } from "@/lib/auth-context";
 import { useProfileData } from "@/lib/profile-hook";
@@ -406,6 +406,29 @@ export default function DashboardPage() {
           {analysis && Object.keys(analysis.metrics).length > 0 && (
             <>
               <motion.hr variants={stagger.item} className="prana-hr" />
+
+              {/* ML Prediction CTA */}
+              {profile && (
+                <motion.div variants={stagger.item}
+                  onClick={() => router.push("/dashboard/results")}
+                  style={{
+                    display: "flex", alignItems: "center", gap: "12px",
+                    padding: "14px 16px", marginBottom: "12px",
+                    background: "linear-gradient(135deg, rgba(74,158,255,0.08), rgba(13,229,168,0.06))",
+                    border: "1.5px solid rgba(74,158,255,0.2)", borderRadius: "16px",
+                    cursor: "pointer", transition: "all 0.2s",
+                  }}>
+                  <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "rgba(74,158,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Brain className="w-5 h-5" style={{ color: "#4a9eff" }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>ML Risk Prediction</div>
+                    <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>Run AI analysis on your health profile</div>
+                  </div>
+                  <span style={{ fontSize: "18px", color: "var(--text-faint)" }}>→</span>
+                </motion.div>
+              )}
+
               <motion.div variants={stagger.item} className="dash-sec">
                 <div className="dash-sec-title">Health <em>Overview</em></div>
                 <div className="dash-sec-tag">{analysis.overall.parametersCount} readings</div>
@@ -462,7 +485,7 @@ export default function DashboardPage() {
 
           {/* Mantra Banner */}
           <motion.div variants={stagger.item} className="mantra-banner mt-4">
-            <span style={{ fontSize: "36px", display: "block", marginBottom: "10px" }}>🕉</span>
+            <span className="mantra-symbol">ॐ</span>
             <div className="mantra-text">
               &ldquo;Sarve bhavantu sukhinaḥ, sarve santu nirāmayāḥ&rdquo;
             </div>
