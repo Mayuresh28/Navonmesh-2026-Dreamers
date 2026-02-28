@@ -3,6 +3,7 @@ import { Syne, Playfair_Display, Inter, Cinzel, DM_Sans, Cormorant_Garamond, Not
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/lib/theme-context";
+import { GoogleTranslate } from "@/components/translate/google-translate";
 
 const syne = Syne({
   variable: "--font-syne",
@@ -62,6 +63,7 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider>
             {children}
+            <GoogleTranslate />
           </ThemeProvider>
         </AuthProvider>
       </body>
