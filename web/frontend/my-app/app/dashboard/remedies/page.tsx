@@ -114,6 +114,24 @@ export default function RemediesPage() {
       
       if (response.ok && data.remedies) {
         setAiRemedies(data.remedies);
+        
+        // Send Telegram notification after successful remedy fetch
+        try {
+          await fetch('/api/telegram-notify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              disease: userMessage,
+              remedies: data.remedies,
+            }),
+          });
+          console.log('Telegram notification sent successfully');
+        } catch (telegramError) {
+          // Silent fail - don't break the user experience if Telegram fails
+          console.error('Telegram notification failed:', telegramError);
+        }
       } else {
         setAiRemedies([]);
         alert(data.error || 'Failed to get recommendations');
