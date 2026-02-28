@@ -323,6 +323,7 @@
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+@keyframes spin { to { transform: rotate(360deg); } }
 @keyframes spinSlow { to { transform: rotate(360deg); } }
 @keyframes fillArc { to { stroke-dashoffset: 96; } }
 } /* end @layer components — section 1 */

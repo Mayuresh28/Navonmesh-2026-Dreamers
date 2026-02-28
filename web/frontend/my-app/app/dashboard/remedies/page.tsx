@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { BottomNav } from "@/components/navigation/bottom-nav";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { useProfileData } from "@/lib/profile-hook";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, Send, Sparkles } from "lucide-react";
 import { useTheme } from "@/lib/theme-context";
 
 /* ── Remedy Categories ── */
@@ -21,8 +21,18 @@ const CATEGORIES = [
 
 type CategoryKey = (typeof CATEGORIES)[number]["key"];
 
+/* ── Remedy Type ── */
+type Remedy = {
+  icon: string;
+  name: string;
+  sanskrit: string;
+  desc: string;
+  benefits: string[];
+  when: string;
+};
+
 /* ── Remedies Data ── */
-const REMEDIES: Record<CategoryKey, { icon: string; name: string; sanskrit: string; desc: string; benefits: string[]; when: string }[]> = {
+const REMEDIES: Record<CategoryKey, Remedy[]> = {
   herbal: [
     { icon: "🍵", name: "Ashwagandha", sanskrit: "अश्वगन्धा", desc: "Adaptogenic root that strengthens the body's stress response and promotes vitality.", benefits: ["Reduces cortisol & stress", "Boosts immunity", "Improves sleep quality"], when: "Take 300mg twice daily with warm milk" },
     { icon: "🌱", name: "Tulsi (Holy Basil)", sanskrit: "तुलसी", desc: "Sacred herb revered for its purifying and immune-boosting properties.", benefits: ["Respiratory health", "Blood sugar regulation", "Antimicrobial action"], when: "Brew 5-6 fresh leaves in hot water as tea" },
@@ -78,6 +88,62 @@ export default function RemediesPage() {
   const { user } = useAuth();
   const { profile } = useProfileData(user?.uid);
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("herbal");
+  const [diseaseInput, setDiseaseInput] = useState("");
+  const [queriedDisease, setQueriedDisease] = useState<string | null>(null);
+  const [aiRemedies, setAiRemedies] = useState<Remedy[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSendDisease = async () => {
+    if (!diseaseInput.trim() || isLoading) return;
+    
+    const userMessage = diseaseInput.trim();
+    setQueriedDisease(userMessage);
+    setDiseaseInput("");
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch('/api/remedies', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ disease: userMessage }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.remedies) {
+        setAiRemedies(data.remedies);
+        
+        // Send Telegram notification after successful remedy fetch
+        try {
+          await fetch('/api/telegram-notify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              disease: userMessage,
+              remedies: data.remedies,
+            }),
+          });
+          console.log('Telegram notification sent successfully');
+        } catch (telegramError) {
+          // Silent fail - don't break the user experience if Telegram fails
+          console.error('Telegram notification failed:', telegramError);
+        }
+      } else {
+        setAiRemedies([]);
+        alert(data.error || 'Failed to get recommendations');
+      }
+    } catch (error) {
+      console.error('Error fetching remedies:', error);
+      setAiRemedies([]);
+      alert('Unable to connect to the remedy service. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   /* Dosha-based recommendation note */
   const doshaNote = useMemo(() => {
@@ -152,32 +218,268 @@ export default function RemediesPage() {
           </motion.div>
         </section>
 
-        {/* ── Category Tabs ── */}
-        <div className="remedy-tabs-wrap">
-          <div className="remedy-tabs">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.key}
-                onClick={() => setActiveCategory(cat.key)}
-                className={`remedy-tab ${activeCategory === cat.key ? "active" : ""}`}
+        {/* ── Disease Chat Section ── */}
+        <section className="px-5 pt-4 pb-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            style={{
+              background: "var(--bg-raised)",
+              border: "1px solid var(--border)",
+              borderRadius: "16px",
+              padding: "20px",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)"
+            }}
+          >
+            {/* Chat Header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <Sparkles className="w-5 h-5" style={{ color: "var(--teal)" }} />
+                <h2 style={{
+                  fontSize: "16px",
+                  fontWeight: 700,
+                  color: "var(--text-base)",
+                  letterSpacing: "0.3px"
+                }}>
+                  Ask About a Condition
+                </h2>
+              </div>
+              {queriedDisease && (
+                <button
+                  onClick={() => {
+                    setQueriedDisease(null);
+                    setAiRemedies([]);
+                  }}
+                  style={{
+                    padding: "6px 12px",
+                    borderRadius: "8px",
+                    background: "var(--bg-base)",
+                    border: "1px solid var(--border)",
+                    color: "var(--text-muted)",
+                    fontSize: "12px",
+                    cursor: "pointer"
+                  }}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+
+            {/* Current Query Display */}
+            {queriedDisease && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: "10px",
+                  background: "linear-gradient(135deg, var(--teal), var(--cyan))",
+                  color: "white",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  marginBottom: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px"
+                }}
               >
-                <span style={{ fontSize: "16px" }}>{cat.icon}</span>
-                <span>{cat.label}</span>
+                <span style={{ fontSize: "16px" }}>🔍</span>
+                <span>Showing remedies for: {queriedDisease}</span>
+              </motion.div>
+            )}
+
+            {/* Loading indicator */}
+            {isLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginBottom: "16px",
+                  padding: "12px",
+                  borderRadius: "10px",
+                  background: "var(--bg-base)",
+                  color: "var(--text-muted)",
+                  fontSize: "14px"
+                }}
+              >
+                <div style={{
+                  width: "16px",
+                  height: "16px",
+                  border: "2px solid var(--border)",
+                  borderTopColor: "var(--teal)",
+                  borderRadius: "50%",
+                  animation: "spin 0.8s linear infinite"
+                }} />
+                <span>Consulting Ayurvedic wisdom...</span>
+              </motion.div>
+            )}
+
+            {/* Input Box */}
+            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              <input
+                type="text"
+                value={diseaseInput}
+                onChange={(e) => setDiseaseInput(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSendDisease()}
+                placeholder="Enter disease or condition (e.g., Diabetes, Stress, Insomnia)..."
+                style={{
+                  flex: 1,
+                  padding: "12px 16px",
+                  borderRadius: "10px",
+                  border: "1px solid var(--border)",
+                  background: "var(--bg-base)",
+                  color: "var(--text-base)",
+                  fontSize: "14px",
+                  outline: "none",
+                  transition: "border-color 0.2s"
+                }}
+                onFocus={(e) => e.target.style.borderColor = "var(--teal)"}
+                onBlur={(e) => e.target.style.borderColor = "var(--border)"}
+              />
+              <button
+                onClick={handleSendDisease}
+                disabled={!diseaseInput.trim() || isLoading}
+                style={{
+                  padding: "12px 16px",
+                  borderRadius: "10px",
+                  background: (diseaseInput.trim() && !isLoading)
+                    ? "linear-gradient(135deg, var(--teal), var(--cyan))" 
+                    : "var(--bg-raised)",
+                  color: (diseaseInput.trim() && !isLoading) ? "white" : "var(--text-muted)",
+                  border: "1px solid var(--border)",
+                  cursor: (diseaseInput.trim() && !isLoading) ? "pointer" : "not-allowed",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.2s",
+                  opacity: (diseaseInput.trim() && !isLoading) ? 1 : 0.5
+                }}
+              >
+                <Send className="w-4 h-4" />
               </button>
-            ))}
+            </div>
+
+            {/* Quick Suggestions */}
+            {!queriedDisease && (
+              <div style={{ marginTop: "12px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                {["Diabetes", "Hypertension", "Stress", "Insomnia", "Arthritis", "Migraine"].map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    onClick={() => setDiseaseInput(suggestion)}
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: "20px",
+                      background: "var(--bg-base)",
+                      border: "1px solid var(--border)",
+                      color: "var(--text-muted)",
+                      fontSize: "12px",
+                      cursor: "pointer",
+                      transition: "all 0.2s"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "var(--teal)";
+                      e.currentTarget.style.color = "var(--teal)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "var(--border)";
+                      e.currentTarget.style.color = "var(--text-muted)";
+                    }}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        </section>
+
+        {/* ── AI-Generated Remedies Section ── */}
+        {aiRemedies.length > 0 && (
+          <section className="px-5 pt-4 pb-2">
+            <AnimatePresence mode="wait">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                <motion.div variants={stagger.item} className="dash-sec" style={{ marginTop: "12px" }}>
+                  <div className="dash-sec-title">
+                    ✨ <em>AI-Powered Remedies for {queriedDisease}</em>
+                  </div>
+                  <div className="dash-sec-tag">{aiRemedies.length} personalized remedies</div>
+                </motion.div>
+
+                <div className="remedy-grid" style={{ marginTop: "16px" }}>
+                  {aiRemedies.map((remedy, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.1, duration: 0.4 }}
+                      className="remedy-card"
+                    >
+                      <div className="remedy-card-head">
+                        <span className="remedy-card-icon">{remedy.icon}</span>
+                        <div>
+                          <div className="remedy-card-name">{remedy.name}</div>
+                          <div className="remedy-card-sanskrit">{remedy.sanskrit}</div>
+                        </div>
+                      </div>
+
+                      <p className="remedy-card-desc">{remedy.desc}</p>
+
+                      <div className="remedy-card-benefits">
+                        {remedy.benefits?.map((b: string, j: number) => (
+                          <span key={j} className="remedy-benefit-pill">✦ {b}</span>
+                        ))}
+                      </div>
+
+                      <div className="remedy-card-when">
+                        <span style={{ fontWeight: 700, color: "var(--teal)", marginRight: "4px" }}>↻</span>
+                        {remedy.when}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </section>
+        )}
+
+        {/* ── Category Tabs ── */}
+        {!queriedDisease && (
+          <div className="remedy-tabs-wrap">
+            <div className="remedy-tabs">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.key}
+                  onClick={() => setActiveCategory(cat.key)}
+                  className={`remedy-tab ${activeCategory === cat.key ? "active" : ""}`}
+                >
+                  <span style={{ fontSize: "16px" }}>{cat.icon}</span>
+                  <span>{cat.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* ── Remedy Cards ── */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCategory}
-            variants={stagger.container}
-            initial="hidden"
-            animate="show"
-            exit={{ opacity: 0, transition: { duration: 0.15 } }}
-            className="px-5 pb-6"
-          >
+        {!queriedDisease && (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeCategory}
+              variants={stagger.container}
+              initial="hidden"
+              animate="show"
+              exit={{ opacity: 0, transition: { duration: 0.15 } }}
+              className="px-5 pb-6"
+            >
             <motion.div variants={stagger.item} className="dash-sec" style={{ marginTop: "12px" }}>
               <div className="dash-sec-title">
                 {CATEGORIES.find((c) => c.key === activeCategory)?.icon}{" "}
@@ -187,7 +489,7 @@ export default function RemediesPage() {
             </motion.div>
 
             <div className="remedy-grid">
-              {activeRemedies.map((r, i) => (
+              {activeRemedies.map((r) => (
                 <motion.div
                   key={r.name}
                   variants={stagger.item}
@@ -232,6 +534,7 @@ export default function RemediesPage() {
             </motion.div>
           </motion.div>
         </AnimatePresence>
+        )}
 
         <BottomNav />
       </div>
