@@ -649,6 +649,7 @@ export default function ResultsPage() {
 
                       {/* ── 3. VITAL SIGNS ── */}
                       <motion.div custom={2} variants={fade} initial="hidden" animate="show" className="rr-card">
+                        <h3 className="rr-card-title">Diabetes</h3>
                         <h3 className="rr-card-title">Your Vital Signs</h3>
                         <p className="rr-card-sub">Averaged from uploaded data — inputs to all models</p>
                         <div className="rr-vitals-grid">
