@@ -616,13 +616,11 @@ export default function ResultsPage() {
                         </motion.div>
                       )}
 
-                      {/* 4. VITALS */}
-                      <motion.div custom={3} variants={fade} initial="hidden" animate="show" className="rr-card">
-                        <div className="rr-card-head">
-                          <ThermometerSun className="w-5 h-5" style={{ color: A.cyan }} />
-                          <h3>Your Vitals at a Glance</h3>
-                        </div>
-                        <p className="rr-card-sub">These are the readings our AI used to check your health</p>
+                      {/* ── 3. VITAL SIGNS ── */}
+                      <motion.div custom={2} variants={fade} initial="hidden" animate="show" className="rr-card">
+                        <h3 className="rr-card-title">Diabetes</h3>
+                        <h3 className="rr-card-title">Your Vital Signs</h3>
+                        <p className="rr-card-sub">Averaged from uploaded data — inputs to all models</p>
                         <div className="rr-vitals-grid">
                           {([
                             { key: "BP",        icon: <HeartPulse className="w-5 h-5" />, label: "Blood Pressure", val: vitals.BP.toFixed(0),  unit: "mmHg", accent: A.coral },
