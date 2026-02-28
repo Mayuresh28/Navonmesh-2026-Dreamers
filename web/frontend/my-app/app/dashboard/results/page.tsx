@@ -90,7 +90,346 @@ function Bar({ pct, color, delay = 0 }: { pct: number; color: string; delay?: nu
   );
 }
 
-/* PAGE */
+/* ═══════════════════════════════════════════════════
+   Theme CSS — injected as a <style> tag
+   dark  → [data-theme="dark"]  on <html>
+   light → [data-theme="light"] on <html>
+   ═══════════════════════════════════════════════════ */
+const THEME_STYLES = `
+  /* ── Shared accent palette ── */
+  :root {
+    --teal:   #0de5a8;
+    --cyan:   #4a9eff;
+    --purple: #a78bfa;
+    --amber:  #ffb83f;
+    --coral:  #ff607a;
+    --rose:   #f472b6;
+  }
+
+  /* ── DARK theme ── */
+  [data-theme="dark"] {
+    --bg-base:        #0b0f1a;
+    --bg-raised:      #111827;
+    --bg-card:        #141c2e;
+    --bg-card2:       #0f172a;
+    --border:         rgba(255,255,255,0.08);
+    --border-mid:     rgba(255,255,255,0.13);
+    --text-main:      #e8edf5;
+    --text-muted:     #8b97b1;
+    --text-faint:     #4a5568;
+    --warn-text:      #ffb83f;
+    --tag-bg:         rgba(13,229,168,0.10);
+    --tag-border:     rgba(13,229,168,0.25);
+    --tag-text:       #0de5a8;
+    --input-bg:       #0f172a;
+    --tab-active-bg:  rgba(13,229,168,0.12);
+    --pill-bg:        rgba(255,255,255,0.05);
+    --pill-border:    rgba(255,255,255,0.10);
+    --ekg-color:      rgba(13,229,168,0.40);
+    --card-shadow:    0 4px 24px rgba(0,0,0,0.40);
+    --summary-bg:     rgba(13,229,168,0.05);
+    --disclaimer-bg:  rgba(255,255,255,0.03);
+    --disclaimer-clr: #4a5568;
+    --error-bg:       rgba(255,96,122,0.08);
+    --error-border:   rgba(255,96,122,0.25);
+  }
+
+  /* ── LIGHT theme ── */
+  [data-theme="light"] {
+    --bg-base:        #f0f7f4;
+    --bg-raised:      #e4f0ea;
+    --bg-card:        #ffffff;
+    --bg-card2:       #f7fdf9;
+    --border:         rgba(0,100,70,0.10);
+    --border-mid:     rgba(0,100,70,0.18);
+    --text-main:      #1a2e25;
+    --text-muted:     #4a6b5a;
+    --text-faint:     #8aab98;
+    --warn-text:      #b45309;
+    --tag-bg:         rgba(13,160,110,0.10);
+    --tag-border:     rgba(13,160,110,0.28);
+    --tag-text:       #0a9e72;
+    --input-bg:       #ffffff;
+    --tab-active-bg:  rgba(13,160,110,0.10);
+    --pill-bg:        rgba(0,80,50,0.06);
+    --pill-border:    rgba(0,80,50,0.14);
+    --ekg-color:      rgba(13,160,110,0.35);
+    --card-shadow:    0 2px 16px rgba(0,80,50,0.08);
+    --summary-bg:     rgba(13,160,110,0.05);
+    --disclaimer-bg:  rgba(0,80,50,0.03);
+    --disclaimer-clr: #8aab98;
+    --error-bg:       rgba(220,38,38,0.06);
+    --error-border:   rgba(220,38,38,0.20);
+  }
+
+  /* ══════════════════════════════════════════
+     EKG strip
+     ══════════════════════════════════════════ */
+  .ekg-strip {
+    width: 100%; height: 44px; overflow: hidden;
+    background: linear-gradient(90deg, var(--bg-base), var(--bg-raised), var(--bg-base));
+  }
+  .ekg-mover {
+    width: 200%; height: 100%;
+    animation: ekgScroll 6s linear infinite;
+  }
+  @keyframes ekgScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ══════════════════════════════════════════
+     Top bar
+     ══════════════════════════════════════════ */
+  .prana-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 20px 10px;
+    position: sticky; top: 0; z-index: 40;
+    background: var(--bg-base);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    transition: background 0.3s ease;
+  }
+  .prana-logo { border-radius: 8px; }
+
+  /* ══════════════════════════════════════════
+     Container
+     ══════════════════════════════════════════ */
+  .rr-container {
+    max-width: 720px; margin: 0 auto; padding: 20px 16px;
+  }
+
+  /* ══════════════════════════════════════════
+     Tabs
+     ══════════════════════════════════════════ */
+  .rr-tabs {
+    display: flex; gap: 4px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 4px;
+    margin-bottom: 20px;
+  }
+  .rr-tab {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    gap: 7px; padding: 10px 14px; border-radius: 10px; border: none;
+    background: transparent; cursor: pointer; font-size: 14px; font-weight: 500;
+    color: var(--text-faint); position: relative;
+    transition: color 0.2s, background 0.2s;
+    font-family: inherit;
+  }
+  .rr-tab.active {
+    color: var(--teal); background: var(--tab-active-bg);
+  }
+  [data-theme="light"] .rr-tab.active { color: #0a9e72; }
+  .rr-tab-line {
+    position: absolute; bottom: -1px; left: 12px; right: 12px;
+    height: 2px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--teal), var(--cyan));
+  }
+
+  /* ══════════════════════════════════════════
+     Cards
+     ══════════════════════════════════════════ */
+  .rr-results-stack { display: flex; flex-direction: column; gap: 16px; }
+
+  .rr-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px;
+    box-shadow: var(--card-shadow);
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+  .rr-card-title {
+    font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 4px;
+  }
+  .rr-card-sub {
+    font-size: 12px; color: var(--text-faint); margin-bottom: 16px;
+  }
+
+  /* ── Diagnosis hero card ── */
+  .rr-diagnosis-hero {
+    border-top: 3px solid transparent;
+    transition: border-top-color 0.3s, background 0.3s;
+  }
+  .rr-diag-top {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
+  }
+  .rr-diag-emoji { font-size: 36px; line-height: 1; }
+  .rr-diag-label {
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text-faint); margin-bottom: 4px;
+  }
+  .rr-diag-name { font-size: 20px; font-weight: 700; line-height: 1.2; }
+
+  .rr-diag-stats {
+    display: flex; align-items: center;
+    background: var(--bg-card2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px; gap: 0; margin-bottom: 16px;
+  }
+  .rr-diag-stat { flex: 1; text-align: center; }
+  .rr-diag-stat-val { font-size: 22px; font-weight: 700; line-height: 1; }
+  .rr-diag-stat-label { font-size: 11px; color: var(--text-faint); margin-top: 4px; }
+  .rr-diag-divider {
+    width: 1px; height: 36px; background: var(--border); margin: 0 8px;
+  }
+
+  .rr-diag-advice {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 13px; color: var(--text-muted); line-height: 1.55;
+    background: var(--bg-card2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px;
+  }
+
+  /* ── Model list / progress bars ── */
+  .rr-model-list { display: flex; flex-direction: column; gap: 12px; }
+  .rr-model-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .rr-model-emoji { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+  .rr-model-name {
+    width: 68px; font-size: 13px; font-weight: 500; color: var(--text-muted); flex-shrink: 0;
+  }
+  .rr-model-pct {
+    width: 44px; text-align: right; font-size: 13px; font-weight: 600; flex-shrink: 0;
+  }
+
+  .rr-bar-track {
+    height: 6px; border-radius: 3px;
+    background: var(--border); overflow: hidden;
+  }
+  .rr-bar-fill { height: 100%; border-radius: 3px; }
+
+  /* ── Vitals grid ── */
+  .rr-vitals-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .rr-vital {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg-card2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px;
+  }
+  .rr-vital-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .rr-vital-label { font-size: 11px; color: var(--text-faint); margin-bottom: 2px; }
+  .rr-vital-val   { font-size: 16px; font-weight: 700; color: var(--text-main); }
+  .rr-vital-unit  { font-size: 11px; font-weight: 400; color: var(--text-faint); }
+
+  /* ── Summary card ── */
+  .rr-summary {
+    border-left: 3px solid transparent;
+    background: var(--summary-bg) !important;
+  }
+  .rr-summary-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .rr-summary-label { font-size: 11px; color: var(--text-faint); margin-bottom: 4px; }
+  .rr-summary-cat   { font-size: 22px; font-weight: 700; }
+  .rr-summary-ring  { flex-shrink: 0; }
+  .rr-summary-meta  {
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    font-size: 12px; color: var(--text-faint);
+  }
+  .rr-summary-meta strong { color: var(--text-muted); font-weight: 600; }
+
+  /* ── NCM signal cards ── */
+  .rr-signal-cards { display: flex; flex-direction: column; gap: 12px; }
+  .rr-signal-card {
+    background: var(--bg-card2); border: 1px solid var(--border);
+    border-left: 3px solid transparent; border-radius: 12px; padding: 14px;
+  }
+  .rr-signal-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .rr-signal-name  { font-size: 14px; font-weight: 600; color: var(--text-main); }
+  .rr-signal-state { font-size: 12px; margin-top: 2px; font-weight: 500; }
+  .rr-signal-prob  { display: flex; align-items: center; gap: 10px; }
+  .rr-signal-prob > div { flex: 1; }
+  .rr-signal-pct   { font-size: 13px; font-weight: 600; width: 44px; text-align: right; }
+
+  /* ── Data chips ── */
+  .rr-data-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .rr-data-chip {
+    display: flex; flex-direction: column; align-items: center;
+    border: 1px solid; border-radius: 12px; padding: 10px 16px; min-width: 80px;
+    background: var(--bg-card2);
+  }
+  .rr-chip-count { font-size: 18px; font-weight: 700; line-height: 1; }
+  .rr-chip-label { font-size: 11px; margin-top: 4px; color: var(--text-faint); }
+
+  /* ── Empty / loading states ── */
+  .rr-center-state {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 48px 24px; gap: 14px; text-align: center;
+  }
+  .rr-empty-icon {
+    width: 72px; height: 72px; border-radius: 50%; border: 2px solid;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .rr-state-title { font-size: 17px; font-weight: 600; color: var(--text-main); }
+  .rr-state-sub   { font-size: 13px; color: var(--text-faint); }
+
+  /* ── Error box ── */
+  .rr-error {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: var(--error-bg); border: 1px solid var(--error-border);
+    border-radius: 12px; padding: 16px; margin-bottom: 16px;
+  }
+  .rr-error-title { font-size: 14px; font-weight: 600; color: var(--coral); margin-bottom: 4px; }
+  .rr-error-msg   { font-size: 13px; color: var(--text-muted); }
+  .rr-error-hint  { font-size: 12px; color: var(--text-faint); margin-top: 4px; }
+
+  /* ── Buttons ── */
+  .rr-btn-sm {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg-raised); color: var(--text-muted);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    font-family: inherit;
+  }
+  .rr-btn-sm:hover { border-color: var(--teal); color: var(--teal); }
+
+  .rr-btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 22px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, var(--teal), var(--cyan));
+    color: #0b0f1a; font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: opacity 0.2s; font-family: inherit;
+  }
+  .rr-btn-primary:hover { opacity: 0.88; }
+
+  /* ── Disclaimer ── */
+  .rr-disclaimer {
+    font-size: 12px; color: var(--disclaimer-clr); text-align: center;
+    padding: 12px 16px; border-radius: 10px;
+    background: var(--disclaimer-bg); border: 1px solid var(--border);
+    line-height: 1.6;
+  }
+
+  /* ── Mantra banner ── */
+  .mantra-banner {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 20px; text-align: center;
+  }
+  .mantra-symbol    { font-size: 22px; color: var(--teal); display: block; margin-bottom: 6px; }
+  .mantra-text      { font-size: 14px; color: var(--text-muted); font-style: italic; }
+  .mantra-trans-text{ font-size: 12px; color: var(--text-faint); margin-top: 2px; }
+  .mantra-src-text  { font-size: 11px; color: var(--text-faint); margin-top: 2px; letter-spacing: 0.5px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 480px) {
+    .rr-vitals-grid { grid-template-columns: 1fr; }
+    .rr-diag-stats  { flex-wrap: wrap; gap: 12px; }
+    .rr-diag-stat   { flex: 0 0 calc(50% - 10px); }
+    .rr-diag-divider{ display: none; }
+  }
+`;
+
+/* ═══════════════════════════════════════════════════
+   Main Page
+   ═══════════════════════════════════════════════════ */
+
 export default function ResultsPage() {
   const { theme, toggle } = useTheme();
   const [activeTab, setActiveTab] = useState<"dynamic" | "ncm">("dynamic");
@@ -120,7 +459,11 @@ export default function ResultsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen pb-28" style={{ background: "var(--bg-base)" }}>
+      {/* ── Inject theme CSS once ── */}
+      <style dangerouslySetInnerHTML={{ __html: THEME_STYLES }} />
+
+      <div className="min-h-screen pb-28" style={{ background: "var(--bg-base)", transition: "background 0.3s ease" }}>
+
         {/* EKG */}
         <div className="ekg-strip" aria-hidden="true">
           <svg className="ekg-mover" viewBox="0 0 600 44" preserveAspectRatio="none" fill="none" stroke="var(--ekg-color)" strokeWidth="1.2">
@@ -207,26 +550,32 @@ export default function ResultsPage() {
 
                       {/* 1. HERO */}
                       {pred && dInfo && (
-                        <motion.div custom={0} variants={fade} initial="hidden" animate="show"
-                          className="rr-hero" style={{ "--accent": sev.color } as React.CSSProperties}>
-                          <div className="rr-hero-badge" style={{ background: `${sev.color}14`, borderColor: `${sev.color}44`, color: sev.color }}>
-                            <sev.Icon className="w-4 h-4" />
-                            {sev.label}
+                        <motion.div custom={0} variants={fade} initial="hidden" animate="show" className="rr-card rr-diagnosis-hero" style={{ borderTopColor: dInfo.color }}>
+                          <div className="rr-diag-top">
+                            <span className="rr-diag-emoji">{dInfo.emoji}</span>
+                            <div>
+                              <div className="rr-diag-label">Predicted Condition</div>
+                              <div className="rr-diag-name" style={{ color: dInfo.color }}>{pred.final_diagnosis}</div>
+                            </div>
                           </div>
-                          <div className="rr-hero-emoji">{dInfo.emoji}</div>
-                          <h2 className="rr-hero-name" style={{ color: sev.color }}>{pred.final_diagnosis}</h2>
-                          <p className="rr-hero-meaning">{dInfo.meaning}</p>
-                          <div className="rr-hero-rings">
-                            <div className="rr-ring-box">
-                              <RiskRing value={Math.min(pred.confidence, 1)} color={sev.color} />
-                              <span className="rr-ring-label">Confidence</span>
+
+                          <div className="rr-diag-stats">
+                            <div className="rr-diag-stat">
+                              <div className="rr-diag-stat-val" style={{ color: dInfo.color }}>{(confPct * 100).toFixed(0)}%</div>
+                              <div className="rr-diag-stat-label">Confidence</div>
                             </div>
                             <div className="rr-ring-box">
                               <RiskRing value={oRisk} color={oColor} />
                               <span className="rr-ring-label">Overall Risk</span>
                             </div>
                           </div>
-                          <button onClick={runDynamic} className="rr-btn-ghost"><RefreshCw className="w-4 h-4" /> Re-check</button>
+
+                          <div className="rr-diag-advice">
+                            <ArrowRight className="w-4 h-4" style={{ color: dInfo.color, flexShrink: 0, marginTop: 2 }} />
+                            <span>{dInfo.advice}</span>
+                          </div>
+
+                          <button onClick={runDynamic} className="rr-btn-sm" style={{ marginTop: 14 }}><RefreshCw className="w-4 h-4" /> Re-run</button>
                         </motion.div>
                       )}
 
