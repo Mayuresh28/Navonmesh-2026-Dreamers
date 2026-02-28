@@ -21,8 +21,18 @@ const CATEGORIES = [
 
 type CategoryKey = (typeof CATEGORIES)[number]["key"];
 
+/* ── Remedy Type ── */
+type Remedy = {
+  icon: string;
+  name: string;
+  sanskrit: string;
+  desc: string;
+  benefits: string[];
+  when: string;
+};
+
 /* ── Remedies Data ── */
-const REMEDIES: Record<CategoryKey, { icon: string; name: string; sanskrit: string; desc: string; benefits: string[]; when: string }[]> = {
+const REMEDIES: Record<CategoryKey, Remedy[]> = {
   herbal: [
     { icon: "🍵", name: "Ashwagandha", sanskrit: "अश्वगन्धा", desc: "Adaptogenic root that strengthens the body's stress response and promotes vitality.", benefits: ["Reduces cortisol & stress", "Boosts immunity", "Improves sleep quality"], when: "Take 300mg twice daily with warm milk" },
     { icon: "🌱", name: "Tulsi (Holy Basil)", sanskrit: "तुलसी", desc: "Sacred herb revered for its purifying and immune-boosting properties.", benefits: ["Respiratory health", "Blood sugar regulation", "Antimicrobial action"], when: "Brew 5-6 fresh leaves in hot water as tea" },
@@ -80,7 +90,7 @@ export default function RemediesPage() {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("herbal");
   const [diseaseInput, setDiseaseInput] = useState("");
   const [queriedDisease, setQueriedDisease] = useState<string | null>(null);
-  const [aiRemedies, setAiRemedies] = useState<any[]>([]);
+  const [aiRemedies, setAiRemedies] = useState<Remedy[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSendDisease = async () => {
