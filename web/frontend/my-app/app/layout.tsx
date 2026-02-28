@@ -47,8 +47,8 @@ const notoDeva = Noto_Serif_Devanagari({
 });
 
 export const metadata: Metadata = {
-  title: "Dhanvantari — Vedic Health System",
-  description: "Advanced Vedic health monitoring with Ayurvedic intelligence",
+  title: "Dhanvantari — Health System",
+  description: "Advanced health monitoring with Ayurvedic intelligence",
 };
 
 export default function RootLayout({

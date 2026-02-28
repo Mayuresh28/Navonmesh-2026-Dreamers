@@ -26,8 +26,27 @@ function paramToFriendlyName(param: string): string {
     emg: "Muscle Activity",
     temperature: "Body Temperature",
     respiratory_rate: "Breathing Rate",
+    sleep: "Sleep Quality",
+    steps: "Daily Steps",
   };
-  return names[param] || param.replace(/_/g, " ");
+  return names[param] || param.charAt(0).toUpperCase() + param.slice(1).replace(/_/g, " ");
+}
+
+function paramToIcon(param: string): string {
+  const icons: Record<string, string> = {
+    glucose: "🩸", heart_rate: "💓", spo2: "🫁", blood_pressure: "🩺",
+    eeg: "🧠", ecg: "💗", emg: "💪", temperature: "🌡️",
+    respiratory_rate: "🌬️", sleep: "😴", steps: "🚶",
+  };
+  return icons[param] || "📊";
+}
+
+function riskLabel(score: number): string {
+  if (score < 0.15) return "Excellent";
+  if (score < 0.35) return "Good";
+  if (score < 0.50) return "Moderate";
+  if (score < 0.65) return "Elevated";
+  return "High";
 }
 
 function riskToStatus(risk: number): "ok" | "warn" {
@@ -228,7 +247,7 @@ export default function DashboardPage() {
               Dhanvantari
             </span>
             <span style={{ fontSize: "8px", letterSpacing: "3px", color: "var(--text-faint)", textTransform: "uppercase" }}>
-              Health OS
+              Health
             </span>
           </div>
 
@@ -255,7 +274,7 @@ export default function DashboardPage() {
         </header>
 
         {/* ── Hero Score Ring ── */}
-        <section className="flex flex-col items-center gap-0 py-6 px-5">
+        <section className="flex flex-col items-center gap-0 py-4 px-5">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -312,7 +331,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Home Panel Content ── */}
-        <motion.div variants={stagger.container} initial="hidden" animate="show" className="px-5 pb-6">
+        <motion.div variants={stagger.container} initial="hidden" animate="show" className="px-5 pb-4">
 
           {/* Section: Your Health Readings */}
           <motion.div variants={stagger.item} className="dash-sec">
@@ -323,7 +342,7 @@ export default function DashboardPage() {
           </motion.div>
 
           {/* Metric Cards (from real analysis) */}
-          {metricCards.length > 0 ? (
+          {metricCards.length > 0 && (
             <motion.div variants={stagger.item} className="metric-grid">
               {metricCards.map((m, i) => (
                 <div key={i} className={`metric-card ${m.status}`}>
@@ -343,15 +362,6 @@ export default function DashboardPage() {
                   <div className={`mc-trend ${m.tc}`}>{m.trend}</div>
                 </div>
               ))}
-            </motion.div>
-          ) : (
-            <motion.div variants={stagger.item} className="prana-vessel" style={{ textAlign: "center", padding: "32px 20px" }}>
-              <span style={{ fontSize: "36px", display: "block", marginBottom: "12px" }}>📊</span>
-              <div style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: "18px", marginBottom: "8px" }}>No Health Data Yet</div>
-              <div style={{ color: "var(--text-muted)", fontSize: "14px", marginBottom: "16px", lineHeight: "1.6" }}>
-                Upload your health readings to see your personalized health dashboard.
-              </div>
-              <button className="btn-primary" onClick={() => router.push("/dynamic")}>Go to Vitals →</button>
             </motion.div>
           )}
 
@@ -392,46 +402,47 @@ export default function DashboardPage() {
             </>
           )}
 
-          {/* Glow Divider */}
-          <motion.hr variants={stagger.item} className="prana-hr" />
-
           {/* ── Health Overview Chart ── */}
           {analysis && Object.keys(analysis.metrics).length > 0 && (
             <>
+              <motion.hr variants={stagger.item} className="prana-hr" />
               <motion.div variants={stagger.item} className="dash-sec">
                 <div className="dash-sec-title">Health <em>Overview</em></div>
                 <div className="dash-sec-tag">{analysis.overall.parametersCount} readings</div>
               </motion.div>
 
-              <motion.div variants={stagger.item} className="prana-vessel">
-                <div className="vessel-label">Your Health Levels</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "8px 0" }}>
-                  {Object.entries(analysis.metrics).map(([param, data]) => (
-                    <div key={param} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                      <span style={{ width: "120px", fontSize: "12px", color: "var(--text-primary)", fontWeight: 600 }}>
-                        {paramToFriendlyName(param)}
-                      </span>
-                      <div className="prana-pbar" style={{ flex: 1, height: "8px" }}>
-                        <div className={`prana-pbar-fill ${data.riskScore >= 0.50 ? "warn" : "ok"}`}
-                          style={{ width: `${data.riskScore * 100}%`, transition: "width 1.2s cubic-bezier(0.22,1,0.36,1)" }} />
+              <motion.div variants={stagger.item} className="overview-grid">
+                {Object.entries(analysis.metrics).map(([param, data]) => {
+                  const pct = Math.round(data.riskScore * 100);
+                  const status = data.riskScore >= 0.50 ? "warn" : "ok";
+                  return (
+                    <div key={param} className={`overview-row ${status}`}>
+                      <div className="ov-icon">{paramToIcon(param)}</div>
+                      <div className="ov-body">
+                        <div className="ov-top">
+                          <span className="ov-name">{paramToFriendlyName(param)}</span>
+                          <span className={`ov-badge ${status}`}>{riskLabel(data.riskScore)}</span>
+                        </div>
+                        <div className="ov-bar-track">
+                          <div className={`ov-bar-fill ${status}`} style={{ width: `${pct}%` }} />
+                        </div>
+                        <div className="ov-bottom">
+                          <span className="ov-samples">{data.sampleCount} samples</span>
+                          <span className="ov-pct">{pct}%</span>
+                        </div>
                       </div>
-                      <span style={{ fontSize: "12px", color: "var(--text-primary)", minWidth: "40px", textAlign: "right", fontWeight: 600 }}>
-                        {(data.riskScore * 100).toFixed(0)}%
-                      </span>
                     </div>
-                  ))}
-                </div>
-                <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "8px" }}>
-                  Based on {Object.values(analysis.metrics).reduce((s, m) => s + m.sampleCount, 0)} data points
-                </div>
+                  );
+                })}
+              </motion.div>
+              <motion.div variants={stagger.item} className="ov-footer">
+                Based on {Object.values(analysis.metrics).reduce((s, m) => s + m.sampleCount, 0)} data points across {analysis.overall.parametersCount} parameters
               </motion.div>
             </>
           )}
 
-          {/* Glow Divider */}
-          <motion.hr variants={stagger.item} className="prana-hr" />
-
           {/* Health Insights */}
+          <motion.hr variants={stagger.item} className="prana-hr" />
           <motion.div variants={stagger.item} className="dash-sec">
             <div className="dash-sec-title">Health <em>Insights</em></div>
           </motion.div>

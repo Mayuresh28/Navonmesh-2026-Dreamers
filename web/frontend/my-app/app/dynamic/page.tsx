@@ -9,6 +9,7 @@ import { ManualForm, FileState } from "@/components/vitals/manual-form";
 import { AutosyncView } from "@/components/vitals/autosync-view";
 import { HealthCard } from "@/components/vitals/health-card";
 import { OverallSummary } from "@/components/vitals/overall-summary";
+import { BottomNav } from "@/components/navigation/bottom-nav";
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    MAIN PAGE
@@ -231,6 +232,8 @@ export default function HealthDashboard() {
                     </div>
                 </div>
             )}
+
+            <BottomNav />
         </div>
     );
 }

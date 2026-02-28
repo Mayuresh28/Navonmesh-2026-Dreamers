@@ -291,7 +291,7 @@
 
 /* ═══ DIVIDER ═══ */
 .prana-hr {
-  border: none; height: 1.5px; margin: 20px 0;
+  border: none; height: 1.5px; margin: 12px 0;
   background: linear-gradient(90deg, transparent, var(--teal-dim), var(--cyan-dim), transparent);
   opacity: 0.4;
 }
@@ -463,7 +463,7 @@
 .status-row {
   display: flex; gap: 8px; flex-wrap: wrap;
   justify-content: center;
-  padding: 16px 20px 0;
+  padding: 8px 20px 0;
 }
 .status-pill {
   display: flex; align-items: center; gap: 6px;
@@ -517,8 +517,10 @@
 /* ── Dashboard Section Header ── */
 .dash-sec {
   display: flex; align-items: center;
-  justify-content: space-between;
-  margin: 20px 0 12px;
+  justify-content: center;
+  gap: 12px;
+  margin: 16px 0 10px;
+  padding: 0 8px;
 }
 .dash-sec-title {
   font-family: var(--font-playfair, 'Playfair Display', serif);
@@ -649,7 +651,570 @@
   .mc-value { font-size: 36px; }
   .dash-sec-title { font-size: 24px; }
 }
+
 } /* end @layer components — dashboard */
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   HEALTH OVERVIEW GRID  (outside @layer so it always wins specificity)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+.overview-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+.overview-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  background: var(--bg-card) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 16px !important;
+  padding: 14px 16px !important;
+  box-shadow: var(--card-shadow) !important;
+  transition: transform 0.18s cubic-bezier(0.22,1,0.36,1), border-color 0.18s, box-shadow 0.18s;
+}
+.overview-row:hover { transform: translateY(-1px); }
+.overview-row.ok   { border-color: var(--ok-border) !important; }
+.overview-row.warn { border-color: var(--warn-border) !important; }
+
+.ov-icon {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 20px !important;
+  flex-shrink: 0 !important;
+}
+.overview-row.ok .ov-icon   { background: var(--ok-bg) !important; }
+.overview-row.warn .ov-icon { background: var(--warn-bg) !important; }
+
+.ov-body {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+.ov-top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 8px !important;
+}
+.ov-name {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  letter-spacing: 0.3px;
+}
+.ov-badge {
+  font-size: 9px !important;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 8px !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  white-space: nowrap;
+}
+.ov-badge.ok   { color: var(--ok-text) !important; background: var(--ok-bg) !important; border: 1px solid var(--ok-border) !important; }
+.ov-badge.warn { color: var(--warn-text) !important; background: var(--warn-bg) !important; border: 1px solid var(--warn-border) !important; }
+
+.ov-bar-track {
+  width: 100% !important;
+  height: 7px !important;
+  border-radius: 7px !important;
+  background: var(--border) !important;
+  overflow: hidden !important;
+}
+.ov-bar-fill {
+  height: 100% !important;
+  border-radius: 7px !important;
+  transition: width 1.4s cubic-bezier(0.22,1,0.36,1);
+}
+.ov-bar-fill.ok {
+  background: linear-gradient(90deg, #09b885 0%, #0de5a8 60%, #18d8f5 100%) !important;
+  box-shadow: 0 0 8px rgba(13, 229, 168, 0.3);
+}
+.ov-bar-fill.warn {
+  background: linear-gradient(90deg, #d4820a 0%, #ffb83f 60%, #ffe08a 100%) !important;
+  box-shadow: 0 0 8px rgba(255, 184, 63, 0.3);
+}
+
+.ov-bottom {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-top: 6px !important;
+}
+.ov-samples {
+  font-size: 10px !important;
+  color: var(--text-faint) !important;
+  font-weight: 500;
+}
+.ov-pct {
+  font-family: var(--font-playfair, 'Playfair Display', serif);
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+}
+.ov-footer {
+  font-size: 11px !important;
+  color: var(--text-muted) !important;
+  text-align: center !important;
+  margin-top: 10px;
+  padding: 8px 0;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+@media (min-width: 768px) {
+  .overview-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   DASHBOARD — WELCOME BANNER, QUICK ACTIONS, REMEDIES PAGE
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@layer components {
+
+/* ── Welcome Banner ── */
+.dash-welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 20px;
+  padding: 20px 22px;
+  background: linear-gradient(135deg, var(--teal-bg) 0%, rgba(24,216,245,0.06) 100%);
+  border: 1px solid var(--border-accent);
+  border-radius: 22px;
+  position: relative;
+  overflow: hidden;
+}
+.dash-welcome::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -20%;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--teal-glow) 0%, transparent 70%);
+  opacity: 0.5;
+}
+.dash-welcome-text { position: relative; z-index: 1; }
+.dash-welcome-greeting {
+  font-family: var(--font-playfair, 'Playfair Display', serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.dash-welcome-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.dash-welcome-icon {
+  font-size: 42px;
+  opacity: 0.25;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Quick Action Cards ── */
+.dash-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 16px 20px 0;
+}
+.dash-action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 8px 14px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
+}
+.dash-action-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2.5px;
+  border-radius: 18px 18px 0 0;
+}
+.dash-action-card.ok::before   { background: linear-gradient(90deg, #09b885, #0de5a8); }
+.dash-action-card.blue::before { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+.dash-action-card.warn::before { background: linear-gradient(90deg, #d4820a, #ffb83f); }
+.dash-action-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-accent);
+  box-shadow: var(--card-shadow), 0 4px 20px var(--teal-glow);
+}
+.dash-action-card:active { transform: scale(0.96); }
+.dash-action-icon {
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+}
+.dash-action-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.3;
+  white-space: pre-line;
+}
+
+/* ═══ REMEDIES PAGE ═══ */
+
+/* Hero Banner */
+.remedy-hero {
+  position: relative;
+  padding: 28px 20px 20px;
+  text-align: center;
+  overflow: hidden;
+}
+.remedy-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--teal-bg) 0%, rgba(24,216,245,0.06) 50%, var(--bg-base) 100%);
+  border-bottom: 1px solid var(--border);
+}
+.remedy-hero-inner { position: relative; z-index: 1; }
+.remedy-hero-title {
+  font-family: var(--font-playfair, 'Playfair Display', serif);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.remedy-hero-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 400px;
+  margin: 0 auto;
+}
+.remedy-dosha-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--ok-bg);
+  border: 1.5px solid var(--ok-border);
+  color: var(--ok-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Category Tabs */
+.remedy-tabs-wrap {
+  padding: 12px 20px 0;
+  position: sticky;
+  top: 58px;
+  z-index: 40;
+}
+.remedy-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 5px;
+  backdrop-filter: blur(16px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.remedy-tabs::-webkit-scrollbar { display: none; }
+.remedy-tab {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 8px 8px;
+  border-radius: 11px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-syne, 'Syne', sans-serif);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-faint);
+  transition: color 0.18s, background 0.18s;
+  white-space: nowrap;
+}
+.remedy-tab.active {
+  background: linear-gradient(135deg, rgba(13,229,168,0.18), rgba(24,216,245,0.12));
+  color: var(--teal);
+  border: 1px solid var(--ok-border);
+}
+.remedy-tab:hover:not(.active) {
+  color: var(--text-muted);
+  background: var(--bg-raised);
+}
+
+/* Remedy Card Grid */
+.remedy-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .remedy-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 1024px) {
+  .remedy-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Individual Remedy Card */
+.remedy-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s;
+}
+.remedy-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--teal), var(--cyan), transparent);
+  opacity: 0.5;
+}
+.remedy-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-accent);
+}
+.remedy-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.remedy-card-icon {
+  font-size: 28px;
+  width: 48px; height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: var(--teal-bg);
+  border: 1px solid var(--border-accent);
+  flex-shrink: 0;
+}
+.remedy-card-name {
+  font-family: var(--font-playfair, 'Playfair Display', serif);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.remedy-card-sanskrit {
+  font-size: 12px;
+  color: var(--teal);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+.remedy-card-desc {
+  font-size: 13px;
+  color: var(--text-body);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.remedy-card-benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.remedy-benefit-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: var(--ok-bg);
+  color: var(--ok-text);
+  border: 1px solid var(--ok-border);
+  letter-spacing: 0.3px;
+}
+.remedy-card-when {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  line-height: 1.5;
+}
+
+/* ── Responsive: dashboard actions ── */
+@media (max-width: 380px) {
+  .dash-actions { grid-template-columns: repeat(2, 1fr); }
+  .dash-action-icon { width: 40px; height: 40px; font-size: 22px; }
+  .dash-welcome-greeting { font-size: 18px; }
+  .remedy-hero-title { font-size: 22px; }
+}
+@media (min-width: 768px) {
+  .dash-welcome { margin: 0 auto; max-width: 720px; }
+  .dash-actions { max-width: 720px; margin: 16px auto 0; }
+}
+
+} /* end @layer components — dashboard extensions */
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   FLOATING DOCK NAVBAR
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.floating-dock-wrapper {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.floating-dock {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 22px;
+  border: 1px solid var(--border-strong);
+  background: rgba(6, 13, 24, 0.92);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.35),
+    0 2px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .floating-dock {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px solid rgba(0, 100, 50, 0.22);
+  box-shadow:
+    0 8px 40px rgba(0, 60, 30, 0.14),
+    0 2px 12px rgba(0, 60, 30, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* ── Dock Icon Button ── */
+.dock-icon-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 2px solid var(--border-strong);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+.dock-icon-btn:hover {
+  background: var(--bg-raised);
+}
+.dock-icon-btn.dock-active {
+  background: var(--bg-raised);
+}
+
+/* ── Icon inner ── */
+.dock-icon-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* ── Tooltip ── */
+.dock-tooltip {
+  position: absolute;
+  left: 50%;
+  top: -38px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: var(--font-syne, 'Syne', sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+.dock-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: var(--bg-card);
+  border-right: 1.5px solid var(--border-strong);
+  border-bottom: 1.5px solid var(--border-strong);
+}
+
+/* ── Active dot indicator ── */
+.dock-active-dot {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+/* ── Responsive ── */
+@media (max-width: 380px) {
+  .floating-dock-wrapper {
+    bottom: 12px;
+  }
+  .floating-dock {
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 18px;
+  }
+}
+@media (min-width: 768px) {
+  .floating-dock {
+    gap: 16px;
+    padding: 12px 20px;
+    border-radius: 26px;
+  }
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    LANDING PAGE — PRĀṆA VEDIC HEALTH OS
