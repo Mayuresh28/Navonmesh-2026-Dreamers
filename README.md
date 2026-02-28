@@ -1,5 +1,10 @@
 # धन्वंतरी (Dhanvantari)
 
+###Login Credentials : 
+
+##Username : test@dhanvantari.dev
+##Password : test1234
+
 ## Preventive Health Monitoring & Early Risk Detection Platform
 
 > Built for **Navonmesh Hackathon 2026** — addressing the growing need for continuous preventive health monitoring and early risk detection in India.
