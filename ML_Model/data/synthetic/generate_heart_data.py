@@ -51,5 +51,7 @@ df = pd.DataFrame({
     "HeartDisease": heart_risk
 })
 
-df.to_csv("heart_synthetic_10k.csv", index=False)
-print("Heart dataset generated!")
+import os
+os.makedirs(".", exist_ok=True)
+df.to_csv("./heart_synthetic_10k.csv", index=False)
+print("✅ Heart dataset generated! (10000 rows)")

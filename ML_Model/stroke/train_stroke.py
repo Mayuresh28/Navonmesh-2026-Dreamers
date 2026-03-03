@@ -14,6 +14,15 @@ Fix:
 
 Run from ML_Model/stroke/
 """
+import sys
+import os
+
+# Set UTF-8 encoding for Windows console
+if sys.platform == 'win32':
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+
 import numpy as np
 import pandas as pd
 import joblib

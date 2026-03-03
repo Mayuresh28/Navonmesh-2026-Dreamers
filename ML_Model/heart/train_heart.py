@@ -14,7 +14,10 @@ import joblib
 import sys
 import os
 
-sys.path.append(os.path.abspath("../"))
+# Add parent directory to path for imports
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, parent_dir)
+
 from utils.preprocessing import preprocess_heart
 
 # =============================

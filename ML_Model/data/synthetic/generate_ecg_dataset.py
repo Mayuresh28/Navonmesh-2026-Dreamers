@@ -40,7 +40,7 @@ df = pd.DataFrame({
     "ECG_Abnormal": ecg_abnormal
 })
 
-os.makedirs("../data", exist_ok=True)
-df.to_csv("../data/ecg_synthetic_10k.csv", index=False)
+os.makedirs("../data/data", exist_ok=True)
+df.to_csv("../data/data/ecg_synthetic_10k.csv", index=False)
 
-print("ECG dataset generated!")
+print("✅ ECG dataset generated! (10000 rows)")

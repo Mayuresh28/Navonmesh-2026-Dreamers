@@ -49,5 +49,7 @@ df = pd.DataFrame({
     "Diabetes": diabetes_risk
 })
 
-df.to_csv("diabetes_synthetic_10k.csv", index=False)
-print("Diabetes dataset generated!")
+import os
+os.makedirs(".", exist_ok=True)
+df.to_csv("./diabetes_synthetic_10k.csv", index=False)
+print("✅ Diabetes dataset generated! (10000 rows)")
