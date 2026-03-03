@@ -28,7 +28,10 @@ from utils.preprocessing_stroke import preprocess_stroke
 
 heart_model = joblib.load("heart/heart_model.pkl")["model"]
 diabetes_model = joblib.load("diabetes/diabetes_model.pkl")["model"]
-stroke_model = joblib.load("stroke/stroke_model.pkl")["model"]
+
+stroke_data = joblib.load("stroke/stroke_model.pkl")
+stroke_model = stroke_data["model"]
+stroke_scaler = stroke_data["scaler"]
 
 ecg_data = joblib.load("./ECG/ECG_model.pkl")
 eeg_data = joblib.load("./EEG/EEG_model.pkl")
@@ -96,7 +99,8 @@ def predict(data: PatientInput):
 
     heart_input = preprocess_heart(input_df.copy())
     diabetes_input = preprocess_diabetes(input_df.copy())
-    stroke_input = preprocess_stroke(input_df.copy())
+    stroke_input_raw = preprocess_stroke(input_df.copy())
+    stroke_input = pd.DataFrame(stroke_scaler.transform(stroke_input_raw), columns=stroke_input_raw.columns)
 
     heart_prob = heart_model.predict_proba(heart_input)[0][1]
     diabetes_prob = diabetes_model.predict_proba(diabetes_input)[0][1]
